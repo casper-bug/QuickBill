@@ -1,1 +1,1249 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBill - Order Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <link rel="manifest" href="/quickbill-app/manifest.json" />
+    <link rel="apple-touch-icon" href="/quickbill-app/icons/icon-192x192.png" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+        /* Custom styles for better aesthetics and mobile handling */
+        .container {
+            max-width: 1280px; /* Equivalent to max-w-7xl */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .shadow-md {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-lg {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-xl {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+        .rounded-md {
+            border-radius: 0.375rem;
+        }
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out forwards;
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        /* Hide pages by default, JavaScript will show the active one */
+        .page-content {
+            display: none;
+        }
+        /* Style for active navigation button */
+        .nav-button.active {
+            background-color: white;
+            color: black;
+        }
+
+        /* Specific styles for tables on small screens */
+        @media (max-width: 639px) { /* Tailwind's 'sm' breakpoint */
+            table th, table td {
+                padding-left: 0.5rem; /* px-2 */
+                padding-right: 0.5rem; /* px-2 */
+                font-size: 0.75rem; /* text-xs */
+            }
+            table input[type="checkbox"] {
+                height: 1rem; /* h-4 */
+                width: 1rem; /* w-4 */
+            }
+            .flex-col-sm-row {
+                flex-direction: column;
+            }
+            .gap-1-sm-gap-2 > *:not(:first-child) {
+                margin-top: 0.25rem; /* gap-1 */
+            }
+            .sm\:text-sm {
+                font-size: 0.875rem; /* text-sm */
+            }
+            .sm\:text-base {
+                font-size: 1rem; /* text-base */
+            }
+        }
+        @media (min-width: 640px) { /* Tailwind's 'sm' breakpoint */
+            .flex-col-sm-row {
+                flex-direction: row;
+            }
+            .gap-1-sm-gap-2 > *:not(:first-child) {
+                margin-left: 0.5rem; /* gap-2 */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white text-black font-sans flex flex-col">
+
+    <div id="message-display" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center justify-between animate-fade-in-down hidden">
+        <span id="message-text"></span>
+        <button id="message-close-btn" class="ml-4 text-white hover:text-gray-300 font-bold">&times;</button>
+    </div>
+
+    <header class="bg-black text-white p-4 shadow-md">
+        <nav class="flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto">
+            <h1 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">QuickBill</h1>
+            <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <button id="nav-allOrders" class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors active">
+                    All Orders
+                </button>
+                <button id="nav-addOrder" class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
+                    Add New Bill
+                </button>
+                <button id="nav-notes" class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
+                    Notes
+                </button>
+                <button id="nav-settings" class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
+                    Settings
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow">
+        <div id="page-allOrders" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">All Orders</h2>
+            <div class="mb-8">
+                <h3 class="text-xl sm:text-2xl font-semibold mb-4 border-b pb-2">Active Orders</h3>
+                <div id="active-orders-list">
+                    <p class="text-gray-600">No active orders found. Start by adding a new order!</p>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-xl sm:text-2xl font-semibold mb-4 border-b pb-2">Completed Orders</h3>
+                <div id="completed-orders-list">
+                    <p class="text-gray-600">No completed orders yet.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-addOrder" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Create New Bill</h2>
+            <form id="add-order-form" class="max-w-3xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md">
+                <div class="mb-4">
+                    <label for="buyerName" class="block text-sm font-medium text-gray-700 mb-1">Buyer Name:</label>
+                    <input
+                        type="text"
+                        id="buyerName"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Enter buyer's name"
+                        required
+                    />
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3">Products:</h3>
+                <div class="overflow-x-auto mb-4">
+                    <table id="products-table" class="min-w-full bg-white border border-gray-200 rounded-md">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Product</th>
+                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Qty</th>
+                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Price/Unit</th>
+                                <th class="py-2 px-3 text-right text-xs sm:text-sm font-semibold uppercase">Total</th>
+                                <th class="py-2 px-3 text-center text-xs sm:text-sm font-semibold uppercase"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <button
+                    type="button"
+                    id="add-item-row-btn"
+                    class="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors shadow-md flex items-center justify-center mb-6"
+                >
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Add Row
+                </button>
+
+                <div class="text-right text-xl font-bold mb-6 pr-2">
+                    Grand Total: ₹<span id="grand-total">0.00</span>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-black text-white px-4 py-3 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+                >
+                    Save Bill
+                </button>
+            </form>
+        </div>
+
+        <div id="page-notes" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Notes</h2>
+
+            <div class="max-w-xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-3">Add New Note</h3>
+                <textarea
+                    id="new-note-content"
+                    rows="4"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mb-4"
+                    placeholder="Write your note here..."
+                ></textarea>
+                <button
+                    id="add-note-btn"
+                    class="w-full bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+                >
+                    Add Note
+                </button>
+            </div>
+
+            <div class="max-w-xl mx-auto">
+                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Your Notes</h3>
+                <div id="notes-list" class="space-y-4">
+                    <p class="text-gray-600">No notes yet. Add one above!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-settings" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Settings</h2>
+            <form id="settings-form" class="max-w-md mx-auto bg-gray-50 p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-3">Company Details</h3>
+                <div class="mb-4">
+                    <label for="companyName" class="block text-sm font-medium text-gray-700 mb-1">Company Name:</label>
+                    <input
+                        type="text"
+                        id="companyName"
+                        name="companyName"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Your Company Name"
+                    />
+                </div>
+                <div class="mb-4">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address:</label>
+                    <textarea
+                        id="address"
+                        name="address"
+                        rows="3"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Your Company Address"
+                    ></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone:</label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Your Phone Number"
+                    />
+                </div>
+                <div class="mb-6">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Your Email Address"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="w-full bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+                >
+                    Save Settings
+                </button>
+
+                <h3 class="text-xl font-semibold mt-8 mb-3 border-t pt-4">Data Management</h3>
+                <div class="flex flex-col gap-4">
+                    <button
+                        type="button"
+                        id="export-data-btn"
+                        class="w-full bg-gray-700 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+                    >
+                        Export All Data (JSON)
+                    </button>
+                    <input
+                        type="file"
+                        id="import-file-input"
+                        accept=".json"
+                        class="hidden"
+                    />
+                    <button
+                        type="button"
+                        id="import-data-btn"
+                        class="w-full bg-gray-700 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg"
+                    >
+                        Import Data (JSON)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-black text-white text-center p-3 text-sm mt-8">
+        <p>&copy; <span id="current-year"></span> QuickBill. All rights reserved.</p>
+        <p id="user-id-display" class="text-xs text-gray-400"></p>
+    </footer>
+
+    <div id="bill-to-print" class="hidden"></div>
+
+    <script type="module">
+        // Firebase imports (using module syntax for direct browser use)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Global variables for Firebase config and app ID (provided by Canvas environment)
+        // These are placeholders for the Canvas environment. When deploying, you might hardcode them
+        // or inject them via your build process if not using a Canvas-like environment.
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- Global State ---
+        let auth = null;
+        let userId = null;
+        let isAuthReady = false;
+        let currentPage = 'allOrders';
+        let orders = [];
+        let completedOrders = [];
+        let notes = [];
+        let companyDetails = {
+            companyName: '',
+            address: '',
+            phone: '',
+            email: ''
+        };
+        let messageTimeout = null;
+
+        // --- Helper functions for Local Storage ---
+        const getLocalStorageKey = (key, currentUserId) => `quickbill-${currentUserId}-${key}`;
+
+        const loadDataFromLocalStorage = (key, currentUserId, defaultValue) => {
+            try {
+                const data = localStorage.getItem(getLocalStorageKey(key, currentUserId));
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (error) {
+                console.error(`Error loading ${key} from local storage:`, error);
+                return defaultValue;
+            }
+        };
+
+        const saveDataToLocalStorage = (key, currentUserId, data) => {
+            try {
+                localStorage.setItem(getLocalStorageKey(key, currentUserId), JSON.stringify(data));
+            } catch (error) {
+                console.error(`Error saving ${key} to local storage:`, error);
+            }
+        };
+
+        // --- Message Display Functions ---
+        const messageDisplay = document.getElementById('message-display');
+        const messageText = document.getElementById('message-text');
+        const messageCloseBtn = document.getElementById('message-close-btn');
+
+        const showMessage = (msg) => {
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+            }
+            messageText.textContent = msg;
+            messageDisplay.classList.remove('hidden');
+            messageTimeout = setTimeout(() => {
+                messageDisplay.classList.add('hidden');
+            }, 3000);
+        };
+
+        messageCloseBtn.addEventListener('click', () => {
+            messageDisplay.classList.add('hidden');
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+            }
+        });
+
+        // --- Core Application Logic ---
+
+        // Function to render the current page
+        const renderPage = (pageId) => {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(`page-${pageId}`).style.display = 'block';
+
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`nav-${pageId}`).classList.add('active');
+
+            currentPage = pageId; // Update global state
+            // Re-render content specific to the page if needed
+            if (pageId === 'allOrders') {
+                renderAllOrders();
+            } else if (pageId === 'notes') {
+                renderNotes();
+            } else if (pageId === 'settings') {
+                renderSettings();
+            } else if (pageId === 'addOrder') {
+                renderAddOrderForm();
+            }
+        };
+
+        // --- All Orders Page Logic ---
+        const renderAllOrders = () => {
+            const activeOrdersList = document.getElementById('active-orders-list');
+            const completedOrdersList = document.getElementById('completed-orders-list');
+
+            activeOrdersList.innerHTML = ''; // Clear previous content
+            completedOrdersList.innerHTML = ''; // Clear previous content
+
+            if (orders.length === 0) {
+                activeOrdersList.innerHTML = '<p class="text-gray-600">No active orders found. Start by adding a new order!</p>';
+            } else {
+                activeOrdersList.innerHTML = `
+                    <div class="overflow-x-auto rounded-lg shadow-md">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Buyer Name</th>
+                                    <th class="py-3 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Date</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Seen</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Delivered</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Actions</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-orders-tbody"></tbody>
+                        </table>
+                    </div>
+                `;
+                const tbody = activeOrdersList.querySelector('#active-orders-tbody');
+                orders.forEach(order => {
+                    tbody.innerHTML += createOrderRow(order);
+                });
+            }
+
+            if (completedOrders.length === 0) {
+                completedOrdersList.innerHTML = '<p class="text-gray-600">No completed orders yet.</p>';
+            } else {
+                completedOrdersList.innerHTML = `
+                    <div class="overflow-x-auto rounded-lg shadow-md">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Buyer Name</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Date</th>
+                                    <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Actions</th>
+                                    <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="completed-orders-tbody"></tbody>
+                        </table>
+                    </div>
+                `;
+                const tbody = completedOrdersList.querySelector('#completed-orders-tbody');
+                completedOrders.forEach(order => {
+                    tbody.innerHTML += createOrderRow(order, true); // Pass true for completed orders
+                });
+            }
+
+            // Attach event listeners after rendering
+            attachOrderEventListeners();
+        };
+
+        const createOrderRow = (order, isCompleted = false) => {
+            const orderDate = new Date(order.orderDate); // Ensure it's a Date object
+            const isExpanded = order.isExpanded || false; // Use a property on the order object for expansion state
+
+            let actionsHtml = '';
+            if (isCompleted) {
+                actionsHtml = `
+                    <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                        Export Photo
+                    </button>
+                    <button onclick="handlePrintBill('${order.id}', 'pdf')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                        Export PDF
+                    </button>
+                    <button onclick="handleToggleDelivered('${order.id}', true)" class="bg-gray-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors shadow-sm">
+                        Move to Active
+                    </button>
+                `;
+            } else {
+                actionsHtml = `
+                    <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                        Photo
+                    </button>
+                    <button onclick="handlePrintBill('${order.id}', 'pdf')" class="bg-black text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                        PDF
+                    </button>
+                `;
+            }
+
+            return `
+                <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
+                    <td class="py-3 px-2 text-sm">${order.buyerName}</td>
+                    <td class="py-3 px-2 text-sm">${orderDate.toLocaleDateString()}</td>
+                    ${!isCompleted ? `
+                    <td class="py-3 px-2 text-center">
+                        <input type="checkbox" ${order.isSeen ? 'checked' : ''} onchange="handleToggleSeen('${order.id}', ${order.isSeen})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0" />
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                        <input type="checkbox" ${order.isDelivered ? 'checked' : ''} onchange="handleToggleDelivered('${order.id}', ${order.isDelivered})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0" />
+                    </td>
+                    ` : ''}
+                    <td class="py-3 px-2 text-center flex flex-col-sm-row gap-1-sm-gap-2 justify-center items-center">
+                        ${actionsHtml}
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                        <button onclick="handleToggleExpand('${order.id}')" class="text-gray-600 hover:text-black focus:outline-none transition-transform duration-200 p-1">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 inline-block transform ${isExpanded ? 'rotate-180' : 'rotate-0'}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+                ${isExpanded ? `
+                <tr>
+                    <td colspan="${isCompleted ? '5' : '7'}" class="p-2 sm:p-4 bg-gray-100 border-t border-gray-200">
+                        <h4 class="font-semibold mb-2 text-sm sm:text-base">Bill Details for ${order.buyerName}:</h4>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full bg-white border border-gray-300 rounded-md text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="bg-gray-200">
+                                        <th class="py-2 px-2 text-left">Product</th>
+                                        <th class="py-2 px-2 text-left">Qty</th>
+                                        <th class="py-2 px-2 text-left">Price/Unit</th>
+                                        <th class="py-2 px-2 text-right">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.items.map(item => `
+                                        <tr class="border-b border-gray-100 last:border-b-0">
+                                            <td class="py-2 px-2">${item.product}</td>
+                                            <td class="py-2 px-2">${item.quantity}</td>
+                                            <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
+                                            <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-right font-bold mt-2 pr-2 text-sm sm:text-base">
+                            Grand Total: ₹${order.grandTotal.toFixed(2)}
+                        </div>
+                    </td>
+                </tr>
+                ` : ''}
+            `;
+        };
+
+        const attachOrderEventListeners = () => {
+            // Re-render all orders to ensure event listeners are correctly attached
+            // This is a simpler approach for a single HTML file, though less efficient than React's diffing.
+            // For production, you might use event delegation or more targeted updates.
+            // However, the `onclick` attributes directly in the HTML string are already handling this.
+        };
+
+        window.handleToggleExpand = (orderId) => {
+            const targetOrder = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
+            if (targetOrder) {
+                targetOrder.isExpanded = !targetOrder.isExpanded; // Toggle the property
+                renderAllOrders(); // Re-render to reflect change
+            }
+        };
+
+        window.handleToggleSeen = (orderId, currentStatus) => {
+            const orderIndex = orders.findIndex(order => order.id === orderId);
+            if (orderIndex > -1) {
+                orders[orderIndex].isSeen = !currentStatus;
+                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({...o, orderDate: o.orderDate.toISOString()})));
+                showMessage(`Order ${orderId} marked as ${!currentStatus ? 'seen' : 'unseen'}.`);
+                renderAllOrders();
+            }
+        };
+
+        window.handleToggleDelivered = (orderId, currentStatus) => {
+            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(order => order.id === orderId);
+            if (!orderToMove) return;
+
+            const newStatus = !currentStatus;
+            const updatedOrder = { ...orderToMove, isDelivered: newStatus };
+
+            if (newStatus) { // Moving to completed
+                orders = orders.filter(order => order.id !== orderId);
+                completedOrders.push(updatedOrder);
+                completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            } else { // Moving to active
+                completedOrders = completedOrders.filter(order => order.id !== orderId);
+                orders.push(updatedOrder);
+                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            }
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({...o, orderDate: o.orderDate.toISOString()})));
+            showMessage(`Order ${orderId} marked as ${newStatus ? 'delivered' : 'active'}.`);
+            renderAllOrders();
+        };
+
+        window.handlePrintBill = async (orderId, format) => {
+            const order = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
+            if (!order) {
+                showMessage("Order not found for printing.");
+                return;
+            }
+
+            // Check if libraries are truly loaded before proceeding
+            if (typeof window.html2canvas === 'undefined' || typeof window.jsPDF === 'undefined') {
+                showMessage("PDF/Image export libraries are still not loaded. Please ensure their CDNs are accessible.");
+                console.error("html2canvas or jsPDF not found. They need to be loaded via CDN for this functionality.");
+                return;
+            }
+
+            const billToPrintDiv = document.getElementById('bill-to-print');
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+
+            billToPrintDiv.innerHTML = `
+                <div class="p-8 bg-white text-black rounded-lg shadow-xl w-full max-w-a4 mx-auto" style="min-height: 297mm; width: 210mm;">
+                    <h1 class="text-3xl font-bold text-center mb-6">${companyDetails.companyName || 'Your Company Name'}</h1>
+                    <div class="text-sm text-center mb-8">
+                        <p>${companyDetails.address || 'Your Company Address'}</p>
+                        <p>Phone: ${companyDetails.phone || 'N/A'} | Email: ${companyDetails.email || 'N/A'}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-300 pb-4">
+                        <div>
+                            <p class="font-semibold text-lg">Bill To:</p>
+                            <p class="text-xl font-bold">${order.buyerName}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm">Date: ${new Date(order.orderDate).toLocaleDateString(undefined, dateOptions)}</p>
+                            <p class="text-sm">Time: ${new Date(order.orderDate).toLocaleTimeString(undefined, timeOptions)}</p>
+                            <p class="text-sm">Order ID: ${order.id || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <table class="min-w-full bg-white border border-gray-300 mb-8">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-300">
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Product</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Quantity</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Price/Unit</th>
+                                <th class="py-3 px-4 text-right text-sm font-semibold uppercase">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.items.map((item, index) => `
+                                <tr class="border-b border-gray-200 last:border-b-0">
+                                    <td class="py-3 px-4 text-base">${item.product}</td>
+                                    <td class="py-3 px-4 text-base">${item.quantity}</td>
+                                    <td class="py-3 px-4 text-base">₹${item.pricePerUnit.toFixed(2)}</td>
+                                    <td class="py-3 px-4 text-right text-base">₹${item.total.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end pr-4 text-xl font-bold">
+                        <p>Grand Total: ₹${order.grandTotal.toFixed(2)}</p>
+                    </div>
+
+                    <div class="mt-12 text-center text-sm text-gray-600">
+                        <p>Thank you for your business!</p>
+                        <p>This is a computer generated bill and does not require a signature.</p>
+                    </div>
+                </div>
+            `;
+            billToPrintDiv.classList.remove('hidden'); // Make it visible for html2canvas
+
+            try {
+                // FIX: Explicitly use window.html2canvas
+                const canvas = await window.html2canvas(billToPrintDiv.firstElementChild, { // Target the inner div
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                });
+
+                if (format === 'photo') {
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = `${order.buyerName}_Bill_${new Date(order.orderDate).toLocaleDateString()}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showMessage("Bill exported as photo!");
+                } else if (format === 'pdf') {
+                    const imgData = canvas.toDataURL('image/png');
+                    const pdf = new window.jsPDF('p', 'mm', 'a4');
+                    const imgWidth = 210;
+                    const pageHeight = 297;
+                    const imgHeight = canvas.height * imgWidth / canvas.width;
+                    let heightLeft = imgHeight;
+                    let position = 0;
+
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+
+                    while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                    }
+                    pdf.save(`${order.buyerName}_Bill_${new Date(order.orderDate).toLocaleDateString()}.pdf`);
+                    showMessage("Bill exported as PDF!");
+                }
+            } catch (error) {
+                console.error("Error generating bill:", error);
+                showMessage("Failed to generate bill. Please try again.");
+            } finally {
+                billToPrintDiv.classList.add('hidden'); // Hide it again
+                billToPrintDiv.innerHTML = ''; // Clear content
+            }
+        };
+
+        // --- Add Order Page Logic ---
+        const addOrderForm = document.getElementById('add-order-form');
+        const buyerNameInput = document.getElementById('buyerName');
+        const productsTableBody = document.querySelector('#products-table tbody');
+        const addItemRowBtn = document.getElementById('add-item-row-btn');
+        const grandTotalSpan = document.getElementById('grand-total');
+
+        let currentItems = []; // Local state for the form
+
+        const renderAddOrderForm = () => {
+            // Reset form fields
+            buyerNameInput.value = '';
+            currentItems = [{ product: '', quantity: 1, pricePerUnit: 0, total: 0 }];
+            updateProductsTable();
+            calculateAndDisplayGrandTotal();
+        };
+
+        const updateProductsTable = () => {
+            productsTableBody.innerHTML = '';
+            currentItems.forEach((item, index) => {
+                const row = productsTableBody.insertRow();
+                row.innerHTML = `
+                    <td class="py-2 px-3">
+                        <input type="text" data-field="product" data-index="${index}" value="${item.product}"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
+                            placeholder="Product Name" required />
+                    </td>
+                    <td class="py-2 px-3">
+                        <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity}"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
+                            min="1" required />
+                    </td>
+                    <td class="py-2 px-3">
+                        <input type="number" data-field="pricePerUnit" data-index="${index}" step="0.01" value="${item.pricePerUnit}"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
+                            min="0" required />
+                    </td>
+                    <td class="py-2 px-3 text-right font-medium text-sm">
+                        ₹<span class="item-total">${item.total.toFixed(2)}</span>
+                    </td>
+                    <td class="py-2 px-3 text-center">
+                        ${currentItems.length > 1 ? `<button type="button" data-action="remove" data-index="${index}" class="text-red-600 hover:text-red-800 text-lg font-bold">&times;</button>` : ''}
+                    </td>
+                `;
+            });
+            attachProductInputListeners();
+        };
+
+        const calculateAndDisplayGrandTotal = () => {
+            const total = currentItems.reduce((sum, item) => sum + item.total, 0);
+            grandTotalSpan.textContent = total.toFixed(2);
+        };
+
+        const attachProductInputListeners = () => {
+            productsTableBody.querySelectorAll('input').forEach(input => {
+                input.oninput = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    const field = e.target.dataset.field;
+                    let value = e.target.value;
+
+                    if (field === 'quantity' || field === 'pricePerUnit') {
+                        value = parseFloat(value);
+                        if (isNaN(value)) value = 0;
+                    }
+
+                    currentItems[index][field] = value;
+                    const quantity = currentItems[index].quantity;
+                    const pricePerUnit = currentItems[index].pricePerUnit;
+                    currentItems[index].total = (isNaN(quantity) ? 0 : quantity) * (isNaN(pricePerUnit) ? 0 : pricePerUnit);
+
+                    // Update the displayed total for the current item
+                    e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
+                    calculateAndDisplayGrandTotal();
+                };
+
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const index = parseInt(e.target.dataset.index);
+                        const field = e.target.dataset.field;
+
+                        let nextInput = null;
+                        if (field === 'product') {
+                            nextInput = productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`);
+                        } else if (field === 'quantity') {
+                            nextInput = productsTableBody.querySelector(`input[data-index="${index}"][data-field="pricePerUnit"]`);
+                        } else if (field === 'pricePerUnit') {
+                            if (index === currentItems.length - 1) {
+                                addItemRow(); // This will re-render and focus on new row
+                                return;
+                            } else {
+                                nextInput = productsTableBody.querySelector(`input[data-index="${index + 1}"][data-field="product"]`);
+                            }
+                        }
+                        if (nextInput) {
+                            nextInput.focus();
+                        }
+                    }
+                };
+            });
+
+            productsTableBody.querySelectorAll('button[data-action="remove"]').forEach(button => {
+                button.onclick = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    removeItemRow(index);
+                };
+            });
+        };
+
+        const addItemRow = () => {
+            currentItems.push({ product: '', quantity: 1, pricePerUnit: 0, total: 0 });
+            updateProductsTable();
+            // Focus on the new row's product input
+            const newRowIndex = currentItems.length - 1;
+            const newProductInput = productsTableBody.querySelector(`input[data-index="${newRowIndex}"][data-field="product"]`);
+            if (newProductInput) {
+                newProductInput.focus();
+            }
+        };
+
+        const removeItemRow = (index) => {
+            currentItems.splice(index, 1);
+            updateProductsTable();
+            calculateAndDisplayGrandTotal();
+        };
+
+        addItemRowBtn.addEventListener('click', addItemRow);
+
+        addOrderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            if (!buyerNameInput.value.trim()) {
+                showMessage("Buyer name cannot be empty.");
+                return;
+            }
+            if (currentItems.length === 0 || currentItems.some(item => !item.product.trim() || isNaN(item.quantity) || item.quantity <= 0 || isNaN(item.pricePerUnit) || item.pricePerUnit < 0)) {
+                showMessage("Please ensure all product details are filled correctly and quantities/prices are valid.");
+                return;
+            }
+
+            const newOrder = {
+                id: crypto.randomUUID(),
+                buyerName: buyerNameInput.value.trim(),
+                orderDate: new Date(),
+                items: currentItems.map(item => ({
+                    product: item.product.trim(),
+                    quantity: parseFloat(item.quantity),
+                    pricePerUnit: parseFloat(item.pricePerUnit),
+                    total: parseFloat(item.total)
+                })),
+                grandTotal: parseFloat(grandTotalSpan.textContent),
+                isSeen: false,
+                isDelivered: false,
+                companyDetails: { ...companyDetails } // Store a copy of current company details
+            };
+
+            orders.push(newOrder);
+            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({...o, orderDate: o.orderDate.toISOString()})));
+            showMessage("Order saved successfully!");
+            renderPage('allOrders'); // Navigate back to all orders
+        });
+
+        // Initial setup for Add Order form
+        buyerNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                productsTableBody.querySelector('input[data-index="0"][data-field="product"]')?.focus();
+            }
+        });
+
+
+        // --- Notes Page Logic ---
+        const newNoteContentInput = document.getElementById('new-note-content');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const notesListDiv = document.getElementById('notes-list');
+
+        const renderNotes = () => {
+            notesListDiv.innerHTML = ''; // Clear previous content
+            if (notes.length === 0) {
+                notesListDiv.innerHTML = '<p class="text-gray-600">No notes yet. Add one above!</p>';
+            } else {
+                notes.forEach(note => {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200';
+                    noteDiv.dataset.noteId = note.id;
+
+                    if (note.isEditing) {
+                        noteDiv.innerHTML = `
+                            <div>
+                                <textarea
+                                    data-note-id="${note.id}"
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mb-3"
+                                    rows="3"
+                                >${note.content}</textarea>
+                                <div class="flex gap-2 justify-end">
+                                    <button onclick="handleSaveEditedNote('${note.id}')" class="bg-black text-white px-3 py-1 rounded-md text-sm hover:bg-gray-800 transition-colors">Save</button>
+                                    <button onclick="handleCancelEditNote('${note.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 transition-colors">Cancel</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        noteDiv.innerHTML = `
+                            <div>
+                                <p class="text-gray-800 text-base ${note.isDone ? 'line-through text-gray-500' : ''}">${note.content}</p>
+                                <p class="text-xs text-gray-500 mt-2">Created: ${new Date(note.createdAt).toLocaleString()}</p>
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <label class="flex items-center text-sm text-gray-700">
+                                        <input type="checkbox" ${note.isDone ? 'checked' : ''} onchange="handleToggleNoteDone('${note.id}', ${note.isDone})" class="form-checkbox h-4 w-4 text-black rounded-md focus:ring-0 mr-1" />
+                                        Done
+                                    </label>
+                                    <button onclick="handleEditNote('${note.id}')" class="bg-gray-600 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-700 transition-colors">Edit</button>
+                                    <button onclick="handleDeleteNote('${note.id}')" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition-colors">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    notesListDiv.appendChild(noteDiv);
+                });
+            }
+        };
+
+        addNoteBtn.addEventListener('click', () => {
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            if (!newNoteContentInput.value.trim()) {
+                showMessage("Note content cannot be empty.");
+                return;
+            }
+            const newNote = {
+                id: crypto.randomUUID(),
+                content: newNoteContentInput.value.trim(),
+                createdAt: new Date(),
+                isDone: false,
+                isEditing: false // Add editing state
+            };
+            notes.push(newNote);
+            notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            saveDataToLocalStorage('notes', userId, notes.map(n => ({...n, createdAt: n.createdAt.toISOString()})));
+            showMessage("Note added!");
+            newNoteContentInput.value = '';
+            renderNotes();
+        });
+
+        window.handleToggleNoteDone = (noteId, currentStatus) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isDone = !currentStatus;
+                notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({...n, createdAt: n.createdAt.toISOString()})));
+                showMessage(`Note marked as ${!currentStatus ? 'done' : 'undone'}.`);
+                renderNotes();
+            }
+        };
+
+        window.handleDeleteNote = (noteId) => {
+            if (window.confirm("Are you sure you want to delete this note?")) {
+                notes = notes.filter(note => note.id !== noteId);
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({...n, createdAt: n.createdAt.toISOString()})));
+                showMessage("Note deleted!");
+                renderNotes();
+            }
+        };
+
+        window.handleEditNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isEditing = true;
+                renderNotes();
+            }
+        };
+
+        window.handleSaveEditedNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                const editedContent = notesListDiv.querySelector(`textarea[data-note-id="${noteId}"]`).value.trim();
+                if (!editedContent) {
+                    showMessage("Note content cannot be empty.");
+                    return;
+                }
+                notes[noteIndex].content = editedContent;
+                notes[noteIndex].isEditing = false;
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({...n, createdAt: n.createdAt.toISOString()})));
+                showMessage("Note updated!");
+                renderNotes();
+            }
+        };
+
+        window.handleCancelEditNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isEditing = false;
+                renderNotes();
+            }
+        };
+
+        // --- Settings Page Logic ---
+        const settingsForm = document.getElementById('settings-form');
+        const companyNameInput = document.getElementById('companyName');
+        const addressInput = document.getElementById('address');
+        const phoneInput = document.getElementById('phone');
+        const emailInput = document.getElementById('email');
+        const exportDataBtn = document.getElementById('export-data-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        const importDataBtn = document.getElementById('import-data-btn');
+
+        const renderSettings = () => {
+            companyNameInput.value = companyDetails.companyName;
+            addressInput.value = companyDetails.address;
+            phoneInput.value = companyDetails.phone;
+            emailInput.value = companyDetails.email;
+        };
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            companyDetails = {
+                companyName: companyNameInput.value.trim(),
+                address: addressInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                email: emailInput.value.trim()
+            };
+            saveDataToLocalStorage('companyDetails', userId, companyDetails);
+            showMessage("Company details saved successfully!");
+        });
+
+        exportDataBtn.addEventListener('click', () => {
+            if (!userId) {
+                showMessage("User not authenticated. Cannot export data.");
+                return;
+            }
+
+            const dataToExport = {
+                companyDetails: companyDetails,
+                orders: [...orders, ...completedOrders].map(order => ({
+                    ...order,
+                    orderDate: order.orderDate.toISOString()
+                })),
+                notes: notes.map(note => ({
+                    ...note,
+                    createdAt: note.createdAt.toISOString()
+                }))
+            };
+
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `quickbill_data_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showMessage("All data exported successfully!");
+        });
+
+        importDataBtn.addEventListener('click', () => {
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    if (
+                        !importedData ||
+                        typeof importedData.companyDetails !== 'object' ||
+                        !Array.isArray(importedData.orders) ||
+                        !Array.isArray(importedData.notes)
+                    ) {
+                        showMessage("Invalid data file format. Please upload a valid export file.");
+                        return;
+                    }
+
+                    companyDetails = importedData.companyDetails;
+
+                    const processedImportedOrders = importedData.orders.map(order => ({
+                        ...order,
+                        orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
+                    }));
+                    orders = processedImportedOrders.filter(order => !order.isDelivered);
+                    completedOrders = processedImportedOrders.filter(order => order.isDelivered);
+                    orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+                    completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+
+                    const processedImportedNotes = importedData.notes.map(note => ({
+                        ...note,
+                        createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+                    }));
+                    notes = processedImportedNotes;
+                    notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+                    saveDataToLocalStorage('companyDetails', userId, companyDetails);
+                    saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({...o, orderDate: o.orderDate.toISOString()})));
+                    saveDataToLocalStorage('notes', userId, notes.map(n => ({...n, createdAt: n.createdAt.toISOString()})));
+
+                    showMessage("Data imported successfully!");
+                    renderSettings(); // Re-render settings to show updated company details
+                    renderAllOrders(); // Re-render orders
+                    renderNotes(); // Re-render notes
+                } catch (error) {
+                    console.error("Error importing data:", error);
+                    showMessage("Failed to import data. Please ensure the file is a valid JSON.");
+                } finally {
+                    event.target.value = null; // Clear the file input value
+                }
+            };
+            reader.readAsText(file);
+        });
+
+
+        // --- Initial Load and Authentication ---
+        window.addEventListener('load', async () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Authenticated with user ID:", userId);
+                    } else {
+                        if (!initialAuthToken) {
+                            try {
+                                const anonymousUserCredential = await signInAnonymously(auth);
+                                userId = anonymousUserCredential.user.uid;
+                                console.log("Signed in anonymously with user ID:", userId);
+                            } catch (error) {
+                                console.error("Error signing in anonymously:", error);
+                                showMessage("Error signing in. Please try again.");
+                            }
+                        } else {
+                            try {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                userId = auth.currentUser.uid;
+                                console.log("Signed in with custom token. User ID:", userId);
+                            } catch (error) {
+                                console.error("Error signing in with custom token:", error);
+                                showMessage("Error signing in with custom token. Please try again.");
+                            }
+                        }
+                    }
+                    isAuthReady = true;
+                    document.getElementById('user-id-display').textContent = `User ID: ${userId}`;
+                    initializeAppData(); // Load data after auth is ready
+                    renderPage('allOrders'); // Render initial page
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showMessage("Failed to initialize the application. Please check console for details.");
+            }
+
+            // PWA Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                // IMPORTANT: Adjust the service worker path for GitHub Pages.
+                // It should be relative to the root of your repository.
+                // Example: If your repo is 'quickbill-app' and index.html is at its root,
+                // then service-worker.js should also be at the root.
+                const serviceWorkerPath = '/quickbill-app/service-worker.js'; // <<< REPLACE with your GitHub Pages repository name if different
+                navigator.serviceWorker.register(serviceWorkerPath)
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            }
+        });
+
+        const initializeAppData = () => {
+            // Load company details
+            companyDetails = loadDataFromLocalStorage('companyDetails', userId, {
+                companyName: '',
+                address: '',
+                phone: '',
+                email: ''
+            });
+
+            // Load orders
+            const storedOrders = loadDataFromLocalStorage('orders', userId, []);
+            const processedOrders = storedOrders.map(order => ({
+                ...order,
+                orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
+            }));
+
+            orders = processedOrders.filter(order => !order.isDelivered);
+            completedOrders = processedOrders.filter(order => order.isDelivered);
+
+            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+
+            // Load notes
+            const storedNotes = loadDataFromLocalStorage('notes', userId, []);
+            notes = storedNotes.map(note => ({
+                ...note,
+                createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+            }));
+            notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            console.log("Data loaded from local storage for user:", userId);
+        };
+
+        // --- Navigation Event Listeners ---
+        document.getElementById('nav-allOrders').addEventListener('click', () => renderPage('allOrders'));
+        document.getElementById('nav-addOrder').addEventListener('click', () => renderPage('addOrder'));
+        document.getElementById('nav-notes').addEventListener('click', () => renderPage('notes'));
+        document.getElementById('nav-settings').addEventListener('click', () => renderPage('settings'));
+
+    </script>
+</body>
+</html>
