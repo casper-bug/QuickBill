@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickBill - Order Management App</title>
+    <title>QuickBill - Order Management Tool</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -123,7 +123,7 @@
     </div>
 
     <header class="bg-black text-white p-4 shadow-md">
-        <nav class="flex flex-col sm:flex-row justify-between items-center max-w-7xl mx-auto">
+        <nav class="flex flex-col sm:flex-row sm:justify-between items-center max-w-7xl mx-auto">
             <h1 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-0">QuickBill</h1>
             <div class="flex flex-wrap justify-center gap-2 sm:gap-4">
                 <button id="nav-allOrders" class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors active">
@@ -330,15 +330,16 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        // IMPORTANT: Replace this with your actual Firebase project's configuration object.
         // Get this from your Firebase Console -> Project settings -> Your apps -> Web app.
-      const firebaseConfig = {
-       apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
-       authDomain: "quickbill-33bf7.firebaseapp.com",
-       projectId: "quickbill-33bf7",
-       storageBucket: "quickbill-33bf7.firebasestorage.app",
-       messagingSenderId: "749941620593",
-       appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
-     };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
+            authDomain: "quickbill-33bf7.firebaseapp.com",
+            projectId: "quickbill-33bf7",
+            storageBucket: "quickbill-33bf7.firebasestorage.app",
+            messagingSenderId: "749941620593",
+            appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
+        };
 
         // --- Global State ---
         let auth = null;
@@ -1171,11 +1172,24 @@
             document.getElementById('current-year').textContent = new Date().getFullYear();
             loadingOverlay.classList.remove('hidden'); // Show loading overlay initially
 
+            // Set a timeout to hide the loading overlay and show an error if auth doesn't complete
+            const authTimeout = setTimeout(() => {
+                if (!isAuthReady) {
+                    loadingOverlay.classList.add('hidden');
+                    showMessage("Application failed to initialize authentication. Please check your internet connection or Firebase configuration.");
+                    console.error("Authentication timed out. App might not function correctly.");
+                }
+            }, 10000); // 10 seconds timeout
+
             try {
+                // Log the firebaseConfig to help debug
+                console.log("Firebase Config being used:", firebaseConfig);
+
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
 
                 onAuthStateChanged(auth, async (user) => {
+                    clearTimeout(authTimeout); // Clear the timeout if auth succeeds
                     if (user) {
                         userId = user.uid;
                         console.log("Authenticated with user ID:", userId);
@@ -1194,16 +1208,18 @@
                     document.getElementById('user-id-display').textContent = `User ID: ${userId}`;
                     initializeAppData(); // Load data after auth is ready
                     renderPage('allOrders'); // Render initial page
-                    loadingOverlay.classList.add('hidden'); // Hide loading overlay once app is ready
                 });
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
-                showMessage("Failed to initialize the application. Please check console for details.");
-                loadingOverlay.classList.add('hidden'); // Hide loading overlay even on error
+                showMessage("Failed to initialize the application. Please check console for details and Firebase configuration.");
+            } finally {
+                // Ensure loading overlay is hidden regardless of success or failure
+                loadingOverlay.classList.add('hidden');
             }
 
             // PWA Service Worker Registration
             if ('serviceWorker' in navigator) {
+                // IMPORTANT: Replace 'quickbill-app' with your actual GitHub repository name.
                 const serviceWorkerPath = '/QuickBill/service-worker.js';
                 navigator.serviceWorker.register(serviceWorkerPath)
                     .then(registration => {
