@@ -9,9 +9,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <link rel="manifest" href="/QuickBill/public/manifest.json" />
+    <link rel="manifest" href="/QuickBill/manifest.json" />
     <link rel="apple-touch-icon" href="/QuickBill/icons/icon-192x192.png" />
-    <link rel="icon" href="/QuickBill/icon/favicon.ico" type="image/x-icon">
+
+    <link rel="icon" href="/QuickBill/icons/favicon.ico" type="image/x-icon">
 
     <style>
         body {
@@ -62,6 +63,19 @@
             background-color: white;
             color: black;
         }
+        /* Loading overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
 
         /* Specific styles for tables on small screens */
         @media (max-width: 639px) { /* Tailwind's 'sm' breakpoint */
@@ -98,6 +112,10 @@
     </style>
 </head>
 <body class="min-h-screen bg-white text-black font-sans flex flex-col">
+
+    <div id="loading-overlay" class="fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex items-center justify-center z-50">
+        <div class="text-lg text-gray-700">Loading application...</div>
+    </div>
 
     <div id="message-display" class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center justify-between animate-fade-in-down hidden">
         <span id="message-text"></span>
@@ -310,19 +328,17 @@
     <script type="module">
         // Firebase imports (using module syntax for direct browser use)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // Global variables for Firebase config and app ID (provided by Canvas environment)
-        // These are placeholders for the Canvas environment. When deploying, you might hardcode them
-        // or inject them via your build process if not using a Canvas-like environment.
-       const firebaseConfig = {
-        apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
-        authDomain: "quickbill-33bf7.firebaseapp.com",
-        projectId: "quickbill-33bf7",
-        storageBucket: "quickbill-33bf7.firebasestorage.app",
-        messagingSenderId: "749941620593",
-        appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
-      };
+        // Get this from your Firebase Console -> Project settings -> Your apps -> Web app.
+      const firebaseConfig = {
+       apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
+       authDomain: "quickbill-33bf7.firebaseapp.com",
+       projectId: "quickbill-33bf7",
+       storageBucket: "quickbill-33bf7.firebasestorage.app",
+       messagingSenderId: "749941620593",
+       appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
+     };
 
         // --- Global State ---
         let auth = null;
@@ -339,6 +355,8 @@
             email: ''
         };
         let messageTimeout = null;
+        const loadingOverlay = document.getElementById('loading-overlay');
+
 
         // --- Helper functions for Local Storage ---
         const getLocalStorageKey = (key, currentUserId) => `quickbill-${currentUserId}-${key}`;
@@ -560,10 +578,8 @@
         };
 
         const attachOrderEventListeners = () => {
-            // Re-render all orders to ensure event listeners are correctly attached
-            // This is a simpler approach for a single HTML file, though less efficient than React's diffing.
-            // For production, you might use event delegation or more targeted updates.
-            // However, the `onclick` attributes directly in the HTML string are already handling this.
+            // Event listeners are attached via inline onclick attributes in createOrderRow
+            // No need for a separate attach loop here for the dynamically added buttons.
         };
 
         window.handleToggleExpand = (orderId) => {
@@ -585,7 +601,7 @@
         };
 
         window.handleToggleDelivered = (orderId, currentStatus) => {
-            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(order => order.id === orderId);
+            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(o => o.id === orderId);
             if (!orderToMove) return;
 
             const newStatus = !currentStatus;
@@ -677,7 +693,6 @@
             billToPrintDiv.classList.remove('hidden'); // Make it visible for html2canvas
 
             try {
-                // FIX: Explicitly use window.html2canvas
                 const canvas = await window.html2canvas(billToPrintDiv.firstElementChild, { // Target the inner div
                     scale: 2,
                     useCORS: true,
@@ -853,8 +868,9 @@
 
         addOrderForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            if (!userId) {
-                showMessage("User not authenticated. Please try again.");
+            // Ensure user is authenticated before proceeding with form submission
+            if (!isAuthReady || !userId) {
+                showMessage("Application is still loading or user not authenticated. Please wait a moment and try again.");
                 return;
             }
             if (!buyerNameInput.value.trim()) {
@@ -1153,6 +1169,7 @@
         // --- Initial Load and Authentication ---
         window.addEventListener('load', async () => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
+            loadingOverlay.classList.remove('hidden'); // Show loading overlay initially
 
             try {
                 const app = initializeApp(firebaseConfig);
@@ -1163,42 +1180,30 @@
                         userId = user.uid;
                         console.log("Authenticated with user ID:", userId);
                     } else {
-                        if (!initialAuthToken) {
-                            try {
-                                const anonymousUserCredential = await signInAnonymously(auth);
-                                userId = anonymousUserCredential.user.uid;
-                                console.log("Signed in anonymously with user ID:", userId);
-                            } catch (error) {
-                                console.error("Error signing in anonymously:", error);
-                                showMessage("Error signing in. Please try again.");
-                            }
-                        } else {
-                            try {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                                userId = auth.currentUser.uid;
-                                console.log("Signed in with custom token. User ID:", userId);
-                            } catch (error) {
-                                console.error("Error signing in with custom token:", error);
-                                showMessage("Error signing in with custom token. Please try again.");
-                            }
+                        // For GitHub Pages, we'll typically rely on anonymous sign-in
+                        try {
+                            const anonymousUserCredential = await signInAnonymously(auth);
+                            userId = anonymousUserCredential.user.uid;
+                            console.log("Signed in anonymously with user ID:", userId);
+                        } catch (error) {
+                            console.error("Error signing in anonymously:", error);
+                            showMessage("Error signing in. Please try again.");
                         }
                     }
                     isAuthReady = true;
                     document.getElementById('user-id-display').textContent = `User ID: ${userId}`;
                     initializeAppData(); // Load data after auth is ready
                     renderPage('allOrders'); // Render initial page
+                    loadingOverlay.classList.add('hidden'); // Hide loading overlay once app is ready
                 });
             } catch (error) {
                 console.error("Error initializing Firebase:", error);
                 showMessage("Failed to initialize the application. Please check console for details.");
+                loadingOverlay.classList.add('hidden'); // Hide loading overlay even on error
             }
 
             // PWA Service Worker Registration
             if ('serviceWorker' in navigator) {
-                // IMPORTANT: Adjust the service worker path for GitHub Pages.
-                // It should be relative to the root of your repository.
-                // Example: If your repo is 'quickbill-app' and index.html is at its root,
-                // then service-worker.js should also be at the root.
                 const serviceWorkerPath = '/QuickBill/service-worker.js';
                 navigator.serviceWorker.register(serviceWorkerPath)
                     .then(registration => {
