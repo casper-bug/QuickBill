@@ -1,12 +1,13 @@
 const CACHE_NAME = 'quickbill-pwa-v2'; // Increment cache version for new assets
-// IMPORTANT: Replace '/YOUR_REPO_NAME/' with your actual GitHub Pages repository name.
-const BASE_PATH = '/QuickBill/';
+
+const BASE_PATH = '/QuickBill/'; 
 
 const urlsToCache = [
-    BASE_PATH,
+    BASE_PATH, // Cache the root path
     `${BASE_PATH}index.html`,
     // PWA Assets
     `${BASE_PATH}manifest.json`,
+    // Ensure these icon paths are correct relative to your BASE_PATH
     `${BASE_PATH}icons/icon-192x192.png`,
     `${BASE_PATH}icons/icon-512x512.png`,
     `${BASE_PATH}icons/favicon.ico`,
@@ -27,7 +28,7 @@ self.addEventListener('install', (event) => {
                 return cache.addAll(urlsToCache);
             })
             .catch(error => {
-                console.error('Service Worker: Failed to cache all URLs:', error);
+                console.error('Service Worker: Failed to cache all URLs during install:', error);
             })
     );
 });
