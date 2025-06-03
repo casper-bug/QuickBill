@@ -1,4 +1,5 @@
-### This is a QuickBill application, a Progressive Web App (PWA) designed for order management.
+### QuickBill  
+An application, a Progressive Web App (PWA) designed for order management.
 
 It allows you to:
 
