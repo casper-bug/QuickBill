@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1195,7 +1194,7 @@
                 // It should be relative to the root of your repository.
                 // Example: If your repo is 'quickbill-app' and index.html is at its root,
                 // then service-worker.js should also be at the root.
-                const serviceWorkerPath = '/quickbill-app/service-worker.js'; // <<< REPLACE with your GitHub Pages repository name if different
+                const serviceWorkerPath = '/QuickBill/service-worker.js';
                 navigator.serviceWorker.register(serviceWorkerPath)
                     .then(registration => {
                         console.log('SW registered: ', registration);
