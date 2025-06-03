@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuickBill - Order Management Tool</title>
+    <title>QuickBill - Order Management App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -75,6 +75,10 @@
             align-items: center;
             justify-content: center;
             z-index: 100;
+        }
+        /* Force hide the loading overlay when 'hidden' class is applied */
+        #loading-overlay.hidden {
+            display: none !important;
         }
 
         /* Specific styles for tables on small screens */
@@ -329,9 +333,6 @@
         // Firebase imports (using module syntax for direct browser use)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        // IMPORTANT: Replace this with your actual Firebase project's configuration object.
-        // Get this from your Firebase Console -> Project settings -> Your apps -> Web app.
         const firebaseConfig = {
             apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
             authDomain: "quickbill-33bf7.firebaseapp.com",
@@ -1176,6 +1177,7 @@
             const authTimeout = setTimeout(() => {
                 if (!isAuthReady) {
                     loadingOverlay.classList.add('hidden');
+                    loadingOverlay.style.display = 'none'; // Force hide the overlay
                     showMessage("Application failed to initialize authentication. Please check your internet connection or Firebase configuration.");
                     console.error("Authentication timed out. App might not function correctly.");
                 }
@@ -1214,12 +1216,17 @@
                 showMessage("Failed to initialize the application. Please check console for details and Firebase configuration.");
             } finally {
                 // Ensure loading overlay is hidden regardless of success or failure
-                loadingOverlay.classList.add('hidden');
+                console.log("Attempting to hide loading overlay.");
+                setTimeout(() => { // Small delay to ensure rendering is complete
+                    loadingOverlay.classList.add('hidden');
+                    // Fallback: directly set display to none in case of specificity issues
+                    loadingOverlay.style.display = 'none';
+                    console.log("Loading overlay hidden successfully.");
+                }, 50); // Delay by 50ms
             }
 
             // PWA Service Worker Registration
             if ('serviceWorker' in navigator) {
-                // IMPORTANT: Replace 'quickbill-app' with your actual GitHub repository name.
                 const serviceWorkerPath = '/QuickBill/service-worker.js';
                 navigator.serviceWorker.register(serviceWorkerPath)
                     .then(registration => {
