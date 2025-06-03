@@ -315,9 +315,14 @@
         // Global variables for Firebase config and app ID (provided by Canvas environment)
         // These are placeholders for the Canvas environment. When deploying, you might hardcode them
         // or inject them via your build process if not using a Canvas-like environment.
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+       const firebaseConfig = {
+        apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
+        authDomain: "quickbill-33bf7.firebaseapp.com",
+        projectId: "quickbill-33bf7",
+        storageBucket: "quickbill-33bf7.firebasestorage.app",
+        messagingSenderId: "749941620593",
+        appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
+      };
 
         // --- Global State ---
         let auth = null;
