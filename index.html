@@ -9,10 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/QuickBill/manifest.json" />
     <link rel="apple-touch-icon" href="/QuickBill/icons/icon-192x192.png" />
-
     <link rel="icon" href="/QuickBill/icons/favicon.ico" type="image/x-icon">
 
     <style>
+        /* Removed @font-face rule for DEM-MO Typeface to simplify and use generic monospace */
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f8f8;
@@ -196,6 +197,11 @@
             width: 90%;
             text-align: center;
         }
+
+        /* QuickBill Title Monospace Font */
+        .quickbill-title-font {
+            font-family: monospace; /* Applied generic monospace font */
+        }
     </style>
 </head>
 
@@ -225,7 +231,7 @@
 
     <header class="bg-black text-white p-4 shadow-md">
         <nav class="flex flex-col sm:flex-row sm:justify-between items-center max-w-7xl mx-auto">
-            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">QuickBill</h1>
+            <h1 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-0 quickbill-title-font">QuickBill</h1>
             <div class="flex flex-wrap justify-center gap-3 sm:gap-4 mt-4 sm:mt-0">
                 <button id="nav-allOrders"
                     class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors active">
@@ -234,6 +240,10 @@
                 <button id="nav-addOrder"
                     class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
                     Add New Bill
+                </button>
+                <button id="nav-stock"
+                    class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
+                    Stock
                 </button>
                 <button id="nav-notes"
                     class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors">
@@ -295,6 +305,7 @@
                         <tbody>
                         </tbody>
                     </table>
+                    <datalist id="product-suggestions"></datalist> <!-- Datalist for product suggestions -->
                 </div>
 
                 <button type="button" id="add-item-row-btn"
@@ -316,6 +327,46 @@
                     Save Bill
                 </button>
             </form>
+        </div>
+
+        <!-- New Stock Management Page -->
+        <div id="page-stock" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Stock Management</h2>
+
+            <div class="max-w-xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-3">Add New Stock Item</h3>
+                <form id="add-stock-form" class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="stockProductName"
+                        class="block w-full sm:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Product Name" required />
+                    <input type="number" id="stockProductPrice"
+                        class="block w-full sm:w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                        placeholder="Price" step="0.01" min="0" required />
+                    <button type="submit"
+                        class="w-full sm:w-1/4 bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                        Add Item
+                    </button>
+                </form>
+            </div>
+
+            <div class="max-w-xl mx-auto">
+                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Your Stock Items</h3>
+                <div id="stock-list" class="overflow-x-auto rounded-lg shadow-md">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Product Name</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Price</th>
+                                <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body">
+                            <!-- Stock items will be rendered here -->
+                            <tr class="border-b border-gray-200 last:border-b-0"><td colspan="3" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add one above!</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div id="page-notes" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
@@ -426,12 +477,13 @@
         let orders = [];
         let completedOrders = [];
         let notes = [];
+        let stock = []; // New global state for stock
         let companyDetails = {
             companyName: '',
             address: '',
             phone: '',
             email: '',
-            gstNumber: '' // Added GST number field
+            gstNumber: ''
         };
         let messageTimeout = null;
         const loadingOverlay = document.getElementById('loading-overlay');
@@ -531,6 +583,8 @@
                 renderSettings();
             } else if (pageId === 'addOrder') {
                 renderAddOrderForm();
+            } else if (pageId === 'stock') { // New stock page rendering
+                renderStock();
             }
         };
 
@@ -870,6 +924,7 @@
         const productsTableBody = document.querySelector('#products-table tbody');
         const addItemRowBtn = document.getElementById('add-item-row-btn');
         const grandTotalSpan = document.getElementById('grand-total');
+        const productSuggestionsDatalist = document.getElementById('product-suggestions');
 
         let currentItems = []; // Local state for the form
 
@@ -894,7 +949,7 @@
                     <td class="py-2 px-3">
                         <input type="text" data-field="product" data-index="${index}" value="${item.product}"
                             class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
-                            placeholder="Product Name" required />
+                            placeholder="Product Name" list="product-suggestions" required />
                     </td>
                     <td class="py-2 px-3">
                         <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity}"
@@ -915,6 +970,16 @@
                 `;
             });
             attachProductInputListeners();
+            updateProductSuggestionsDatalist(); // Update datalist whenever table is rendered
+        };
+
+        const updateProductSuggestionsDatalist = () => {
+            productSuggestionsDatalist.innerHTML = '';
+            stock.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                productSuggestionsDatalist.appendChild(option);
+            });
         };
 
         const calculateAndDisplayGrandTotal = () => {
@@ -943,6 +1008,24 @@
                     e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
                     calculateAndDisplayGrandTotal();
                 };
+
+                // Auto-fill price when product name is selected/entered
+                if (input.dataset.field === 'product') {
+                    input.addEventListener('change', (e) => {
+                        const productName = e.target.value.trim();
+                        const index = parseInt(e.target.dataset.index);
+                        const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
+
+                        if (stockItem) {
+                            currentItems[index].pricePerUnit = parseFloat(stockItem.price);
+                            currentItems[index].total = currentItems[index].quantity * currentItems[index].pricePerUnit;
+                            updateProductsTable(); // Re-render to update pricePerUnit and total
+                            // Try to focus on the quantity field of the current row
+                            productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`)?.focus();
+                        }
+                    });
+                }
+
 
                 input.onkeydown = (e) => {
                     if (e.key === 'Enter') {
@@ -1049,6 +1132,148 @@
                 productsTableBody.querySelector('input[data-index="0"][data-field="product"]')?.focus();
             }
         });
+
+        // --- Stock Management Page Logic ---
+        const addStockForm = document.getElementById('add-stock-form');
+        const stockProductNameInput = document.getElementById('stockProductName');
+        const stockProductPriceInput = document.getElementById('stockProductPrice');
+        const stockTableBody = document.getElementById('stock-table-body');
+
+        const renderStock = () => {
+            stockTableBody.innerHTML = ''; // Clear previous content
+            if (stock.length === 0) {
+                stockTableBody.innerHTML = `
+                    <tr class="border-b border-gray-200 last:border-b-0">
+                        <td colspan="3" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add one above!</td>
+                    </tr>
+                `;
+            } else {
+                stock.forEach(item => {
+                    const row = stockTableBody.insertRow();
+                    row.dataset.stockId = item.id;
+                    if (item.isEditing) {
+                        row.innerHTML = `
+                            <td class="py-3 px-4">
+                                <input type="text" data-field="name" value="${item.name}"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black" />
+                            </td>
+                            <td class="py-3 px-4">
+                                <input type="number" data-field="price" value="${item.price}" step="0.01" min="0"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black" />
+                            </td>
+                            <td class="py-3 px-4 text-center flex gap-2 justify-center">
+                                <button onclick="saveEditedStockItem('${item.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors">Save</button>
+                                <button onclick="cancelEditStockItem('${item.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-500 transition-colors">Cancel</button>
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td class="py-3 px-4 text-base">${item.name}</td>
+                            <td class="py-3 px-4 text-base">₹${parseFloat(item.price).toFixed(2)}</td>
+                            <td class="py-3 px-4 text-center flex gap-2 justify-center">
+                                <button onclick="editStockItem('${item.id}')" class="bg-gray-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors">Edit</button>
+                                <button onclick="deleteStockItem('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-red-700 transition-colors">Delete</button>
+                            </td>
+                        `;
+                    }
+                });
+            }
+            updateProductSuggestionsDatalist(); // Keep datalist updated with stock changes
+        };
+
+        addStockForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            const productName = stockProductNameInput.value.trim();
+            const productPrice = parseFloat(stockProductPriceInput.value);
+
+            if (!productName || isNaN(productPrice) || productPrice < 0) {
+                showMessage("Please enter valid product name and price.");
+                return;
+            }
+
+            // Check for duplicate product names (case-insensitive)
+            const isDuplicate = stock.some(item => item.name.toLowerCase() === productName.toLowerCase());
+            if (isDuplicate) {
+                showMessage("Product with this name already exists in stock.");
+                return;
+            }
+
+            const newStockItem = {
+                id: crypto.randomUUID(),
+                name: productName,
+                price: productPrice,
+                isEditing: false // Add editing state
+            };
+            stock.push(newStockItem);
+            stock.sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by name
+            saveDataToLocalStorage('stock', userId, stock);
+            showMessage("Stock item added!");
+            stockProductNameInput.value = '';
+            stockProductPriceInput.value = '';
+            renderStock();
+        });
+
+        window.editStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                stock[itemIndex].isEditing = true;
+                renderStock();
+            }
+        };
+
+        window.saveEditedStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                const row = stockTableBody.querySelector(`tr[data-stock-id="${id}"]`);
+                const nameInput = row.querySelector('input[data-field="name"]');
+                const priceInput = row.querySelector('input[data-field="price"]');
+
+                const newName = nameInput.value.trim();
+                const newPrice = parseFloat(priceInput.value);
+
+                if (!newName || isNaN(newPrice) || newPrice < 0) {
+                    showMessage("Please enter valid product name and price.");
+                    return;
+                }
+                
+                // Check for duplicate names (excluding the current item being edited)
+                const isDuplicate = stock.some(item => item.id !== id && item.name.toLowerCase() === newName.toLowerCase());
+                if (isDuplicate) {
+                    showMessage("Another product with this name already exists.");
+                    return;
+                }
+
+                stock[itemIndex].name = newName;
+                stock[itemIndex].price = newPrice;
+                stock[itemIndex].isEditing = false;
+                stock.sort((a, b) => a.name.localeCompare(b.name));
+                saveDataToLocalStorage('stock', userId, stock);
+                showMessage("Stock item updated!");
+                renderStock();
+            }
+        };
+
+        window.cancelEditStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                stock[itemIndex].isEditing = false;
+                renderStock();
+            }
+        };
+
+        window.deleteStockItem = async (id) => {
+            const confirmed = await showConfirmation("Are you sure you want to delete this stock item? This cannot be undone.");
+            if (confirmed) {
+                stock = stock.filter(item => item.id !== id);
+                saveDataToLocalStorage('stock', userId, stock);
+                showMessage("Stock item deleted!");
+                renderStock();
+            }
+        };
 
 
         // --- Notes Page Logic ---
@@ -1208,7 +1433,7 @@
                 address: addressInput.value.trim(),
                 phone: phoneInput.value.trim(),
                 email: emailInput.value.trim(),
-                gstNumber: gstNumberInput.value.trim() // Save GST number
+                gstNumber: gstNumberInput.value.trim()
             };
             saveDataToLocalStorage('companyDetails', userId, companyDetails);
             showMessage("Company details saved successfully!");
@@ -1229,7 +1454,8 @@
                 notes: notes.map(note => ({
                     ...note,
                     createdAt: note.createdAt.toISOString()
-                }))
+                })),
+                stock: stock // Export stock data
             };
 
             const jsonString = JSON.stringify(dataToExport, null, 2);
@@ -1266,7 +1492,8 @@
                         !importedData ||
                         typeof importedData.companyDetails !== 'object' ||
                         !Array.isArray(importedData.orders) ||
-                        !Array.isArray(importedData.notes)
+                        !Array.isArray(importedData.notes) ||
+                        !Array.isArray(importedData.stock) // Validate stock data
                     ) {
                         showMessage("Invalid data file format. Please upload a valid export file.");
                         return;
@@ -1295,14 +1522,23 @@
                     notes = processedImportedNotes;
                     notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+                    // Import stock data
+                    stock = importedData.stock.map(item => ({
+                        ...item,
+                        price: parseFloat(item.price) // Ensure price is a number
+                    }));
+                    stock.sort((a, b) => a.name.localeCompare(b.name));
+
                     saveDataToLocalStorage('companyDetails', userId, companyDetails);
                     saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
                     saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+                    saveDataToLocalStorage('stock', userId, stock); // Save imported stock data
 
                     showMessage("Data imported successfully!");
                     renderSettings(); // Re-render settings to show updated company details
                     renderAllOrders(); // Re-render orders
                     renderNotes(); // Re-render notes
+                    renderStock(); // Re-render stock
                 } catch (error) {
                     console.error("Error importing data:", error);
                     showMessage("Failed to import data. Please ensure the file is a valid JSON.");
@@ -1414,6 +1650,14 @@
             }));
             notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+            // Load stock data
+            const storedStock = loadDataFromLocalStorage('stock', userId, []);
+            stock = storedStock.map(item => ({
+                ...item,
+                price: parseFloat(item.price) // Ensure price is a number
+            }));
+            stock.sort((a, b) => a.name.localeCompare(b.name));
+
             console.log("Data loaded from local storage for user:", userId);
         };
 
@@ -1431,6 +1675,7 @@
         // --- Navigation Event Listeners ---
         document.getElementById('nav-allOrders').addEventListener('click', () => renderPage('allOrders'));
         document.getElementById('nav-addOrder').addEventListener('click', () => renderPage('addOrder'));
+        document.getElementById('nav-stock').addEventListener('click', () => renderPage('stock')); // New stock navigation
         document.getElementById('nav-notes').addEventListener('click', () => renderPage('notes'));
         document.getElementById('nav-settings').addEventListener('click', () => renderPage('settings'));
     </script>
