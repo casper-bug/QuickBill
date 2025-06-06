@@ -7,13 +7,13 @@
     <title>QuickBill - Order Management App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Removed @font-face rule for DEM-MO Typeface to simplify and use generic monospace -->
     <link rel="manifest" href="/QuickBill/manifest.json" />
     <link rel="apple-touch-icon" href="/QuickBill/icons/icon-192x192.png" />
+
     <link rel="icon" href="/QuickBill/icons/favicon.ico" type="image/x-icon">
 
     <style>
-        /* Removed @font-face rule for DEM-MO Typeface to simplify and use generic monospace */
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f8f8;
@@ -200,7 +200,8 @@
 
         /* QuickBill Title Monospace Font */
         .quickbill-title-font {
-            font-family: monospace; /* Applied generic monospace font */
+            font-family: monospace;
+            /* Applied generic monospace font */
         }
     </style>
 </head>
@@ -208,7 +209,7 @@
 <body class="min-h-screen bg-white text-black font-sans flex flex-col">
 
     <div id="loading-overlay"
-        class="fixed top-0 left-0 w-full h-full bg-white bg-opacity-90 flex items-center justify-center z-50">
+        class="fixed top-0 left-0 w-full h-100% bg-white bg-opacity-90 flex items-center justify-center z-50">
         <div class="text-lg text-gray-700">Loading application...</div>
     </div>
 
@@ -223,8 +224,10 @@
         <div class="modal-content">
             <p id="confirmation-message" class="mb-6 text-lg"></p>
             <div class="flex justify-center gap-4">
-                <button id="confirm-yes" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">Yes</button>
-                <button id="confirm-no" class="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition-colors">No</button>
+                <button id="confirm-yes"
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">Yes</button>
+                <button id="confirm-no"
+                    class="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition-colors">No</button>
             </div>
         </div>
     </div>
@@ -273,7 +276,8 @@
                     <p class="text-gray-600">No completed orders yet.</p>
                 </div>
                 <div class="mt-4 text-center">
-                    <button id="clear-completed-orders-btn" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors shadow-md hidden">
+                    <button id="clear-completed-orders-btn"
+                        class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors shadow-md hidden">
                         Clear All Delivered Orders
                     </button>
                 </div>
@@ -305,7 +309,8 @@
                         <tbody>
                         </tbody>
                     </table>
-                    <datalist id="product-suggestions"></datalist> <!-- Datalist for product suggestions -->
+                    <!-- Datalist for product suggestions - populated from stock -->
+                    <datalist id="product-suggestions"></datalist>
                 </div>
 
                 <button type="button" id="add-item-row-btn"
@@ -362,7 +367,10 @@
                         </thead>
                         <tbody id="stock-table-body">
                             <!-- Stock items will be rendered here -->
-                            <tr class="border-b border-gray-200 last:border-b-0"><td colspan="3" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add one above!</td></tr>
+                            <tr class="border-b border-gray-200 last:border-b-0">
+                                <td colspan="3" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add
+                                    one above!</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -441,6 +449,10 @@
                         class="w-full bg-gray-700 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
                         Import Data (JSON)
                     </button>
+                    <button type="button" id="reset-app-btn"
+                        class="w-full bg-red-600 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-red-700 transition-colors shadow-lg">
+                        Reset App (Clear All Data)
+                    </button>
                 </div>
             </form>
         </div>
@@ -455,8 +467,14 @@
 
     <script type="module">
         // Firebase imports (using module syntax for direct browser use)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // IMPORTANT: Replace this with your actual Firebase project's configuration object.
         // Get this from your Firebase Console -> Project settings -> Your apps -> Web app.
@@ -496,23 +514,32 @@
 
 
         // --- Helper functions for Local Storage ---
-        const getLocalStorageKey = (key, currentUserId) => `quickbill-${currentUserId}-${key}`;
+        const getLocalStorageKey = (key, currentUserId) => {
+            const lsKey = `quickbill-${currentUserId}-${key}`;
+            console.log(`[LocalStorage] Generating key: ${lsKey}`);
+            return lsKey;
+        };
 
         const loadDataFromLocalStorage = (key, currentUserId, defaultValue) => {
             try {
-                const data = localStorage.getItem(getLocalStorageKey(key, currentUserId));
-                return data ? JSON.parse(data) : defaultValue;
+                const lsKey = getLocalStorageKey(key, currentUserId);
+                const data = localStorage.getItem(lsKey);
+                const parsedData = data ? JSON.parse(data) : defaultValue;
+                console.log(`[LocalStorage] Loaded '${key}' for user '${currentUserId}':`, parsedData);
+                return parsedData;
             } catch (error) {
-                console.error(`Error loading ${key} from local storage:`, error);
+                console.error(`[LocalStorage] Error loading ${key} for user '${currentUserId}':`, error);
                 return defaultValue;
             }
         };
 
         const saveDataToLocalStorage = (key, currentUserId, data) => {
             try {
-                localStorage.setItem(getLocalStorageKey(key, currentUserId), JSON.stringify(data));
+                const lsKey = getLocalStorageKey(key, currentUserId);
+                localStorage.setItem(lsKey, JSON.stringify(data));
+                console.log(`[LocalStorage] Saved '${key}' for user '${currentUserId}'. Data sample:`, data ? JSON.stringify(data).substring(0, 100) + '...' : 'empty');
             } catch (error) {
-                console.error(`Error saving ${key} to local storage:`, error);
+                console.error(`[LocalStorage] Error saving ${key} for user '${currentUserId}':`, error);
             }
         };
 
@@ -656,9 +683,14 @@
         const createOrderRow = (order, isCompleted = false) => {
             const orderDate = new Date(order.orderDate); // Ensure it's a Date object
             const isExpanded = order.isExpanded || false; // Use a property on the order object for expansion state
+            const isEditing = order.isEditing || false; // Use a property for editing state
 
             let actionsHtml = '';
+            let buyerNameCellContent;
+            let itemsDetailsHtml = '';
+
             if (isCompleted) {
+                // Completed orders are not editable
                 actionsHtml = `
                     <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
                         Export Photo
@@ -667,26 +699,96 @@
                         Move to Active
                     </button>
                 `;
+                buyerNameCellContent = order.buyerName;
+                itemsDetailsHtml = order.items.map(item => `
+                    <tr class="border-b border-gray-100 last:border-b-0">
+                        <td class="py-2 px-2">${item.product}</td>
+                        <td class="py-2 px-2">${item.quantity}</td>
+                        <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
+                        <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
+                    </tr>
+                `).join('');
             } else {
-                actionsHtml = `
-                    <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
-                        Photo
-                    </button>
-                `;
+                // Active orders are editable
+                if (isEditing) {
+                    buyerNameCellContent = `
+                        <input type="text" value="${order.buyerName}" data-order-field="buyerName"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black" />
+                    `;
+                    actionsHtml = `
+                        <button onclick="handleSaveEditedOrder('${order.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                            Save
+                        </button>
+                        <button onclick="handleCancelEditOrder('${order.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-500 transition-colors shadow-sm">
+                            Cancel
+                        </button>
+                    `;
+                    itemsDetailsHtml = order.items.map((item, itemIndex) => `
+                        <tr class="border-b border-gray-100 last:border-b-0" data-item-index="${itemIndex}">
+                            <td class="py-2 px-2">
+                                <!-- Product input for editing, uses datalist for suggestions -->
+                                <input type="text" value="${item.product}" data-item-field="product"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-black focus:border-black" list="product-suggestions" />
+                            </td>
+                            <td class="py-2 px-2">
+                                <input type="number" value="${item.quantity}" data-item-field="quantity" step="1" min="1"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-black focus:border-black" />
+                            </td>
+                            <td class="py-2 px-2">
+                                <input type="number" value="${item.pricePerUnit}" data-item-field="pricePerUnit" step="0.01" min="0"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-black focus:border-black" />
+                            </td>
+                            <td class="py-2 px-2 text-right text-xs">₹<span class="edited-item-total">${item.total.toFixed(2)}</span></td>
+                            <td class="py-2 px-2 text-center">
+                                <button onclick="handleRemoveOrderItem('${order.id}', ${itemIndex})" class="text-red-600 hover:text-red-800 text-sm font-bold">&times;</button>
+                            </td>
+                        </tr>
+                    `).join('') + `
+                    <tr>
+                        <td colspan="5" class="p-2 text-center">
+                            <button onclick="handleAddOrderItem('${order.id}')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs hover:bg-gray-300 transition-colors flex items-center mx-auto">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Add Item Row
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                } else {
+                    actionsHtml = `
+                        <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm">
+                            Photo
+                        </button>
+                        <button onclick="handleEditOrder('${order.id}')" class="bg-gray-600 text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors shadow-sm">
+                            Edit
+                        </button>
+                    `;
+                    buyerNameCellContent = order.buyerName;
+                    itemsDetailsHtml = order.items.map(item => `
+                        <tr class="border-b border-gray-100 last:border-b-0">
+                            <td class="py-2 px-2">${item.product}</td>
+                            <td class="py-2 px-2">${item.quantity}</td>
+                            <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
+                            <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
+                        </tr>
+                    `).join('');
+                }
             }
+
 
             return `
                 <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50">
-                    <td class="py-3 px-2 text-sm">${order.buyerName}</td>
+                    <td class="py-3 px-2 text-sm">${buyerNameCellContent}</td>
                     <td class="py-3 px-2 text-sm">${orderDate.toLocaleDateString()}</td>
-                    ${!isCompleted ? `
+                    ${!isCompleted && !isEditing ? `
                     <td class="py-3 px-2 text-center">
                         <input type="checkbox" ${order.isSeen ? 'checked' : ''} onchange="handleToggleSeen('${order.id}', ${order.isSeen})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0" />
                     </td>
                     <td class="py-3 px-2 text-center">
                         <input type="checkbox" ${order.isDelivered ? 'checked' : ''} onchange="handleToggleDelivered('${order.id}', ${order.isDelivered})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0" />
                     </td>
-                    ` : ''}
+                    ` : isEditing ? `<td colspan="2"></td>` : ''}
                     <td class="py-3 px-2 text-center flex flex-col-sm-row gap-2 sm:gap-3 justify-center items-center">
                         ${actionsHtml}
                     </td>
@@ -700,7 +802,7 @@
                 </tr>
                 ${isExpanded ? `
                 <tr>
-                    <td colspan="${isCompleted ? '5' : '7'}" class="p-2 sm:p-4 bg-gray-100 border-t border-gray-200">
+                    <td colspan="${isCompleted || isEditing ? '5' : '7'}" class="p-2 sm:p-4 bg-gray-100 border-t border-gray-200">
                         <h4 class="font-semibold mb-2 text-sm sm:text-base">Bill Details for ${order.buyerName}:</h4>
                         <div class="overflow-x-auto">
                             <table class="min-w-full bg-white border border-gray-300 rounded-md text-xs sm:text-sm">
@@ -710,22 +812,16 @@
                                         <th class="py-2 px-2 text-left">Qty</th>
                                         <th class="py-2 px-2 text-left">Price/Unit</th>
                                         <th class="py-2 px-2 text-right">Total</th>
+                                        ${isEditing ? '<th class="py-2 px-2 text-center"></th>' : ''}
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    ${order.items.map(item => `
-                                        <tr class="border-b border-gray-100 last:border-b-0">
-                                            <td class="py-2 px-2">${item.product}</td>
-                                            <td class="py-2 px-2">${item.quantity}</td>
-                                            <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
-                                            <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
-                                        </tr>
-                                    `).join('')}
+                                <tbody id="order-items-tbody-${order.id}">
+                                    ${itemsDetailsHtml}
                                 </tbody>
                             </table>
                         </div>
                         <div class="text-right font-bold mt-2 pr-2 text-sm sm:text-base">
-                            Grand Total: ₹${order.grandTotal.toFixed(2)}
+                            Grand Total: ₹<span id="order-grand-total-${order.id}">${order.grandTotal.toFixed(2)}</span>
                         </div>
                     </td>
                 </tr>
@@ -734,189 +830,203 @@
         };
 
         const attachOrderEventListeners = () => {
-            // Event listeners are attached via inline onclick attributes in createOrderRow
-            // No need for a separate attach loop here for the dynamically added buttons.
-        };
+            // Event listeners for inline editing inputs
+            document.querySelectorAll('input[data-order-field], input[data-item-field], select[data-item-field]').forEach(input => {
+                input.oninput = (e) => {
+                    // This complex selector extracts the orderId from the nearest parent 'tr' which contains the expand button.
+                    // This is necessary because data-order-id is not directly on the editing row, but the main order row.
+                    const orderId = e.target.closest('tr').dataset.orderId || e.target.closest('table').closest('td').closest('tr').previousElementSibling.querySelector('button[onclick^="handleToggleExpand"]').onclick.toString().match(/'([^']*)'/)[1];
+                    const orderIndex = orders.findIndex(o => o.id === orderId);
+                    if (orderIndex === -1) return;
 
-        window.handleToggleExpand = (orderId) => {
-            const targetOrder = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
-            if (targetOrder) {
-                targetOrder.isExpanded = !targetOrder.isExpanded; // Toggle the property
-                renderAllOrders(); // Re-render to reflect change
-            }
-        };
+                    const field = e.target.dataset.orderField || e.target.dataset.itemField;
+                    const value = e.target.value;
 
-        window.handleToggleSeen = (orderId, currentStatus) => {
-            const orderIndex = orders.findIndex(order => order.id === orderId);
-            if (orderIndex > -1) {
-                orders[orderIndex].isSeen = !currentStatus;
-                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
-                showMessage(`Order ${orderId} marked as ${!currentStatus ? 'seen' : 'unseen'}.`);
-                renderAllOrders();
-            }
-        };
+                    if (e.target.dataset.orderField) {
+                        // Update buyer name in the order object
+                        orders[orderIndex][field] = value;
+                    } else if (e.target.dataset.itemField) {
+                        // Update product details in the order item
+                        const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                        orders[orderIndex].items[itemIndex][field] = (field === 'product') ? value : parseFloat(value);
 
-        window.handleToggleDelivered = (orderId, currentStatus) => {
-            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(o => o.id === orderId);
-            if (!orderToMove) return;
+                        // Recalculate item total and grand total
+                        const qty = orders[orderIndex].items[itemIndex].quantity;
+                        const price = orders[orderIndex].items[itemIndex].pricePerUnit;
+                        orders[orderIndex].items[itemIndex].total = (isNaN(qty) ? 0 : qty) * (isNaN(price) ? 0 : price);
 
-            const newStatus = !currentStatus;
-            const updatedOrder = { ...orderToMove,
-                isDelivered: newStatus
-            };
-
-            if (newStatus) { // Moving to completed
-                orders = orders.filter(order => order.id !== orderId);
-                completedOrders.push(updatedOrder);
-                completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            } else { // Moving to active
-                completedOrders = completedOrders.filter(order => order.id !== orderId);
-                orders.push(updatedOrder);
-                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            }
-            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
-            showMessage(`Order ${orderId} marked as ${newStatus ? 'delivered' : 'active'}.`);
-            renderAllOrders();
-        };
-
-        // Helper function to dynamically load a script using Promises
-        const loadScript = (url) => {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = url;
-                script.onload = () => {
-                    console.log(`Script loaded successfully: ${url}`);
-                    resolve();
+                        // Update the displayed item total immediately
+                        e.target.closest('tr').querySelector('.edited-item-total').textContent = orders[orderIndex].items[itemIndex].total.toFixed(2);
+                        calculateOrderGrandTotal(orderId);
+                    }
                 };
-                script.onerror = () => {
-                    console.error(`Failed to load script: ${url}`);
-                    reject(new Error(`Failed to load library from ${url}. Please check network or browser extensions.`));
-                };
-                document.head.appendChild(script);
+
+                // Auto-fill price on change for product name input in edit mode
+                if (input.dataset.itemField === 'product') {
+                    input.addEventListener('change', (e) => {
+                        // Similar complex selector for orderId
+                        const orderId = e.target.closest('tr').closest('table').closest('td').closest('tr').previousElementSibling.querySelector('button[onclick^="handleToggleExpand"]').onclick.toString().match(/'([^']*)'/)[1];
+                        const orderIndex = orders.findIndex(o => o.id === orderId);
+                        if (orderIndex === -1) return;
+
+                        const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                        const productName = e.target.value.trim();
+                        const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
+
+                        if (stockItem) {
+                            // Update pricePerUnit and recalculate total
+                            orders[orderIndex].items[itemIndex].pricePerUnit = parseFloat(stockItem.price);
+                            const qty = orders[orderIndex].items[itemIndex].quantity;
+                            const price = orders[orderIndex].items[itemIndex].pricePerUnit;
+                            orders[orderIndex].items[itemIndex].total = (isNaN(qty) ? 0 : qty) * (isNaN(price) ? 0 : price);
+                            // Re-render the entire orders list to reflect the updated price and total correctly
+                            renderAllOrders();
+                        }
+                    });
+                }
             });
         };
 
-        window.handlePrintBill = async (orderId, format) => {
-            const order = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
-            if (!order) {
-                showMessage("Order not found for printing.");
+        window.calculateOrderGrandTotal = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                const total = order.items.reduce((sum, item) => sum + item.total, 0);
+                order.grandTotal = total;
+                // Update the displayed grand total for the specific order
+                const grandTotalElement = document.getElementById(`order-grand-total-${orderId}`);
+                if (grandTotalElement) {
+                    grandTotalElement.textContent = total.toFixed(2);
+                }
+            }
+        };
+
+        window.handleEditOrder = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                // Store a deep copy of the original order for potential cancellation
+                order._originalState = JSON.parse(JSON.stringify(order));
+                order.isEditing = true;
+                order.isExpanded = true; // Ensure expanded when editing
+                renderAllOrders();
+                // After rendering, attach event listeners to newly created inputs
+                attachOrderEventListeners();
+            }
+        };
+
+        window.handleSaveEditedOrder = (orderId) => {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) return;
+
+            const order = orders[orderIndex];
+            // Find the input element within the currently rendered active orders tbody
+            const buyerNameInput = document.getElementById('active-orders-tbody').querySelector(`tr td input[data-order-field="buyerName"]`);
+            if (!buyerNameInput) {
+                // This might happen if the table re-rendered and the specific input was recreated
+                // or if the user navigates away before saving.
+                // In a production app, more robust state management or a unique ID on the 'tr' would help.
+                showMessage("Could not find buyer name input. Please try again.");
                 return;
             }
 
-            // Only load html2canvas as jsPDF is no longer needed
-            if (typeof window.html2canvas === 'undefined') {
-                showMessage("Loading image export library...");
-                try {
-                    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-                    console.log("html2canvas loaded successfully.");
-                } catch (error) {
-                    console.error("Error loading html2canvas library:", error);
-                    showMessage(`Image export features are not available. ${error.message}`);
-                    return;
-                }
+            const newBuyerName = buyerNameInput.value.trim();
+            if (!newBuyerName) {
+                showMessage("Buyer name cannot be empty.");
+                return;
             }
 
-            const billToPrintDiv = document.getElementById('bill-to-print');
-            const dateOptions = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            };
-            const timeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
+            const newItems = [];
+            let isValid = true;
+            const itemsTableBody = document.getElementById(`order-items-tbody-${orderId}`);
+            if (!itemsTableBody) {
+                showMessage("Could not find order items table. Please try again.");
+                return;
+            }
 
-            // Enhanced styling for the bill to ensure consistent spacing in the image output
-            // Company name font size increased to text-5xl
-            billToPrintDiv.innerHTML = `
-                <div class="p-8 bg-white text-black rounded-lg shadow-xl w-full" style="min-height: 297mm; width: 210mm; box-sizing: border-box;">
-                    <h1 class="text-5xl font-bold text-center mb-4">${companyDetails.companyName || 'Your Company Name'}</h1>
-                    <div class="text-sm text-center mb-6 leading-tight">
-                        ${companyDetails.address ? `<p>${companyDetails.address}</p>` : ''}
-                        ${companyDetails.phone || companyDetails.email ? `<p>${companyDetails.phone ? `Phone: ${companyDetails.phone}` : ''} ${companyDetails.phone && companyDetails.email ? '|' : ''} ${companyDetails.email ? `Email: ${companyDetails.email}` : ''}</p>` : ''}
-                        ${companyDetails.gstNumber ? `<p>GSTIN: ${companyDetails.gstNumber}</p>` : ''}
-                    </div>
+            itemsTableBody.querySelectorAll('tr[data-item-index]').forEach(row => {
+                const productInput = row.querySelector('input[data-item-field="product"]');
+                const quantityInput = row.querySelector('input[data-item-field="quantity"]');
+                const priceInput = row.querySelector('input[data-item-field="pricePerUnit"]');
 
-                    <div class="flex justify-between items-start mb-6 border-b border-gray-300 pb-4">
-                        <div>
-                            <p class="font-semibold text-lg mb-1">Bill To:</p>
-                            <p class="text-xl font-bold">${order.buyerName}</p>
-                        </div>
-                        <div class="text-right text-sm">
-                            <p>Date: ${new Date(order.orderDate).toLocaleDateString(undefined, dateOptions)}</p>
-                            <p>Time: ${new Date(order.orderDate).toLocaleTimeString(undefined, timeOptions)}</p>
-                            <p>Order ID: ${order.id || 'N/A'}</p>
-                        </div>
-                    </div>
+                const product = productInput.value.trim();
+                const quantity = parseFloat(quantityInput.value);
+                const pricePerUnit = parseFloat(priceInput.value);
+                const total = quantity * pricePerUnit;
 
-                    <table class="min-w-full bg-white border border-gray-300 mb-8" style="border-collapse: collapse;">
-                        <thead>
-                            <tr class="bg-gray-100 border-b border-gray-300">
-                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Product</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Quantity</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Price/Unit</th>
-                                <th class="py-3 px-4 text-right text-sm font-semibold uppercase border border-gray-300">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${order.items.map((item, index) => `
-                                <tr class="border-b border-gray-200 last:border-b-0">
-                                    <td class="py-3 px-4 text-base border border-gray-300">${item.product}</td>
-                                    <td class="py-3 px-4 text-base border border-gray-300">${item.quantity}</td>
-                                    <td class="py-3 px-4 text-base border border-gray-300">₹${item.pricePerUnit.toFixed(2)}</td>
-                                    <td class="py-3 px-4 text-right text-base border border-gray-300">₹${item.total.toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-
-                    <div class="flex justify-end pr-4 text-xl font-bold">
-                        <p>Grand Total: ₹${order.grandTotal.toFixed(2)}</p>
-                    </div>
-
-                    <div class="mt-12 text-center text-sm text-gray-600">
-                        <p>Thank you for your business!</p>
-                        <p>This is a computer generated bill and does not require a signature.</p>
-                    </div>
-                </div>
-            `;
-            billToPrintDiv.classList.add('visible-for-capture');
-
-            // Add a small delay to allow the DOM to fully render before capturing
-            setTimeout(async () => {
-                try {
-                    const canvas = await window.html2canvas(billToPrintDiv.firstElementChild, {
-                        scale: 2, // Increased scale for better resolution
-                        useCORS: true,
-                        logging: false,
-                        // Removed explicit width and height to let html2canvas determine based on rendered element
-                    });
-
-                    // Only photo export logic remains
-                    if (format === 'photo') {
-                        const imgData = canvas.toDataURL('image/png');
-                        const link = document.createElement('a');
-                        link.href = imgData;
-                        link.download = `${order.buyerName}_Bill_${new Date(order.orderDate).toLocaleDateString()}.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        showMessage("Bill exported as photo!");
-                    } else {
-                        // Fallback for any other format requests, though buttons only offer photo
-                        showMessage("Only photo export is supported.");
-                    }
-                } catch (error) {
-                    console.error("Error generating bill:", error);
-                    showMessage("Failed to generate bill. Please try again.");
-                } finally {
-                    billToPrintDiv.classList.remove('visible-for-capture');
-                    billToPrintDiv.innerHTML = '';
+                if (!product || isNaN(quantity) || quantity <= 0 || isNaN(pricePerUnit) || pricePerUnit < 0) {
+                    showMessage("All product fields must be filled correctly with valid numbers for quantity and price.");
+                    isValid = false;
+                    return; // Exit forEach early if invalid
                 }
-            }, 50); // 50ms delay
+                newItems.push({
+                    product,
+                    quantity,
+                    pricePerUnit,
+                    total
+                });
+            });
+
+            if (!isValid) {
+                return; // Stop function if validation failed
+            }
+
+            if (newItems.length === 0) {
+                showMessage("Bill must contain at least one product.");
+                return;
+            }
+
+            order.buyerName = newBuyerName;
+            order.items = newItems;
+            calculateOrderGrandTotal(orderId); // Recalculate grand total based on new items
+            order.isEditing = false;
+            delete order._originalState; // Clean up original state
+
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({
+                ...o,
+                orderDate: o.orderDate.toISOString()
+            })));
+            showMessage("Order updated successfully!");
+            renderAllOrders();
         };
+
+        window.handleCancelEditOrder = (orderId) => {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) return;
+
+            const order = orders[orderIndex];
+            if (order._originalState) {
+                // Revert to original state by replacing the current order with the deep copy
+                orders[orderIndex] = JSON.parse(JSON.stringify(order._originalState));
+            }
+            orders[orderIndex].isEditing = false;
+            delete orders[orderIndex]._originalState; // Clean up original state
+            showMessage("Order edit cancelled.");
+            renderAllOrders();
+        };
+
+        window.handleAddOrderItem = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.items.push({
+                    product: '',
+                    quantity: 1,
+                    pricePerUnit: 0,
+                    total: 0
+                });
+                renderAllOrders(); // Re-render to show the new row
+            }
+        };
+
+        window.handleRemoveOrderItem = (orderId, itemIndex) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.items.length > 1) { // Ensure at least one item remains
+                order.items.splice(itemIndex, 1);
+                calculateOrderGrandTotal(orderId);
+                renderAllOrders(); // Re-render to reflect removal
+            } else if (order.items.length <= 1) {
+                showMessage("An order must have at least one product.");
+            }
+        };
+
 
         // --- Add Order Page Logic ---
         const addOrderForm = document.getElementById('add-order-form');
@@ -947,14 +1057,19 @@
                 const row = productsTableBody.insertRow();
                 row.innerHTML = `
                     <td class="py-2 px-3">
+                        <!-- Product input for new orders, uses datalist for suggestions -->
                         <input type="text" data-field="product" data-index="${index}" value="${item.product}"
                             class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
                             placeholder="Product Name" list="product-suggestions" required />
                     </td>
                     <td class="py-2 px-3">
-                        <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity}"
+                        <select data-field="quantity" data-index="${index}"
                             class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black"
-                            min="1" required />
+                            required>
+                            ${Array.from({length: 20}, (_, i) => i + 1).map(qty => `
+                                <option value="${qty}" ${item.quantity === qty ? 'selected' : ''}>${qty}</option>
+                            `).join('')}
+                        </select>
                     </td>
                     <td class="py-2 px-3">
                         <input type="number" data-field="pricePerUnit" data-index="${index}" step="0.01" value="${item.pricePerUnit}"
@@ -973,6 +1088,7 @@
             updateProductSuggestionsDatalist(); // Update datalist whenever table is rendered
         };
 
+        // Populates the datalist with product names from the stock array
         const updateProductSuggestionsDatalist = () => {
             productSuggestionsDatalist.innerHTML = '';
             stock.forEach(item => {
@@ -988,44 +1104,35 @@
         };
 
         const attachProductInputListeners = () => {
-            productsTableBody.querySelectorAll('input').forEach(input => {
+            productsTableBody.querySelectorAll('input[data-field="product"]').forEach(input => {
                 input.oninput = (e) => {
                     const index = parseInt(e.target.dataset.index);
                     const field = e.target.dataset.field;
                     let value = e.target.value;
-
-                    if (field === 'quantity' || field === 'pricePerUnit') {
-                        value = parseFloat(value);
-                        if (isNaN(value)) value = 0;
-                    }
 
                     currentItems[index][field] = value;
                     const quantity = currentItems[index].quantity;
                     const pricePerUnit = currentItems[index].pricePerUnit;
                     currentItems[index].total = (isNaN(quantity) ? 0 : quantity) * (isNaN(pricePerUnit) ? 0 : pricePerUnit);
 
-                    // Update the displayed total for the current item
                     e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
                     calculateAndDisplayGrandTotal();
                 };
 
-                // Auto-fill price when product name is selected/entered
-                if (input.dataset.field === 'product') {
-                    input.addEventListener('change', (e) => {
-                        const productName = e.target.value.trim();
-                        const index = parseInt(e.target.dataset.index);
-                        const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
+                // Auto-fill price when product name is selected/entered from suggestions
+                input.addEventListener('change', (e) => {
+                    const productName = e.target.value.trim();
+                    const index = parseInt(e.target.dataset.index);
+                    const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
 
-                        if (stockItem) {
-                            currentItems[index].pricePerUnit = parseFloat(stockItem.price);
-                            currentItems[index].total = currentItems[index].quantity * currentItems[index].pricePerUnit;
-                            updateProductsTable(); // Re-render to update pricePerUnit and total
-                            // Try to focus on the quantity field of the current row
-                            productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`)?.focus();
-                        }
-                    });
-                }
-
+                    if (stockItem) {
+                        currentItems[index].pricePerUnit = parseFloat(stockItem.price);
+                        currentItems[index].total = currentItems[index].quantity * currentItems[index].pricePerUnit;
+                        updateProductsTable(); // Re-render to update pricePerUnit and total
+                        // Try to focus on the quantity field of the current row
+                        productsTableBody.querySelector(`select[data-index="${index}"][data-field="quantity"]`)?.focus();
+                    }
+                });
 
                 input.onkeydown = (e) => {
                     if (e.key === 'Enter') {
@@ -1033,25 +1140,55 @@
                         const index = parseInt(e.target.dataset.index);
                         const field = e.target.dataset.field;
 
-                        let nextInput = null;
+                        let nextElement = null;
                         if (field === 'product') {
-                            nextInput = productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`);
-                        } else if (field === 'quantity') {
-                            nextInput = productsTableBody.querySelector(`input[data-index="${index}"][data-field="pricePerUnit"]`);
-                        } else if (field === 'pricePerUnit') {
-                            if (index === currentItems.length - 1) {
-                                addItemRow(); // This will re-render and focus on new row
-                                return;
-                            } else {
-                                nextInput = productsTableBody.querySelector(`input[data-index="${index + 1}"][data-field="product"]`);
-                            }
+                            nextElement = productsTableBody.querySelector(`select[data-index="${index}"][data-field="quantity"]`);
                         }
-                        if (nextInput) {
-                            nextInput.focus();
+                        if (nextElement) {
+                            nextElement.focus();
                         }
                     }
                 };
             });
+
+            productsTableBody.querySelectorAll('select[data-field="quantity"]').forEach(select => {
+                select.onchange = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    currentItems[index].quantity = parseInt(e.target.value);
+                    const quantity = currentItems[index].quantity;
+                    const pricePerUnit = currentItems[index].pricePerUnit;
+                    currentItems[index].total = (isNaN(quantity) ? 0 : quantity) * (isNaN(pricePerUnit) ? 0 : pricePerUnit);
+                    e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
+                    calculateAndDisplayGrandTotal();
+                    // Focus on the pricePerUnit input after quantity is selected
+                    productsTableBody.querySelector(`input[data-index="${index}"][data-field="pricePerUnit"]`)?.focus();
+                };
+            });
+
+            productsTableBody.querySelectorAll('input[data-field="pricePerUnit"]').forEach(input => {
+                input.oninput = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    currentItems[index].pricePerUnit = parseFloat(e.target.value);
+                    const quantity = currentItems[index].quantity;
+                    const pricePerUnit = currentItems[index].pricePerUnit;
+                    currentItems[index].total = (isNaN(quantity) ? 0 : quantity) * (isNaN(pricePerUnit) ? 0 : pricePerUnit);
+                    e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
+                    calculateAndDisplayGrandTotal();
+                };
+
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const index = parseInt(e.target.dataset.index);
+                        if (index === currentItems.length - 1) {
+                            addItemRow();
+                        } else {
+                            productsTableBody.querySelector(`input[data-index="${index + 1}"][data-field="product"]`)?.focus();
+                        }
+                    }
+                };
+            });
+
 
             productsTableBody.querySelectorAll('button[data-action="remove"]').forEach(button => {
                 button.onclick = (e) => {
@@ -1114,13 +1251,17 @@
                 grandTotal: parseFloat(grandTotalSpan.textContent),
                 isSeen: false,
                 isDelivered: false,
+                isEditing: false, // Initialize isEditing for new orders
                 companyDetails: { ...companyDetails
                 } // Store a copy of current company details
             };
 
             orders.push(newOrder);
             orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({
+                ...o,
+                orderDate: o.orderDate.toISOString()
+            })));
             showMessage("Order saved successfully!");
             renderPage('allOrders'); // Navigate back to all orders
         });
@@ -1239,7 +1380,7 @@
                     showMessage("Please enter valid product name and price.");
                     return;
                 }
-                
+
                 // Check for duplicate names (excluding the current item being edited)
                 const isDuplicate = stock.some(item => item.id !== id && item.name.toLowerCase() === newName.toLowerCase());
                 if (isDuplicate) {
@@ -1247,6 +1388,7 @@
                     return;
                 }
 
+                // Corrected logic for saving the edited stock item
                 stock[itemIndex].name = newName;
                 stock[itemIndex].price = newPrice;
                 stock[itemIndex].isEditing = false;
@@ -1344,7 +1486,10 @@
             };
             notes.push(newNote);
             notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+            saveDataToLocalStorage('notes', userId, notes.map(n => ({
+                ...n,
+                createdAt: n.createdAt.toISOString()
+            })));
             showMessage("Note added!");
             newNoteContentInput.value = '';
             renderNotes();
@@ -1355,7 +1500,10 @@
             if (noteIndex > -1) {
                 notes[noteIndex].isDone = !currentStatus;
                 notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-                saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({
+                    ...n,
+                    createdAt: n.createdAt.toISOString()
+                })));
                 showMessage(`Note marked as ${!currentStatus ? 'done' : 'undone'}.`);
                 renderNotes();
             }
@@ -1365,7 +1513,10 @@
             const confirmed = await showConfirmation("Are you sure you want to delete this note?");
             if (confirmed) {
                 notes = notes.filter(note => note.id !== noteId);
-                saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({
+                    ...n,
+                    createdAt: n.createdAt.toISOString()
+                })));
                 showMessage("Note deleted!");
                 renderNotes();
             }
@@ -1389,7 +1540,10 @@
                 }
                 notes[noteIndex].content = editedContent;
                 notes[noteIndex].isEditing = false;
-                saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+                saveDataToLocalStorage('notes', userId, notes.map(n => ({
+                    ...n,
+                    createdAt: n.createdAt.toISOString()
+                })));
                 showMessage("Note updated!");
                 renderNotes();
             }
@@ -1409,17 +1563,19 @@
         const addressInput = document.getElementById('address');
         const phoneInput = document.getElementById('phone');
         const emailInput = document.getElementById('email');
-        const gstNumberInput = document.getElementById('gstNumber'); 
+        const gstNumberInput = document.getElementById('gstNumber');
         const exportDataBtn = document.getElementById('export-data-btn');
         const importFileInput = document.getElementById('import-file-input');
         const importDataBtn = document.getElementById('import-data-btn');
+        const resetAppBtn = document.getElementById('reset-app-btn');
+        // const refreshAppBtn = document.getElementById('refresh-app-btn'); // Removed refresh button
 
         const renderSettings = () => {
             companyNameInput.value = companyDetails.companyName;
             addressInput.value = companyDetails.address;
             phoneInput.value = companyDetails.phone;
             emailInput.value = companyDetails.email;
-            gstNumberInput.value = companyDetails.gstNumber; 
+            gstNumberInput.value = companyDetails.gstNumber;
         };
 
         settingsForm.addEventListener('submit', (e) => {
@@ -1530,8 +1686,14 @@
                     stock.sort((a, b) => a.name.localeCompare(b.name));
 
                     saveDataToLocalStorage('companyDetails', userId, companyDetails);
-                    saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
-                    saveDataToLocalStorage('notes', userId, notes.map(n => ({ ...n, createdAt: n.createdAt.toISOString() })));
+                    saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({
+                        ...o,
+                        orderDate: o.orderDate.toISOString()
+                    })));
+                    saveDataToLocalStorage('notes', userId, notes.map(n => ({
+                        ...n,
+                        createdAt: n.createdAt.toISOString()
+                    })));
                     saveDataToLocalStorage('stock', userId, stock); // Save imported stock data
 
                     showMessage("Data imported successfully!");
@@ -1547,6 +1709,18 @@
                 }
             };
             reader.readAsText(file);
+        });
+
+        // New: Reset App (Clear All Data) button logic
+        resetAppBtn.addEventListener('click', async () => {
+            const confirmed = await showConfirmation("Are you sure you want to reset the application? This will permanently delete ALL your data and reload the site.");
+            if (confirmed) {
+                localStorage.clear(); // Clear all data from local storage
+                showMessage("Application reset successfully. Reloading...");
+                setTimeout(() => {
+                    location.reload(); // Reload the page
+                }, 1000); // Give a brief moment for message to show
+            }
         });
 
 
@@ -1620,6 +1794,7 @@
         });
 
         const initializeAppData = () => {
+            console.log(`[AppInit] Initializing app data for user ID: ${userId}`);
             // Load company details
             companyDetails = loadDataFromLocalStorage('companyDetails', userId, {
                 companyName: '',
@@ -1628,6 +1803,8 @@
                 email: '',
                 gstNumber: '' // Initialize GST number
             });
+            console.log('[AppInit] Company details after load:', companyDetails);
+
 
             // Load orders
             const storedOrders = loadDataFromLocalStorage('orders', userId, []);
@@ -1641,6 +1818,9 @@
 
             orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
             completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            console.log('[AppInit] Active orders after load:', orders);
+            console.log('[AppInit] Completed orders after load:', completedOrders);
+
 
             // Load notes
             const storedNotes = loadDataFromLocalStorage('notes', userId, []);
@@ -1649,6 +1829,8 @@
                 createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
             }));
             notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            console.log('[AppInit] Notes after load:', notes);
+
 
             // Load stock data
             const storedStock = loadDataFromLocalStorage('stock', userId, []);
@@ -1657,6 +1839,7 @@
                 price: parseFloat(item.price) // Ensure price is a number
             }));
             stock.sort((a, b) => a.name.localeCompare(b.name));
+            console.log('[AppInit] Stock after load:', stock);
 
             console.log("Data loaded from local storage for user:", userId);
         };
@@ -1666,7 +1849,10 @@
             const confirmed = await showConfirmation("Are you sure you want to clear all delivered orders? This action cannot be undone.");
             if (confirmed) {
                 completedOrders = []; // Clear the array
-                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({ ...o, orderDate: o.orderDate.toISOString() })));
+                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders].map(o => ({
+                    ...o,
+                    orderDate: o.orderDate.toISOString()
+                })));
                 showMessage("All delivered orders cleared!");
                 renderAllOrders(); // Re-render the page to reflect the change
             }
