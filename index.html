@@ -260,7 +260,7 @@
             padding-right: 0.5rem;
             color: #9ca3af;
             cursor: pointer;
-            font-size: 1.125rem; /* Increased size to text-lg (18px) for better visibility/clickability */
+            font-size: 1rem; /* Changed from 1.125rem to 1rem for better mobile fit */
         }
     </style>
 </head>
@@ -352,7 +352,7 @@
 
         <div id="page-addOrder" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
             <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Create New Bill</h2>
-            <form id="add-order-form" class="max-w-3xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md">
+            <form id="add-order-form" class="max-w-3xl mx-auto bg-gray-50 p-4 sm:p-6 rounded-lg shadow-md">
                 <div class="mb-4">
                     <label for="buyerName" class="block text-sm font-medium text-gray-700 mb-1">Buyer Name:</label>
                     <input type="text" id="buyerName"
@@ -365,11 +365,11 @@
                     <table id="products-table" class="min-w-full bg-white border border-gray-200 rounded-md">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Product</th>
-                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Qty</th>
-                                <th class="py-2 px-3 text-left text-xs sm:text-sm font-semibold uppercase">Price/Unit</th>
-                                <th class="py-2 px-3 text-right text-xs sm:text-sm font-semibold uppercase">Total</th>
-                                <th class="py-2 px-3 text-center text-xs sm:text-sm font-semibold uppercase"></th>
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Product</th>
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Qty</th>
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Price/Unit</th>
+                                <th class="py-2 px-2 text-right text-xs sm:text-sm font-semibold uppercase">Total</th>
+                                <th class="py-2 px-2 text-center text-xs sm:text-sm font-semibold uppercase"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1068,7 +1068,7 @@
                 if (isEditing) {
                     buyerNameCellContent = `
                         <input type="text" value="${order.buyerName}" data-order-field="buyerName"
-                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
                     `;
                     actionsHtml = `
                         <button onclick="window.handleSaveEditedOrder('${order.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center">
@@ -1083,20 +1083,20 @@
                             <td class="py-2 px-2 relative">
                                 <!-- Product input for editing, now using custom autocomplete -->
                                 <input type="text" value="${item.product}" data-item-field="product"
-                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-black focus:border-black transition-colors" />
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
                             </td>
                             <td class="py-2 px-2">
                                 <div class="relative-input-wrapper">
                                     <!-- Quantity input for editing, now using custom autocomplete -->
                                     <input type="number" value="${item.quantity || ''}" data-item-field="quantity" step="1" min="1"
-                                        class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                        class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black text-xs sm:text-sm"
                                         required />
                                     <span class="material-icons dropdown-arrow" data-target-input="quantity-${itemIndex}">arrow_drop_down</span>
                                 </div>
                             </td>
                             <td class="py-2 px-2">
                                 <input type="number" value="${item.pricePerUnit}" data-item-field="pricePerUnit" step="0.01" min="0"
-                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-black focus:border-black transition-colors" />
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
                             </td>
                             <td class="py-2 px-2 text-right text-xs">₹<span class="edited-item-total">${item.total.toFixed(2)}</span></td>
                             <td class="py-2 px-2 text-center">
@@ -1659,30 +1659,30 @@
             currentItems.forEach((item, index) => {
                 const row = productsTableBody.insertRow();
                 row.innerHTML = `
-                    <td class="py-2 px-3 relative">
+                    <td class="py-2 px-2 relative">
                         <!-- Product input for new orders, uses custom autocomplete -->
                         <input type="text" data-field="product" data-index="${index}" value="${item.product}"
-                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black transition-colors"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors"
                             placeholder="Product Name" required />
                     </td>
-                    <td class="py-2 px-3">
+                    <td class="py-2 px-2">
                         <div class="relative-input-wrapper">
                             <!-- Quantity input for new orders, uses custom autocomplete -->
                             <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity || ''}" step="1" min="1"
-                                class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm"
+                                class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black text-xs sm:text-sm"
                                 required />
                             <span class="material-icons dropdown-arrow" data-target-input="quantity-${index}">arrow_drop_down</span>
                         </div>
                     </td>
-                    <td class="py-2 px-3">
+                    <td class="py-2 px-2">
                         <input type="number" data-field="pricePerUnit" data-index="${index}" value="${item.pricePerUnit || ''}" step="0.01"
-                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black transition-colors"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors"
                             min="0" required />
                     </td>
-                    <td class="py-2 px-3 text-right font-medium text-sm">
+                    <td class="py-2 px-2 text-right font-medium text-xs sm:text-sm">
                         ₹<span class="item-total">${item.total.toFixed(2)}</span>
                     </td>
-                    <td class="py-2 px-3 text-center">
+                    <td class="py-2 px-2 text-center">
                         ${currentItems.length > 1 ? `<button type="button" data-action="remove" data-index="${index}" class="text-red-600 hover:text-red-800 text-lg font-bold transition-colors">&times;</button>` : ''}
                     </td>
                 `;
@@ -1886,11 +1886,11 @@
                         row.innerHTML = `
                             <td class="py-3 px-4">
                                 <input type="text" data-field="name" value="${item.name}"
-                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
                             </td>
                             <td class="py-3 px-4">
                                 <input type="number" data-field="price" value="${item.price}" step="0.01" min="0"
-                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors" />
                             </td>
                             <td class="py-3 px-4 text-center flex gap-2 justify-center">
                                 <button onclick="window.saveEditedStockItem('${item.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors">Save</button>
