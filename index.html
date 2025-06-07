@@ -9,6 +9,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Google Fonts Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Material Icons specific style for proper rendering -->
+    <style>
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px; /* default size */
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+
     <link rel="manifest" href="/QuickBill/manifest.json" />
     <link rel="apple-touch-icon" href="/QuickBill/icons/icon-192x192.png" />
 
@@ -2412,4 +2432,5 @@
         document.getElementById('nav-settings').addEventListener('click', () => renderPage('settings'));
     </script>
 </body>
+
 </html>
