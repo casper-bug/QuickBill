@@ -1,0 +1,3230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickBill - Order Management App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Material Icons specific style for proper rendering -->
+    <style>
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px; /* default size */
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Additional Mobile Touch Optimizations */        @media (max-width: 639px) {            /* Ensure touch targets are at least 44x44px */            button:not(.mobile-menu-close):not(.hamburger-button), .nav-button, .mobile-nav-item {                min-height: 44px;            }                        /* Better spacing for stat cards */            .stat-value {                font-size: 1.75rem;            }                        /* Improve hamburger button touch target */            .hamburger-button {                min-width: 48px;                min-height: 48px;            }        }
+    </style>
+
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" />
+
+    <link rel="icon" href="./icons/favicon.png" type="image/x-icon">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        /* Custom styles for better aesthetics and mobile handling */
+        .container {
+            max-width: 1280px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .shadow-md {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-md {
+            border-radius: 0.375rem;
+        }
+
+        .animate-fade-in-down {
+            animation: fadeInDown 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        /* Hide pages by default, JavaScript will show the active one */
+        .page-content {
+            display: none;
+        }
+
+        /* Style for active navigation button */
+        .nav-button.active {
+            background-color: white;
+            color: black;
+        }
+
+        /* Loading overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        /* Force hide the loading overlay when 'hidden' class is applied */
+        #loading-overlay.hidden {
+            display: none !important;
+        }
+
+        /* Hidden div for bill generation - positioned off-screen */
+        #bill-to-print {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            z-index: -1;
+            width: 210mm;
+            min-height: 297mm;
+            background-color: white;
+        }
+
+        /* When bill-to-print is made visible for capture, it should still be off-screen */
+        #bill-to-print.visible-for-capture {
+            left: -9999px;
+            top: -9999px;
+            z-index: -1;
+            display: block;
+        }
+
+        /* Specific styles for tables on small screens */
+        @media (max-width: 639px) {
+            table th,
+            table td {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                font-size: 0.75rem;
+            }
+
+            table input[type="checkbox"] {
+                height: 1rem;
+                width: 1rem;
+            }
+
+            .flex-col-sm-row {
+                flex-direction: column;
+            }
+
+            .gap-1-sm-gap-2>* :not(:first-child) {
+                margin-top: 0.25rem;
+            }
+
+            .sm\:text-sm {
+                font-size: 0.875rem;
+            }
+
+            .sm\:text-base {
+                font-size: 1rem;
+            }
+            
+            /* Mobile-specific table container */
+            .mobile-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Mobile navigation improvements */
+            .mobile-nav-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .mobile-nav-button {
+                width: 100%;
+                text-align: center;
+                padding: 0.75rem 0.5rem;
+            }
+            
+            /* Mobile form improvements */
+            .mobile-form-input {
+                font-size: 16px;
+            }
+            
+            /* Dashboard specific mobile styles */
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            /* Hide regular nav on mobile, show hamburger */
+            .nav-full {
+                display: none;
+            }
+            
+            .nav-hamburger {
+                display: flex;
+            }
+        }
+
+        @media (min-width: 640px) {
+            .flex-col-sm-row {
+                flex-direction: row;
+            }
+
+            .gap-1-sm-gap-2>* :not(:first-child) {
+                margin-left: 0.5rem;
+            }
+            
+            /* Dashboard specific styles */
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            /* Show regular nav on desktop, hide hamburger */
+            .nav-full {
+                display: flex;
+            }
+            
+            .nav-hamburger {
+                display: none;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Custom Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* QuickBill Title Monospace Font */
+        .quickbill-title-font {
+            font-family: monospace;
+        }
+
+        /* Autocomplete List Styling */
+        .autocomplete-items {
+            border-top: none;
+            cursor: pointer;
+            position: absolute;
+            z-index: 1001;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .autocomplete-items div {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .autocomplete-items div:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #f3f4f6;
+        }
+
+        .autocomplete-active {
+            background-color: #e5e7eb !important;
+        }
+
+        /* Custom CSS for dropdown arrow alignment */
+        .relative-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-right: 0.5rem;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        /* Stock quantity low warning */
+        .low-stock {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        
+        /* Stock deduction checkbox styling */
+        .stock-deduction-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Dashboard specific styles */
+        .dashboard-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .stat-card.revenue {
+            border-left-color: #10b981;
+        }
+        
+        .stat-card.orders {
+            border-left-color: #3b82f6;
+        }
+        
+        .stat-card.customers {
+            border-left-color: #8b5cf6;
+        }
+        
+        .stat-card.stock {
+            border-left-color: #f59e0b;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .stat-change.positive {
+            color: #10b981;
+        }
+        
+        .stat-change.negative {
+            color: #ef4444;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            height: 300px;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .top-products-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .top-product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .top-product-item:last-child {
+            border-bottom: none;
+        }
+        
+        .product-rank {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 0.75rem;
+        }
+        
+        .product-rank-1 {
+            background: #f59e0b;
+        }
+        
+        .product-rank-2 {
+            background: #6b7280;
+        }
+        
+        .product-rank-3 {
+            background: #92400e;
+        }
+        
+        .product-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .product-sales {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        
+        .dashboard-section {
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #1f2937;
+        }
+        
+        .recent-activity-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .recent-activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            margin-right: 1rem;
+            color: #3b82f6;
+        }
+        
+        .activity-details {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .activity-amount {
+            font-weight: 600;
+            color: #10b981;
+        }
+        
+        .dashboard-date-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .date-filter-button {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        
+        .date-filter-button.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .date-filter-button:hover:not(.active) {
+            background: #f9fafb;
+        }
+        
+        /* Simple chart styles */
+        .simple-bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            gap: 0.5rem;
+            padding: 1rem 0;
+        }
+        
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+        
+        .bar {
+            width: 100%;
+            background: #3b82f6;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s ease;
+        }
+        
+        .bar-label {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            text-align: center;
+            color: #6b7280;
+        }
+        
+        .simple-line-chart {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+        
+        .line-path {
+            fill: none;
+            stroke: #3b82f6;
+            stroke-width: 2;
+        }
+        
+        .area-path {
+            fill: rgba(59, 130, 246, 0.1);
+        }
+        
+        .chart-grid-line {
+            stroke: #e5e7eb;
+            stroke-width: 1;
+        }
+        
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: relative;
+        }
+        
+        .hamburger-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        .mobile-menu-header {
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mobile-menu-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .mobile-menu-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .mobile-nav-items {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        .mobile-nav-item:hover, .mobile-nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .mobile-nav-item i {
+            font-size: 1.25rem;
+            width: 24px;
+        }
+        
+        .mobile-user-info {
+            padding: 1rem;
+            border-top: 1px solid #333;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+        /* Additional Mobile Touch Optimizations */        @media (max-width: 639px) {            /* Ensure touch targets are at least 44x44px */            button:not(.mobile-menu-close):not(.hamburger-button), .nav-button, .mobile-nav-item {                min-height: 44px;            }                        /* Better spacing for stat cards */            .stat-value {                font-size: 1.75rem;            }                        /* Improve hamburger button touch target */            .hamburger-button {                min-width: 48px;                min-height: 48px;            }        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-white text-black font-sans flex flex-col">
+
+    <div id="loading-overlay"
+        class="fixed top-0 left-0 w-full h-100% bg-white bg-opacity-90 flex items-center justify-center z-50">
+        <div class="text-lg text-gray-700">Loading application...</div>
+    </div>
+
+    <div id="message-display"
+        class="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg shadow-lg z-50 flex items-center justify-between animate-fade-in-down hidden">
+        <span id="message-text"></span>
+        <button id="message-close-btn" class="ml-4 text-white hover:text-gray-300 font-bold">
+            <i class="material-icons text-xl">close</i>
+        </button>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <p id="confirmation-message" class="mb-6 text-lg"></p>
+            <div class="flex justify-center gap-4">
+                <button id="confirm-yes"
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">Yes</button>
+                <button id="confirm-no"
+                    class="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition-colors">No</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-black text-white p-4 shadow-md">
+        <nav class="flex flex-col sm:flex-row sm:justify-between items-center max-w-7xl mx-auto mobile-nav-container">
+            <div class="flex items-center justify-between w-full">
+                <h1 class="text-xl sm:text-2xl font-bold quickbill-title-font">QuickBill</h1>
+                
+                <!-- Hamburger Menu Button (Mobile) -->
+                <div class="nav-hamburger hamburger-menu">
+                    <button class="hamburger-button" id="hamburger-toggle">
+                        <i class="material-icons">menu</i>
+                    </button>
+                </div>
+                
+                <!-- Regular Navigation (Desktop) -->
+                <div class="nav-full flex flex-wrap justify-center gap-3 sm:gap-4">
+                    <button id="nav-dashboard"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors active mobile-nav-button">
+                        Dashboard
+                    </button>
+                    <button id="nav-allOrders"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors mobile-nav-button">
+                        All Orders
+                    </button>
+                    <button id="nav-addOrder"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors mobile-nav-button">
+                        Add New Bill
+                    </button>
+                    <button id="nav-stock"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors mobile-nav-button">
+                        Stock
+                    </button>
+                    <button id="nav-notes"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors mobile-nav-button">
+                        Notes
+                    </button>
+                    <button id="nav-settings"
+                        class="nav-button px-4 py-2 rounded-md text-sm sm:text-base font-medium transition-colors mobile-nav-button">
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Mobile Hamburger Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <div class="mobile-menu-title">QuickBill</div>
+            <button class="mobile-menu-close" id="mobile-menu-close">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+        <div class="mobile-nav-items">
+            <a href="#" class="mobile-nav-item active" data-page="dashboard">
+                <i class="material-icons">dashboard</i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-page="allOrders">
+                <i class="material-icons">receipt</i>
+                <span>All Orders</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-page="addOrder">
+                <i class="material-icons">add_circle</i>
+                <span>Add New Bill</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-page="stock">
+                <i class="material-icons">inventory</i>
+                <span>Stock</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-page="notes">
+                <i class="material-icons">notes</i>
+                <span>Notes</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-page="settings">
+                <i class="material-icons">settings</i>
+                <span>Settings</span>
+            </a>
+        </div>
+        <div class="mobile-user-info">
+            <div id="mobile-user-id">User ID: Loading...</div>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page-content p-4 sm:p-6 md:p-8 bg-gray-50 text-black min-h-screen">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-2xl sm:text-3xl font-bold mb-6">Dashboard</h2>
+                
+                <!-- Date Range Filter -->
+                <div class="dashboard-date-filter">
+                    <button class="date-filter-button active" data-range="7">Last 7 Days</button>
+                    <button class="date-filter-button" data-range="30">Last 30 Days</button>
+                    <button class="date-filter-button" data-range="90">Last 90 Days</button>
+                    <button class="date-filter-button" data-range="365">Last Year</button>
+                    <button class="date-filter-button" data-range="all">All Time</button>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="dashboard-grid">
+                    <div class="stat-card revenue">
+                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-value" id="total-revenue">₹0</div>
+                        <div class="stat-change positive" id="revenue-change">
+                            <i class="material-icons text-sm">arrow_upward</i>
+                            <span>0% from previous period</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card orders">
+                        <div class="stat-label">Total Orders</div>
+                        <div class="stat-value" id="total-orders">0</div>
+                        <div class="stat-change positive" id="orders-change">
+                            <i class="material-icons text-sm">arrow_upward</i>
+                            <span>0% from previous period</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card customers">
+                        <div class="stat-label">Active Customers</div>
+                        <div class="stat-value" id="active-customers">0</div>
+                        <div class="stat-change positive" id="customers-change">
+                            <i class="material-icons text-sm">arrow_upward</i>
+                            <span>0% from previous period</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card stock">
+                        <div class="stat-label">Low Stock Items</div>
+                        <div class="stat-value" id="low-stock-count">0</div>
+                        <div class="stat-change negative" id="stock-change">
+                            <i class="material-icons text-sm">arrow_downward</i>
+                            <span>0 items need restocking</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Revenue Chart -->
+                    <div class="chart-container">
+                        <div class="chart-title">Revenue Trend</div>
+                        <div class="simple-bar-chart" id="revenue-chart">
+                            <!-- Revenue bars will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Orders Chart -->
+                    <div class="chart-container">
+                        <div class="chart-title">Orders Over Time</div>
+                        <div class="simple-line-chart" id="orders-chart">
+                            <!-- Orders line chart will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Top Products -->
+                    <div class="chart-container">
+                        <div class="chart-title">Top Selling Products</div>
+                        <ul class="top-products-list" id="top-products">
+                            <!-- Top products will be generated by JavaScript -->
+                        </ul>
+                    </div>
+                    
+                    <!-- Recent Activity -->
+                    <div class="chart-container">
+                        <div class="chart-title">Recent Activity</div>
+                        <div id="recent-activity">
+                            <!-- Recent activity will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Stock Status -->
+                    <div class="chart-container">
+                        <div class="chart-title">Stock Status</div>
+                        <div id="stock-status">
+                            <!-- Stock status will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-allOrders" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">All Orders</h2>
+            <div class="mb-4 flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <input type="text" id="order-search-input"
+                    class="w-full sm:w-1/2 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input"
+                    placeholder="Search by buyer name or date (YYYY-MM-DD)" />
+            </div>
+            <div class="mb-8">
+                <h3 class="text-xl sm:text-2xl font-semibold mb-4 border-b pb-2">Active Orders</h3>
+                <div id="active-orders-list">
+                    <p class="text-gray-600">No active orders found. Start by adding a new order!</p>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-xl sm:text-2xl font-semibold mb-4 border-b pb-2">Completed Orders</h3>
+                <div id="completed-orders-list">
+                    <p class="text-gray-600">No completed orders yet.</p>
+                </div>
+                <div class="mt-4 text-center">
+                    <button id="clear-completed-orders-btn"
+                        class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors shadow-md hidden">
+                        Clear All Delivered Orders
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-addOrder" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Create New Bill</h2>
+            <form id="add-order-form" class="max-w-3xl mx-auto bg-gray-50 p-4 sm:p-6 rounded-lg shadow-md">
+                <div class="mb-4">
+                    <label for="buyerName" class="block text-sm font-medium text-gray-700 mb-1">Buyer Name:</label>
+                    <input type="text" id="buyerName"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mobile-form-input"
+                        placeholder="Enter buyer's name" required />
+                </div>
+                
+                <!-- Stock Deduction Option -->
+                <div class="stock-deduction-container mb-4">
+                    <input type="checkbox" id="deduct-from-stock" class="h-4 w-4 text-black rounded focus:ring-black">
+                    <label for="deduct-from-stock" class="text-sm font-medium text-gray-700">Deduct items from stock when saving bill</label>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-3">Products:</h3>
+                <div class="overflow-x-auto mb-4 mobile-table-container">
+                    <table id="products-table" class="min-w-full bg-white border border-gray-200 rounded-md">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Product</th>
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Qty</th>
+                                <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Price/Unit</th>
+                                <th class="py-2 px-2 text-right text-xs sm:text-sm font-semibold uppercase">Total</th>
+                                <th class="py-2 px-2 text-center text-xs sm:text-sm font-semibold uppercase"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <button type="button" id="add-item-row-btn"
+                    class="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 transition-colors shadow-md flex items-center justify-center mb-6">
+                    <i class="material-icons mr-2">add_circle_outline</i>
+                    Add Row
+                </button>
+
+                <div class="text-right text-xl font-bold mb-6 pr-2">
+                    Grand Total: ₹<span id="grand-total">0.00</span>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-black text-white px-4 py-3 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                    Save Bill
+                </button>
+            </form>
+        </div>
+
+        <!-- Stock Management Page -->
+        <div id="page-stock" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Stock Management</h2>
+
+            <div class="max-w-xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-3">Add New Stock Item</h3>
+                <form id="add-stock-form" class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="stockProductName"
+                        class="block w-full sm:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mobile-form-input"
+                        placeholder="Product Name" required />
+                    <input type="number" id="stockProductPrice"
+                        class="block w-full sm:w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mobile-form-input"
+                        placeholder="Price" step="0.01" min="0" required />
+                    <input type="number" id="stockProductQuantity"
+                        class="block w-full sm:w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mobile-form-input"
+                        placeholder="Qty" step="1" min="0" required />
+                    <button type="submit"
+                        class="w-full sm:w-1/4 bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                        Add Item
+                    </button>
+                </form>
+            </div>
+
+            <div class="max-w-xl mx-auto">
+                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Your Stock Items</h3>
+                <div id="stock-list" class="overflow-x-auto rounded-lg shadow-md mobile-table-container">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Product Name</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Price</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Quantity</th>
+                                <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-table-body">
+                            <!-- Stock items will be rendered here -->
+                            <tr class="border-b border-gray-200 last:border-b-0">
+                                <td colspan="4" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add
+                                    one above!</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-notes" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Notes</h2>
+
+            <div class="max-w-xl mx-auto bg-gray-50 p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-3">Add New Note</h3>
+                <textarea id="new-note-content" rows="4"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mb-4 mobile-form-input"
+                    placeholder="Write your note here..."></textarea>
+                <button id="add-note-btn"
+                    class="w-full bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                    Add Note
+                </button>
+            </div>
+
+            <div class="max-w-xl mx-auto">
+                <h3 class="text-xl font-semibold mb-4 border-b pb-2">Your Notes</h3>
+                <div id="notes-list" class="space-y-4">
+                    <p class="text-gray-600">No notes yet. Add one above!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-settings" class="page-content p-4 sm:p-6 md:p-8 bg-white text-black min-h-screen">
+            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-center">Settings</h2>
+            <form id="settings-form" class="max-w-md mx-auto bg-gray-50 p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-3">Company Details</h3>
+                <div class="mb-4">
+                    <label for="companyName" class="block text-sm font-medium text-gray-700 mb-1">Company Name:</label>
+                    <input type="text" id="companyName" name="companyName"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="Your Company Name" />
+                </div>
+                <div class="mb-4">
+                    <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address:</label>
+                    <textarea id="address" name="address" rows="3"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="Your Company Address"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone:</label>
+                    <input type="tel" id="phone" name="phone"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="Your Phone Number" />
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                    <input type="email" id="email" name="email"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="Your Email Address" />
+                </div>
+                <div class="mb-6">
+                    <label for="gstNumber" class="block text-sm font-medium text-gray-700 mb-1">GST Number:</label>
+                    <input type="text" id="gstNumber" name="gstNumber"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="Your GST Number (Optional)" />
+                </div>
+
+                <h3 class="text-xl font-semibold mb-3 border-t pt-4">Bill Layout Customization</h3>
+                <div class="mb-4">
+                    <label for="defaultBillNotes" class="block text-sm font-medium text-gray-700 mb-1">Default Bill
+                        Notes (for Photo Bill):</label>
+                    <textarea id="defaultBillNotes" name="defaultBillNotes" rows="3"
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm transition-colors mobile-form-input"
+                        placeholder="E.g., Thank you for your business!"></textarea>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-black text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                    Save Settings
+                </button>
+
+                <h3 class="text-xl font-semibold mt-8 mb-3 border-t pt-4">Data Management</h3>
+                <div class="flex flex-col gap-4">
+                    <button type="button" id="export-data-btn"
+                        class="w-full bg-gray-700 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                        Export All Data (JSON)
+                    </button>
+                    <input type="file" id="import-file-input" accept=".json" class="hidden" />
+                    <button type="button" id="import-data-btn"
+                        class="w-full bg-gray-700 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-gray-800 transition-colors shadow-lg">
+                        Import Data (JSON)
+                    </button>
+                    <button type="button" id="reset-app-btn"
+                        class="w-full bg-red-600 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-red-700 transition-colors shadow-lg">
+                        Reset App (Clear All Data)
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-black text-white text-center p-3 text-sm mt-8">
+        <p>&copy; <span id="current-year"></span> QuickBill. All rights reserved.</p>
+        <p id="user-id-display" class="text-xs text-gray-400"></p>
+    </footer>
+
+    <div id="bill-to-print"></div>
+
+
+    <!-- Firebase Configuration -->
+    <script>
+        // Define Firebase config to eliminate console warnings
+        // Users can customize this by replacing with their own Firebase project credentials
+        window.__firebase_config = JSON.stringify({
+            apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
+            authDomain: "quickbill-33bf7.firebaseapp.com",
+            projectId: "quickbill-33bf7",
+            storageBucket: "quickbill-33bf7.firebasestorage.app",
+            messagingSenderId: "749941620593",
+            appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
+        });
+    </script>
+    <script type="module">
+        // Firebase imports (using module syntax for direct browser use)
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // --- Firebase Configuration ---
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        if (!firebaseConfig.projectId) {
+            console.warn("Firebase config not fully provided by __firebase_config. Using default values for some fields.");
+            firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc";
+            firebaseConfig.authDomain = firebaseConfig.authDomain || "quickbill-33bf7.firebaseapp.com";
+            firebaseConfig.projectId = firebaseConfig.projectId || "quickbill-33bf7";
+            firebaseConfig.storageBucket = firebaseConfig.storageBucket || "quickbill-33bf7.firebasestorage.app";
+            firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "749941620593";
+            firebaseConfig.appId = firebaseConfig.appId || "1:749941620593:web:4ae8ba14e6b5291dfd00d0";
+        }
+
+        // --- Global State ---
+        let auth = null;
+        let userId = null;
+        let isAuthReady = false;
+        let currentPage = 'dashboard';
+        let orders = [];
+        let completedOrders = [];
+        let notes = [];
+        let stock = [];
+        let companyDetails = {
+            companyName: '',
+            address: '',
+            phone: '',
+            email: '',
+            gstNumber: '',
+            defaultBillNotes: ''
+        };
+        let messageTimeout = null;
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const confirmationModal = document.getElementById('confirmation-modal');
+        const confirmationMessage = document.getElementById('confirmation-message');
+        const confirmYesBtn = document.getElementById('confirm-yes');
+        const confirmNoBtn = document.getElementById('confirm-no');
+        let resolveConfirmationPromise;
+
+        // --- Hamburger Menu Logic ---
+        const hamburgerToggle = document.getElementById('hamburger-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+
+        hamburgerToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+            document.body.classList.add('menu-open');
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+        });
+
+        mobileNavItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = item.dataset.page;
+                renderPage(page);
+                mobileMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+                
+                mobileNavItems.forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                item.classList.add('active');
+            });
+        });
+
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+            }
+        });
+
+        // --- Helper functions for Local Storage ---
+        const getLocalStorageKey = (key, currentUserId) => {
+            const lsKey = `quickbill-${currentUserId}-${key}`;
+            return lsKey;
+        };
+
+        const loadDataFromLocalStorage = (key, currentUserId, defaultValue) => {
+            try {
+                const lsKey = getLocalStorageKey(key, currentUserId);
+                const data = localStorage.getItem(lsKey);
+                const parsedData = data ? JSON.parse(data) : defaultValue;
+                return parsedData;
+            } catch (error) {
+                console.error(`[LocalStorage] Error loading ${key} for user '${currentUserId}':`, error);
+                return defaultValue;
+            }
+        };
+
+        const saveDataToLocalStorage = (key, currentUserId, data) => {
+            try {
+                const lsKey = getLocalStorageKey(key, currentUserId);
+                let dataToStore = data;
+
+                if (key === 'orders') {
+                    dataToStore = data.map(item => {
+                        if (item.orderDate && typeof item.orderDate !== 'string') {
+                            return { ...item, orderDate: item.orderDate.toISOString() };
+                        } else if (item.orderDate && typeof item.orderDate === 'string') {
+                            return item;
+                        }
+                        return { ...item, orderDate: new Date().toISOString() };
+                    });
+                } else if (key === 'notes') {
+                    dataToStore = data.map(note => ({
+                        ...note,
+                        createdAt: note.createdAt ? new Date(note.createdAt).toISOString() : new Date().toISOString()
+                    }));
+                }
+
+                localStorage.setItem(lsKey, JSON.stringify(dataToStore));
+            } catch (error) {
+                console.error(`[LocalStorage] Error saving ${key} for user '${currentUserId}':`, error);
+            }
+        };
+
+        // --- Message Display Functions ---
+        const messageDisplay = document.getElementById('message-display');
+        const messageText = document.getElementById('message-text');
+        const messageCloseBtn = document.getElementById('message-close-btn');
+
+        const showMessage = (msg) => {
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+            }
+            messageText.textContent = msg;
+            messageDisplay.classList.remove('hidden');
+            messageTimeout = setTimeout(() => {
+                messageDisplay.classList.add('hidden');
+            }, 3000);
+        };
+
+        messageCloseBtn.addEventListener('click', () => {
+            messageDisplay.classList.add('hidden');
+            if (messageTimeout) {
+                clearTimeout(messageTimeout);
+            }
+        });
+
+        // --- Custom Confirmation Modal Functions ---
+        const showConfirmation = (message) => {
+            confirmationMessage.textContent = message;
+            confirmationModal.classList.remove('hidden');
+            return new Promise(resolve => {
+                resolveConfirmationPromise = resolve;
+            });
+        };
+
+        confirmYesBtn.addEventListener('click', () => {
+            confirmationModal.classList.add('hidden');
+            resolveConfirmationPromise(true);
+        });
+
+        confirmNoBtn.addEventListener('click', () => {
+            confirmationModal.classList.add('hidden');
+            resolveConfirmationPromise(false);
+        });
+
+        // --- Dashboard Logic ---
+        const renderDashboard = () => {
+            document.querySelectorAll('.date-filter-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.date-filter-button').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    updateDashboardData(parseInt(this.dataset.range));
+                });
+            });
+            
+            updateDashboardData(7);
+        };
+
+        const updateDashboardData = (daysRange) => {
+            const endDate = new Date();
+            const startDate = new Date();
+            
+            if (daysRange === 'all') {
+                startDate.setTime(0);
+            } else {
+                startDate.setDate(endDate.getDate() - daysRange);
+            }
+            
+            const previousEndDate = new Date(startDate);
+            const previousStartDate = new Date(startDate);
+            previousStartDate.setDate(previousStartDate.getDate() - daysRange);
+            
+            const currentPeriodOrders = [...orders, ...completedOrders].filter(order => {
+                const orderDate = new Date(order.orderDate);
+                return orderDate >= startDate && orderDate <= endDate;
+            });
+            
+            const previousPeriodOrders = [...orders, ...completedOrders].filter(order => {
+                const orderDate = new Date(order.orderDate);
+                return orderDate >= previousStartDate && orderDate < startDate;
+            });
+            
+            const currentRevenue = currentPeriodOrders.reduce((sum, order) => sum + order.grandTotal, 0);
+            const previousRevenue = previousPeriodOrders.reduce((sum, order) => sum + order.grandTotal, 0);
+            const revenueChange = previousRevenue > 0 ? ((currentRevenue - previousRevenue) / previousRevenue * 100) : 0;
+            
+            const currentOrdersCount = currentPeriodOrders.length;
+            const previousOrdersCount = previousPeriodOrders.length;
+            const ordersChange = previousOrdersCount > 0 ? ((currentOrdersCount - previousOrdersCount) / previousOrdersCount * 100) : 0;
+            
+            const currentCustomers = [...new Set(currentPeriodOrders.map(order => order.buyerName))].length;
+            const previousCustomers = [...new Set(previousPeriodOrders.map(order => order.buyerName))].length;
+            const customersChange = previousCustomers > 0 ? ((currentCustomers - previousCustomers) / previousCustomers * 100) : 0;
+            
+            const lowStockCount = stock.filter(item => item.quantity <= 5).length;
+            
+            document.getElementById('total-revenue').textContent = `₹${currentRevenue.toFixed(2)}`;
+            document.getElementById('total-orders').textContent = currentOrdersCount;
+            document.getElementById('active-customers').textContent = currentCustomers;
+            document.getElementById('low-stock-count').textContent = lowStockCount;
+            
+            updateChangeIndicator('revenue-change', revenueChange, 'revenue');
+            updateChangeIndicator('orders-change', ordersChange, 'orders');
+            updateChangeIndicator('customers-change', customersChange, 'customers');
+            
+            renderRevenueChart(currentPeriodOrders, daysRange);
+            renderOrdersChart(currentPeriodOrders, daysRange);
+            renderTopProducts(currentPeriodOrders);
+            renderRecentActivity(currentPeriodOrders);
+            renderStockStatus();
+        };
+
+        const updateChangeIndicator = (elementId, change, type) => {
+            const element = document.getElementById(elementId);
+            const isPositive = change >= 0;
+            
+            element.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
+            element.innerHTML = `
+                <i class="material-icons text-sm">${isPositive ? 'arrow_upward' : 'arrow_downward'}</i>
+                <span>${Math.abs(change).toFixed(1)}% from previous period</span>
+            `;
+            
+            if (type === 'stock') {
+                const lowStockCount = stock.filter(item => item.quantity <= 5).length;
+                element.querySelector('span').textContent = `${lowStockCount} items need restocking`;
+            }
+        };
+
+        const renderRevenueChart = (orders, daysRange) => {
+            const chartContainer = document.getElementById('revenue-chart');
+            chartContainer.innerHTML = '';
+            
+            let groupedData = {};
+            const now = new Date();
+            
+            if (daysRange <= 30) {
+                for (let i = daysRange - 1; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setDate(date.getDate() - i);
+                    const dateKey = date.toISOString().split('T')[0];
+                    groupedData[dateKey] = 0;
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate).toISOString().split('T')[0];
+                    if (groupedData[orderDate] !== undefined) {
+                        groupedData[orderDate] += order.grandTotal;
+                    }
+                });
+            } else {
+                const weeks = Math.ceil(daysRange / 7);
+                for (let i = weeks - 1; i >= 0; i--) {
+                    const weekStart = new Date(now);
+                    weekStart.setDate(weekStart.getDate() - (i * 7));
+                    groupedData[`Week ${weeks - i}`] = 0;
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate);
+                    const diffTime = Math.abs(now - orderDate);
+                    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+                    if (diffWeeks <= weeks) {
+                        groupedData[`Week ${weeks - diffWeeks + 1}`] += order.grandTotal;
+                    }
+                });
+            }
+            
+            const values = Object.values(groupedData);
+            const maxValue = Math.max(...values, 1);
+            
+            Object.entries(groupedData).forEach(([label, value]) => {
+                const barHeight = (value / maxValue) * 150;
+                
+                const barContainer = document.createElement('div');
+                barContainer.className = 'bar-container';
+                
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${barHeight}px`;
+                bar.title = `₹${value.toFixed(2)}`;
+                
+                const barLabel = document.createElement('div');
+                barLabel.className = 'bar-label';
+                barLabel.textContent = daysRange <= 30 ? 
+                    new Date(label).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 
+                    label;
+                
+                barContainer.appendChild(bar);
+                barContainer.appendChild(barLabel);
+                chartContainer.appendChild(barContainer);
+            });
+        };
+
+        const renderOrdersChart = (orders, daysRange) => {
+            const chartContainer = document.getElementById('orders-chart');
+            chartContainer.innerHTML = '';
+            
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", "0 0 400 200");
+            
+            let groupedData = {};
+            const now = new Date();
+            const dataPoints = [];
+            
+            if (daysRange <= 30) {
+                for (let i = 0; i < daysRange; i++) {
+                    const date = new Date(now);
+                    date.setDate(date.getDate() - (daysRange - 1 - i));
+                    const dateKey = date.toISOString().split('T')[0];
+                    groupedData[dateKey] = 0;
+                    dataPoints.push({ date: dateKey, count: 0 });
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate).toISOString().split('T')[0];
+                    const dataPoint = dataPoints.find(dp => dp.date === orderDate);
+                    if (dataPoint) {
+                        dataPoint.count++;
+                    }
+                });
+            } else {
+                const weeks = Math.ceil(daysRange / 7);
+                for (let i = 0; i < weeks; i++) {
+                    dataPoints.push({ label: `Week ${i + 1}`, count: 0 });
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate);
+                    const diffTime = Math.abs(now - orderDate);
+                    const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+                    if (diffWeeks <= weeks) {
+                        dataPoints[weeks - diffWeeks].count++;
+                    }
+                });
+            }
+            
+            const counts = dataPoints.map(dp => dp.count);
+            const maxCount = Math.max(...counts, 1);
+            
+            for (let i = 0; i <= 4; i++) {
+                const y = 40 + (i * 40);
+                const line = document.createElementNS(svgNS, "line");
+                line.setAttribute("x1", "40");
+                line.setAttribute("y1", y);
+                line.setAttribute("x2", "360");
+                line.setAttribute("y2", y);
+                line.setAttribute("class", "chart-grid-line");
+                svg.appendChild(line);
+                
+                const text = document.createElementNS(svgNS, "text");
+                text.setAttribute("x", "30");
+                text.setAttribute("y", y + 4);
+                text.setAttribute("text-anchor", "end");
+                text.setAttribute("font-size", "10");
+                text.setAttribute("fill", "#6b7280");
+                text.textContent = Math.round((maxCount / 4) * (4 - i));
+                svg.appendChild(text);
+            }
+            
+            const points = dataPoints.map((dp, i) => {
+                const x = 40 + (i * (320 / (dataPoints.length - 1)));
+                const y = 200 - 40 - (dp.count / maxCount * 160);
+                return `${x},${y}`;
+            }).join(' ');
+            
+            const polyline = document.createElementNS(svgNS, "polyline");
+            polyline.setAttribute("points", points);
+            polyline.setAttribute("class", "line-path");
+            polyline.setAttribute("fill", "none");
+            svg.appendChild(polyline);
+            
+            const areaPoints = `${points} 360,200 40,200`;
+            const polygon = document.createElementNS(svgNS, "polygon");
+            polygon.setAttribute("points", areaPoints);
+            polygon.setAttribute("class", "area-path");
+            svg.appendChild(polygon);
+            
+            dataPoints.forEach((dp, i) => {
+                const x = 40 + (i * (320 / (dataPoints.length - 1)));
+                const y = 200 - 40 - (dp.count / maxCount * 160);
+                
+                const circle = document.createElementNS(svgNS, "circle");
+                circle.setAttribute("cx", x);
+                circle.setAttribute("cy", y);
+                circle.setAttribute("r", "4");
+                circle.setAttribute("fill", "#3b82f6");
+                svg.appendChild(circle);
+                
+                const text = document.createElementNS(svgNS, "text");
+                text.setAttribute("x", x);
+                text.setAttribute("y", "195");
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("font-size", "10");
+                text.setAttribute("fill", "#6b7280");
+                
+                if (daysRange <= 30) {
+                    const date = new Date(dp.date);
+                    text.textContent = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                } else {
+                    text.textContent = dp.label;
+                }
+                
+                svg.appendChild(text);
+            });
+            
+            chartContainer.appendChild(svg);
+        };
+
+        const renderTopProducts = (orders) => {
+            const topProductsContainer = document.getElementById('top-products');
+            topProductsContainer.innerHTML = '';
+            
+            const productSales = {};
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (!productSales[item.product]) {
+                        productSales[item.product] = {
+                            quantity: 0,
+                            revenue: 0
+                        };
+                    }
+                    productSales[item.product].quantity += item.quantity;
+                    productSales[item.product].revenue += item.total;
+                });
+            });
+            
+            const topProducts = Object.entries(productSales)
+                .map(([product, data]) => ({
+                    product,
+                    ...data
+                }))
+                .sort((a, b) => b.revenue - a.revenue)
+                .slice(0, 5);
+            
+            const maxRevenue = topProducts.length > 0 ? Math.max(...topProducts.map(p => p.revenue)) : 1;
+            
+            topProducts.forEach((product, index) => {
+                const percentage = (product.revenue / maxRevenue) * 100;
+                
+                const listItem = document.createElement('li');
+                listItem.className = 'top-product-item';
+                
+                listItem.innerHTML = `
+                    <div class="product-info">
+                        <div class="product-rank ${index < 3 ? `product-rank-${index + 1}` : ''}">${index + 1}</div>
+                        <div>
+                            <div class="font-medium">${product.product}</div>
+                            <div class="text-sm text-gray-500">${product.quantity} sold</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-sales">₹${product.revenue.toFixed(2)}</div>
+                `;
+                
+                topProductsContainer.appendChild(listItem);
+            });
+            
+            if (topProducts.length === 0) {
+                topProductsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No sales data available</p>';
+            }
+        };
+
+        const renderRecentActivity = (orders) => {
+            const activityContainer = document.getElementById('recent-activity');
+            activityContainer.innerHTML = '';
+            
+            const recentOrders = [...orders]
+                .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
+                .slice(0, 5);
+            
+            recentOrders.forEach(order => {
+                const activityItem = document.createElement('div');
+                activityItem.className = 'recent-activity-item';
+                
+                const timeAgo = getTimeAgo(new Date(order.orderDate));
+                
+                activityItem.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="material-icons">receipt</i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">New order from ${order.buyerName}</div>
+                        <div class="activity-time">${timeAgo}</div>
+                    </div>
+                    <div class="activity-amount">₹${order.grandTotal.toFixed(2)}</div>
+                `;
+                
+                activityContainer.appendChild(activityItem);
+            });
+            
+            if (recentOrders.length === 0) {
+                activityContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No recent activity</p>';
+            }
+        };
+
+        const renderStockStatus = () => {
+            const stockContainer = document.getElementById('stock-status');
+            stockContainer.innerHTML = '';
+            
+            const lowStockItems = stock
+                .filter(item => item.quantity <= 10)
+                .sort((a, b) => a.quantity - b.quantity)
+                .slice(0, 5);
+            
+            lowStockItems.forEach(item => {
+                const stockItem = document.createElement('div');
+                stockItem.className = 'recent-activity-item';
+                
+                const statusClass = item.quantity <= 5 ? 'low-stock' : '';
+                const statusText = item.quantity <= 5 ? 'Low Stock' : 'Moderate Stock';
+                
+                stockItem.innerHTML = `
+                    <div class="activity-icon">
+                        <i class="material-icons">inventory_2</i>
+                    </div>
+                    <div class="activity-details">
+                        <div class="activity-title">${item.name}</div>
+                        <div class="activity-time">${statusText}</div>
+                    </div>
+                    <div class="${statusClass}">${item.quantity} left</div>
+                `;
+                
+                stockContainer.appendChild(stockItem);
+            });
+            
+            if (lowStockItems.length === 0) {
+                stockContainer.innerHTML = '<p class="text-gray-500 text-center py-4">All items are well stocked</p>';
+            }
+        };
+
+        const getTimeAgo = (date) => {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min ago`;
+            if (diffHours < 24) return `${diffHours} hr ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            
+            return date.toLocaleDateString();
+        };
+
+        // --- Page Rendering Logic ---
+        const renderPage = (pageId) => {
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(`page-${pageId}`).style.display = 'block';
+
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.getElementById(`nav-${pageId}`).classList.add('active');
+
+            currentPage = pageId;
+            
+            if (pageId === 'dashboard') {
+                renderDashboard();
+            } else if (pageId === 'allOrders') {
+                renderAllOrders();
+            } else if (pageId === 'notes') {
+                renderNotes();
+            } else if (pageId === 'settings') {
+                renderSettings();
+            } else if (pageId === 'addOrder') {
+                renderAddOrderForm();
+            } else if (pageId === 'stock') {
+                renderStock();
+            }
+        };
+
+        // --- All Orders Page Logic ---
+        const orderSearchInput = document.getElementById('order-search-input');
+        let displayedOrders = [];
+
+        const renderAllOrders = () => {
+            const activeOrdersList = document.getElementById('active-orders-list');
+            const completedOrdersList = document.getElementById('completed-orders-list');
+            const clearCompletedOrdersBtn = document.getElementById('clear-completed-orders-btn');
+
+            const searchTerm = orderSearchInput.value.toLowerCase();
+
+            const allOrdersCombined = [...orders, ...completedOrders];
+
+            displayedOrders = allOrdersCombined.filter(order => {
+                const buyerNameMatch = order.buyerName.toLowerCase().includes(searchTerm);
+                const orderDateFormatted = new Date(order.orderDate).toISOString().slice(0, 10);
+                const dateMatch = orderDateFormatted.includes(searchTerm);
+                return buyerNameMatch || dateMatch;
+            });
+
+            const activeFiltered = displayedOrders.filter(order => !order.isDelivered);
+            const completedFiltered = displayedOrders.filter(order => order.isDelivered);
+
+            activeOrdersList.innerHTML = '';
+            completedOrdersList.innerHTML = '';
+
+            if (activeFiltered.length === 0) {
+                activeOrdersList.innerHTML = '<p class="text-gray-600">No active orders found. Start by adding a new order!</p>';
+            } else {
+                activeOrdersList.innerHTML = `
+                    <div class="overflow-x-auto rounded-lg shadow-md mobile-table-container">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Buyer Name</th>
+                                    <th class="py-3 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Date</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Seen</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Delivered</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Actions</th>
+                                    <th class="py-3 px-2 text-center text-xs sm:text-sm font-semibold uppercase">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="active-orders-tbody"></tbody>
+                        </table>
+                    </div>
+                `;
+                const tbody = activeOrdersList.querySelector('#active-orders-tbody');
+                activeFiltered.forEach(order => {
+                    tbody.innerHTML += createOrderRow(order);
+                });
+            }
+
+            if (completedFiltered.length === 0) {
+                completedOrdersList.innerHTML = '<p class="text-gray-600">No completed orders yet.</p>';
+                clearCompletedOrdersBtn.classList.add('hidden');
+            } else {
+                completedOrdersList.innerHTML = `
+                    <div class="overflow-x-auto rounded-lg shadow-md mobile-table-container">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Buyer Name</th>
+                                    <th class="py-3 px-4 text-left text-sm font-semibold uppercase">Date</th>
+                                    <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Actions</th>
+                                    <th class="py-3 px-4 text-center text-sm font-semibold uppercase">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="completed-orders-tbody"></tbody>
+                        </table>
+                    </div>
+                `;
+                const tbody = completedOrdersList.querySelector('#completed-orders-tbody');
+                completedFiltered.forEach(order => {
+                    tbody.innerHTML += createOrderRow(order, true);
+                });
+                clearCompletedOrdersBtn.classList.remove('hidden');
+            }
+
+            attachOrderEventListeners();
+        };
+
+        const createOrderRow = (order, isCompleted = false) => {
+            const orderDate = new Date(order.orderDate);
+            const isExpanded = order.isExpanded || false;
+            const isEditing = order.isEditing || false;
+
+            let actionsHtml = '';
+            let buyerNameCellContent;
+            let itemsDetailsHtml = '';
+
+            if (isCompleted) {
+                actionsHtml = `
+                    <button onclick="window.handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center">
+                        <i class="material-icons text-base mr-1">image</i> Export Photo
+                    </button>
+                    <button onclick="window.handleToggleDelivered('${order.id}', true)" class="bg-gray-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center">
+                        <i class="material-icons text-base mr-1">unarchive</i> Move to Active
+                    </button>
+                `;
+                buyerNameCellContent = order.buyerName;
+                itemsDetailsHtml = order.items.map(item => `
+                    <tr class="border-b border-gray-100 last:border-b-0">
+                        <td class="py-2 px-2">${item.product}</td>
+                        <td class="py-2 px-2">${item.quantity}</td>
+                        <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
+                        <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+            } else {
+                if (isEditing) {
+                    buyerNameCellContent = `
+                        <input type="text" value="${order.buyerName}" data-order-field="buyerName"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                    `;
+                    actionsHtml = `
+                        <button onclick="window.handleSaveEditedOrder('${order.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center">
+                            <i class="material-icons text-base mr-1">save</i> Save
+                        </button>
+                        <button onclick="window.handleCancelEditOrder('${order.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-500 transition-colors shadow-sm flex items-center justify-center">
+                            <i class="material-icons text-base mr-1">cancel</i> Cancel
+                        </button>
+                    `;
+                    itemsDetailsHtml = order.items.map((item, itemIndex) => `
+                        <tr class="border-b border-gray-100 last:border-b-0" data-item-index="${itemIndex}">
+                            <td class="py-2 px-2 relative">
+                                <input type="text" value="${item.product}" data-item-field="product"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                            </td>
+                            <td class="py-2 px-2">
+                                <div class="relative-input-wrapper">
+                                    <input type="number" value="${item.quantity || ''}" data-item-field="quantity" step="1" min="1"
+                                        class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black text-xs sm:text-sm mobile-form-input"
+                                        required />
+                                    <span class="material-icons dropdown-arrow" data-target-input="quantity-${itemIndex}">arrow_drop_down</span>
+                                </div>
+                            </td>
+                            <td class="py-2 px-2">
+                                <input type="number" value="${item.pricePerUnit}" data-item-field="pricePerUnit" step="0.01" min="0"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                            </td>
+                            <td class="py-2 px-2 text-right text-xs">₹<span class="edited-item-total">${item.total.toFixed(2)}</span></td>
+                            <td class="py-2 px-2 text-center">
+                                <button onclick="window.handleRemoveOrderItem('${order.id}', ${itemIndex})" class="text-red-600 hover:text-red-800 text-sm font-bold transition-colors">
+                                    <i class="material-icons text-base">delete</i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('') + `
+                    <tr>
+                        <td colspan="5" class="p-2 text-center">
+                            <button onclick="window.handleAddOrderItem('${order.id}')" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-md text-xs hover:bg-gray-300 transition-colors flex items-center justify-center mx-auto">
+                                <i class="material-icons mr-1 text-sm">add_circle_outline</i> Add Item Row
+                            </button>
+                        </td>
+                    </tr>
+                    `;
+                } else {
+                    actionsHtml = `
+                        <button onclick="window.handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center">
+                            <i class="material-icons text-base mr-1">image</i> Photo
+                        </button>
+                        <button onclick="window.handleEditOrder('${order.id}')" class="bg-gray-600 text-white px-2 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center">
+                            <i class="material-icons text-base mr-1">edit</i> Edit
+                        </button>
+                    `;
+                    buyerNameCellContent = order.buyerName;
+                    itemsDetailsHtml = order.items.map(item => `
+                        <tr class="border-b border-gray-100 last:border-b-0">
+                            <td class="py-2 px-2">${item.product}</td>
+                            <td class="py-2 px-2">${item.quantity}</td>
+                            <td class="py-2 px-2">₹${item.pricePerUnit.toFixed(2)}</td>
+                            <td class="py-2 px-2 text-right">₹${item.total.toFixed(2)}</td>
+                        </tr>
+                    `).join('');
+                }
+            }
+
+            return `
+                <tr class="border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors">
+                    <td class="py-3 px-2 text-sm">${buyerNameCellContent}</td>
+                    <td class="py-3 px-2 text-sm">${orderDate.toLocaleDateString()}</td>
+                    ${!isCompleted && !isEditing ? `
+                    <td class="py-3 px-2 text-center">
+                        <input type="checkbox" ${order.isSeen ? 'checked' : ''} onchange="window.handleToggleSeen('${order.id}', ${order.isSeen})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0 transition-colors" />
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                        <input type="checkbox" ${order.isDelivered ? 'checked' : ''} onchange="window.handleToggleDelivered('${order.id}', ${order.isDelivered})" class="form-checkbox h-4 w-4 sm:h-5 sm:w-5 text-black rounded-md focus:ring-0 transition-colors" />
+                    </td>
+                    ` : isEditing ? `<td colspan="2"></td>` : ''}
+                    <td class="py-3 px-2 text-center flex flex-col-sm-row gap-2 sm:gap-3 justify-center items-center">
+                        ${actionsHtml}
+                    </td>
+                    <td class="py-3 px-2 text-center">
+                        <button onclick="window.handleToggleExpand('${order.id}')" class="text-gray-600 hover:text-black focus:outline-none transition-transform duration-200 p-1">
+                            <i class="material-icons transform ${isExpanded ? 'rotate-180' : 'rotate-0'}">expand_more</i>
+                        </button>
+                    </td>
+                </tr>
+                ${isExpanded ? `
+                <tr>
+                    <td colspan="${isCompleted || isEditing ? '5' : '7'}" class="p-2 sm:p-4 bg-gray-100 border-t border-gray-200">
+                        <h4 class="font-semibold mb-2 text-sm sm:text-base">Bill Details for ${order.buyerName}:</h4>
+                        <div class="overflow-x-auto mobile-table-container">
+                            <table class="min-w-full bg-white border border-gray-300 rounded-md text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="bg-gray-200">
+                                        <th class="py-2 px-2 text-left">Product</th>
+                                        <th class="py-2 px-2 text-left">Qty</th>
+                                        <th class="py-2 px-2 text-left">Price/Unit</th>
+                                        <th class="py-2 px-2 text-right">Total</th>
+                                        ${isEditing ? '<th class="py-2 px-2 text-center"></th>' : ''}
+                                    </tr>
+                                </thead>
+                                <tbody id="order-items-tbody-${order.id}">
+                                    ${itemsDetailsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-right font-bold mt-2 pr-2 text-sm sm:text-base">
+                            Grand Total: ₹<span id="order-grand-total-${order.id}">${order.grandTotal.toFixed(2)}</span>
+                        </div>
+                    </td>
+                </tr>
+                ` : ''}
+            `;
+        };
+
+        const attachOrderEventListeners = () => {
+            document.querySelectorAll('input[data-order-field], input[data-item-field]').forEach(input => {
+                input.oninput = (e) => {
+                    let orderId;
+                    const closestRow = e.target.closest('tr');
+                    if (closestRow && closestRow.dataset.orderId) {
+                        orderId = closestRow.dataset.orderId;
+                    } else {
+                        const detailRow = e.target.closest('tr');
+                        const tbodyId = detailRow.parentNode.id;
+                        if (tbodyId && tbodyId.startsWith('order-items-tbody-')) {
+                            orderId = tbodyId.replace('order-items-tbody-', '');
+                        }
+                    }
+
+                    if (!orderId) {
+                        console.error("Could not determine orderId for input:", e.target);
+                        return;
+                    }
+
+                    const orderIndex = orders.findIndex(o => o.id === orderId);
+                    if (orderIndex === -1) return;
+
+                    const field = e.target.dataset.orderField || e.target.dataset.itemField;
+                    let value = e.target.value;
+
+                    if (field === 'quantity' || field === 'pricePerUnit') {
+                        value = value === '' ? '' : parseFloat(value);
+                    }
+
+                    if (e.target.dataset.orderField) {
+                        orders[orderIndex][field] = value;
+                    } else if (e.target.dataset.itemField) {
+                        const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                        orders[orderIndex].items[itemIndex][field] = (field === 'product') ? value : parseFloat(value);
+
+                        const qty = orders[orderIndex].items[itemIndex].quantity;
+                        const price = orders[orderIndex].items[itemIndex].pricePerUnit;
+                        orders[orderIndex].items[itemIndex].total = (isNaN(qty) || qty === '' ? 0 : qty) * (isNaN(price) || price === '' ? 0 : price);
+
+                        e.target.closest('tr').querySelector('.edited-item-total').textContent = orders[orderIndex].items[itemIndex].total.toFixed(2);
+                        window.calculateOrderGrandTotal(orderId);
+                    }
+                };
+
+                if (input.dataset.itemField === 'product') {
+                    input.addEventListener('change', (e) => {
+                        let orderId;
+                        const detailRow = e.target.closest('tr');
+                        const tbodyId = detailRow.parentNode.id;
+                        if (tbodyId && tbodyId.startsWith('order-items-tbody-')) {
+                            orderId = tbodyId.replace('order-items-tbody-', '');
+                        }
+
+                        if (!orderId) {
+                            console.error("Could not determine orderId for product change input:", e.target);
+                            return;
+                        }
+
+                        const orderIndex = orders.findIndex(o => o.id === orderId);
+                        if (orderIndex === -1) return;
+
+                        const itemIndex = parseInt(e.target.closest('tr').dataset.itemIndex);
+                        const productName = e.target.value.trim();
+                        const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
+
+                        if (stockItem) {
+                            orders[orderIndex].items[itemIndex].pricePerUnit = parseFloat(stockItem.price);
+                            const qty = orders[orderIndex].items[itemIndex].quantity;
+                            const price = orders[orderIndex].items[itemIndex].pricePerUnit;
+                            orders[orderIndex].items[itemIndex].total = (isNaN(qty) ? 0 : qty) * (isNaN(price) ? 0 : price);
+                            renderAllOrders();
+                        }
+                    });
+                }
+            });
+        };
+
+        // Order management functions
+        window.handleToggleExpand = (orderId) => {
+            const targetOrder = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
+            if (targetOrder) {
+                targetOrder.isExpanded = !targetOrder.isExpanded;
+                renderAllOrders();
+            }
+        };
+
+        window.handleToggleSeen = (orderId, currentStatus) => {
+            const orderIndex = orders.findIndex(order => order.id === orderId);
+            if (orderIndex > -1) {
+                orders[orderIndex].isSeen = !currentStatus;
+                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+                showMessage(`Order ${orderId} marked as ${!currentStatus ? 'seen' : 'unseen'}.`);
+                renderAllOrders();
+            }
+        };
+
+        window.handleToggleDelivered = (orderId, currentStatus) => {
+            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(o => o.id === orderId);
+            if (!orderToMove) return;
+
+            const newStatus = !currentStatus;
+            const updatedOrder = {
+                ...orderToMove,
+                isDelivered: newStatus,
+                isEditing: false
+            };
+
+            if (newStatus) {
+                orders = orders.filter(order => order.id !== orderId);
+                completedOrders.push(updatedOrder);
+                completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            } else {
+                completedOrders = completedOrders.filter(order => order.id !== orderId);
+                orders.push(updatedOrder);
+                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            }
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+            showMessage(`Order ${orderToMove.buyerName} marked as ${newStatus ? 'delivered' : 'active'}.`);
+            renderAllOrders();
+        };
+
+        window.handleEditOrder = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order._originalState = JSON.parse(JSON.stringify(order));
+                order.isEditing = true;
+                order.isExpanded = true;
+                renderAllOrders();
+                attachOrderEventListeners();
+            }
+        };
+
+        window.handleSaveEditedOrder = (orderId) => {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) return;
+
+            const order = orders[orderIndex];
+            const buyerNameInput = document.getElementById('active-orders-tbody').querySelector(`tr td input[data-order-field="buyerName"]`);
+            if (!buyerNameInput) {
+                showMessage("Could not find buyer name input. Please try again.");
+                return;
+            }
+
+            const newBuyerName = buyerNameInput.value.trim();
+            if (!newBuyerName) {
+                showMessage("Buyer name cannot be empty.");
+                return;
+            }
+
+            const newItems = [];
+            let isValid = true;
+            const itemsTableBody = document.getElementById(`order-items-tbody-${orderId}`);
+            if (!itemsTableBody) {
+                showMessage("Could not find order items table. Please try again.");
+                return;
+            }
+
+            itemsTableBody.querySelectorAll('tr[data-item-index]').forEach(row => {
+                const productInput = row.querySelector('input[data-item-field="product"]');
+                const quantityInput = row.querySelector('div.relative-input-wrapper input[data-item-field="quantity"]');
+                const priceInput = row.querySelector('input[data-item-field="pricePerUnit"]');
+
+                const product = productInput.value.trim();
+                const quantity = quantityInput.value === '' ? '' : parseFloat(quantityInput.value);
+                const pricePerUnit = priceInput.value === '' ? '' : parseFloat(priceInput.value);
+                const total = (isNaN(quantity) || quantity === '' ? 0 : quantity) * (isNaN(pricePerUnit) || pricePerUnit === '' ? 0 : pricePerUnit);
+
+                if (!product) {
+                    showMessage("Product name cannot be empty for an item.");
+                    isValid = false;
+                    return;
+                }
+                if (isNaN(quantity) || quantity <= 0) {
+                    showMessage(`Quantity for product "${product}" must be a positive number.`);
+                    isValid = false;
+                    return;
+                }
+                if (isNaN(pricePerUnit) || pricePerUnit < 0) {
+                    showMessage(`Price per unit for product "${product}" must be a non-negative number.`);
+                    isValid = false;
+                    return;
+                }
+
+                newItems.push({
+                    product,
+                    quantity,
+                    pricePerUnit,
+                    total
+                });
+            });
+
+            if (!isValid) {
+                return;
+            }
+
+            if (newItems.length === 0) {
+                showMessage("Bill must contain at least one product.");
+                return;
+            }
+
+            order.buyerName = newBuyerName;
+            order.items = newItems;
+            window.calculateOrderGrandTotal(orderId);
+            order.isEditing = false;
+            delete order._originalState;
+
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+            showMessage("Order updated successfully!");
+            renderAllOrders();
+        };
+
+        window.handleCancelEditOrder = (orderId) => {
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex === -1) return;
+
+            const order = orders[orderIndex];
+            if (order._originalState) {
+                orders[orderIndex] = JSON.parse(JSON.stringify(order._originalState));
+            }
+            orders[orderIndex].isEditing = false;
+            delete orders[orderIndex]._originalState;
+            showMessage("Order edit cancelled.");
+            renderAllOrders();
+        };
+
+        window.handleAddOrderItem = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.items.push({
+                    product: '',
+                    quantity: '',
+                    pricePerUnit: 0,
+                    total: 0
+                });
+                renderAllOrders();
+            }
+        };
+
+        window.handleRemoveOrderItem = (orderId, itemIndex) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order && order.items.length > 1) {
+                order.items.splice(itemIndex, 1);
+                window.calculateOrderGrandTotal(orderId);
+                renderAllOrders();
+            } else if (order.items.length <= 1) {
+                showMessage("An order must have at least one product.");
+            }
+        };
+
+        window.calculateOrderGrandTotal = (orderId) => {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                const total = order.items.reduce((sum, item) => sum + (isNaN(item.total) ? 0 : item.total), 0);
+                order.grandTotal = total;
+                const grandTotalElement = document.getElementById(`order-grand-total-${orderId}`);
+                if (grandTotalElement) {
+                    grandTotalElement.textContent = total.toFixed(2);
+                }
+            }
+        };
+
+        // Bill printing function
+        const loadScript = (url) => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url;
+                script.onload = () => {
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error(`Failed to load script: ${url}`);
+                    reject(new Error(`Failed to load library from ${url}. Please check network or browser extensions.`));
+                };
+                document.head.appendChild(script);
+            });
+        };
+
+        window.handlePrintBill = async (orderId, format) => {
+            const order = orders.find(o => o.id === orderId) || completedOrders.find(o => o.id === orderId);
+            if (!order) {
+                showMessage("Order not found for printing.");
+                return;
+            }
+
+            if (typeof window.html2canvas === 'undefined') {
+                showMessage("Loading image export library...");
+                try {
+                    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+                } catch (error) {
+                    console.error("Error loading html2canvas library:", error);
+                    showMessage(`Image export features are not available. ${error.message}`);
+                    return;
+                }
+            }
+
+            const billToPrintDiv = document.getElementById('bill-to-print');
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+
+            const billNotes = companyDetails.defaultBillNotes || '';
+
+            billToPrintDiv.innerHTML = `
+                <div class="p-8 bg-white text-black rounded-lg shadow-xl w-full" style="min-height: 297mm; width: 210mm; box-sizing: border-box;">
+                    <h1 class="text-5xl font-bold text-center mb-4">${companyDetails.companyName || 'Your Company Name'}</h1>
+                    <div class="text-sm text-center mb-6 leading-tight">
+                        ${companyDetails.address ? `<p>${companyDetails.address}</p>` : ''}
+                        ${companyDetails.phone || companyDetails.email ? `<p>${companyDetails.phone ? `Phone: ${companyDetails.phone}` : ''} ${companyDetails.phone && companyDetails.email ? '|' : ''} ${companyDetails.email ? `Email: ${companyDetails.email}` : ''}</p>` : ''}
+                        ${companyDetails.gstNumber ? `<p>GSTIN: ${companyDetails.gstNumber}</p>` : ''}
+                    </div>
+
+                    <div class="flex justify-between items-start mb-6 border-b border-gray-300 pb-4">
+                        <div>
+                            <p class="font-semibold text-lg mb-1">Bill To:</p>
+                            <p class="text-xl font-bold">${order.buyerName}</p>
+                        </div>
+                        <div class="text-right text-sm">
+                            <p>Date: ${new Date(order.orderDate).toLocaleDateString(undefined, dateOptions)}</p>
+                            <p>Time: ${new Date(order.orderDate).toLocaleTimeString(undefined, timeOptions)}</p>
+                            <p>Order ID: ${order.id || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <table class="min-w-full bg-white border border-gray-300 mb-8" style="border-collapse: collapse;">
+                        <thead>
+                            <tr class="bg-gray-100 border-b border-gray-300">
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Product</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Quantity</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold uppercase border border-gray-300">Price/Unit</th>
+                                <th class="py-3 px-4 text-right text-sm font-semibold uppercase border border-gray-300">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.items.map((item, index) => `
+                                <tr class="border-b border-gray-200 last:border-b-0">
+                                    <td class="py-3 px-4 text-base border border-gray-300">${item.product}</td>
+                                    <td class="py-3 px-4 text-base border border-gray-300">${item.quantity}</td>
+                                    <td class="py-3 px-4 text-base border border-gray-300">₹${item.pricePerUnit.toFixed(2)}</td>
+                                    <td class="py-3 px-4 text-right text-base border border-gray-300">₹${item.total.toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="flex justify-end pr-4 text-xl font-bold">
+                        <p>Grand Total: ₹${order.grandTotal.toFixed(2)}</p>
+                    </div>
+
+                    ${billNotes ? `<div class="text-left mt-4 text-sm"><p>Notes: ${billNotes}</p></div>` : ''}
+
+                    <div class="mt-12 text-center text-sm text-gray-600">
+                        <p>Thank you for your business!</p>
+                        <p>This is a computer generated bill and does not require a signature.</p>
+                    </div>
+                </div>
+            `;
+            billToPrintDiv.classList.add('visible-for-capture');
+
+            setTimeout(async () => {
+                try {
+                    const canvas = await window.html2canvas(billToPrintDiv.firstElementChild, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                    });
+
+                    if (format === 'photo') {
+                        const imgData = canvas.toDataURL('image/png');
+                        const link = document.createElement('a');
+                        link.href = imgData;
+                        link.download = `${order.buyerName}_Bill_${new Date(order.orderDate).toLocaleDateString().replace(/\//g, '-')}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        showMessage("Bill exported as photo!");
+                    } else {
+                        showMessage("Only photo export is supported.");
+                    }
+                } catch (error) {
+                    console.error("Error generating bill:", error);
+                    showMessage("Failed to generate bill. Please try again.");
+                } finally {
+                    billToPrintDiv.classList.remove('visible-for-capture');
+                    billToPrintDiv.innerHTML = '';
+                }
+            }, 50);
+        };
+
+        // --- Add Order Page Logic ---
+        const addOrderForm = document.getElementById('add-order-form');
+        const buyerNameInput = document.getElementById('buyerName');
+        const productsTableBody = document.querySelector('#products-table tbody');
+        const addItemRowBtn = document.getElementById('add-item-row-btn');
+        const grandTotalSpan = document.getElementById('grand-total');
+        const deductFromStockCheckbox = document.getElementById('deduct-from-stock');
+
+        let currentItems = [];
+
+        const renderAddOrderForm = () => {
+            buyerNameInput.value = '';
+            currentItems = [{
+                product: '',
+                quantity: '',
+                pricePerUnit: 0,
+                total: 0
+            }];
+            updateProductsTable();
+            calculateAndDisplayGrandTotal();
+        };
+
+        const updateProductsTable = () => {
+            productsTableBody.innerHTML = '';
+            currentItems.forEach((item, index) => {
+                const row = productsTableBody.insertRow();
+                row.innerHTML = `
+                    <td class="py-2 px-2 relative">
+                        <input type="text" data-field="product" data-index="${index}" value="${item.product}"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input"
+                            placeholder="Product Name" required />
+                    </td>
+                    <td class="py-2 px-2">
+                        <div class="relative-input-wrapper">
+                            <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity || ''}" step="1" min="1"
+                                class="block w-full px-2 py-1 pr-7 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black text-xs sm:text-sm mobile-form-input"
+                                required />
+                            <span class="material-icons dropdown-arrow" data-target-input="quantity-${index}">arrow_drop_down</span>
+                        </div>
+                    </td>
+                    <td class="py-2 px-2">
+                        <input type="number" data-field="pricePerUnit" data-index="${index}" value="${item.pricePerUnit || ''}" step="0.01"
+                            class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input"
+                            min="0" required />
+                    </td>
+                    <td class="py-2 px-2 text-right font-medium text-xs sm:text-sm">
+                        ₹<span class="item-total">${item.total.toFixed(2)}</span>
+                    </td>
+                    <td class="py-2 px-2 text-center">
+                        ${currentItems.length > 1 ? `<button type="button" data-action="remove" data-index="${index}" class="text-red-600 hover:text-red-800 text-lg font-bold transition-colors">&times;</button>` : ''}
+                    </td>
+                `;
+            });
+            attachProductInputListeners();
+        };
+
+        const calculateAndDisplayGrandTotal = () => {
+            const total = currentItems.reduce((sum, item) => sum + (isNaN(item.total) ? 0 : item.total), 0);
+            grandTotalSpan.textContent = total.toFixed(2);
+        };
+
+        const attachProductInputListeners = () => {
+            productsTableBody.querySelectorAll('input[data-field]').forEach(input => {
+                input.oninput = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    const field = e.target.dataset.field;
+                    let value = e.target.value;
+
+                    if (field === 'product') {
+                        currentItems[index][field] = value;
+                    } else if (field === 'quantity' || field === 'pricePerUnit') {
+                        currentItems[index][field] = value === '' ? '' : parseFloat(value);
+                    }
+
+                    const quantity = currentItems[index].quantity;
+                    const pricePerUnit = currentItems[index].pricePerUnit;
+                    currentItems[index].total = (isNaN(quantity) || quantity === '' ? 0 : quantity) * (isNaN(pricePerUnit) || pricePerUnit === '' ? 0 : pricePerUnit);
+
+                    e.target.closest('tr').querySelector('.item-total').textContent = currentItems[index].total.toFixed(2);
+                    calculateAndDisplayGrandTotal();
+                };
+
+                if (input.dataset.field === 'product') {
+                    input.addEventListener('change', (e) => {
+                        const productName = e.target.value.trim();
+                        const index = parseInt(e.target.dataset.index);
+                        const stockItem = stock.find(item => item.name.toLowerCase() === productName.toLowerCase());
+
+                        if (stockItem) {
+                            currentItems[index].pricePerUnit = parseFloat(stockItem.price);
+                            currentItems[index].total = (isNaN(currentItems[index].quantity) || currentItems[index].quantity === '' ? 0 : currentItems[index].quantity) * currentItems[index].pricePerUnit;
+                            calculateAndDisplayGrandTotal();
+                            productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`)?.focus();
+                        }
+                    });
+                }
+
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const index = parseInt(e.target.dataset.index);
+                        const field = e.target.dataset.field;
+
+                        let nextElement = null;
+                        if (field === 'product') {
+                            nextElement = productsTableBody.querySelector(`input[data-index="${index}"][data-field="quantity"]`);
+                        } else if (field === 'quantity') {
+                            nextElement = productsTableBody.querySelector(`input[data-index="${index}"][data-field="pricePerUnit"]`);
+                        } else if (field === 'pricePerUnit') {
+                            if (index === currentItems.length - 1) {
+                                addItemRow();
+                            } else {
+                                nextElement = productsTableBody.querySelector(`input[data-index="${index + 1}"][data-field="product"]`);
+                            }
+                        }
+                        if (nextElement) {
+                            nextElement.focus();
+                        }
+                    }
+                };
+            });
+
+            productsTableBody.querySelectorAll('button[data-action="remove"]').forEach(button => {
+                button.onclick = (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    removeItemRow(index);
+                };
+            });
+        };
+
+        const addItemRow = () => {
+            currentItems.push({
+                product: '',
+                quantity: '',
+                pricePerUnit: 0,
+                total: 0
+            });
+            updateProductsTable();
+            const newRowIndex = currentItems.length - 1;
+            const newProductInput = productsTableBody.querySelector(`input[data-index="${newRowIndex}"][data-field="product"]`);
+            if (newProductInput) {
+                newProductInput.focus();
+            }
+        };
+
+        const removeItemRow = (index) => {
+            currentItems.splice(index, 1);
+            updateProductsTable();
+            calculateAndDisplayGrandTotal();
+        };
+
+        addItemRowBtn.addEventListener('click', addItemRow);
+
+        addOrderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!isAuthReady || !userId) {
+                showMessage("Application is still loading or user not authenticated. Please wait a moment and try again.");
+                return;
+            }
+            if (!buyerNameInput.value.trim()) {
+                showMessage("Buyer name cannot be empty.");
+                return;
+            }
+            if (currentItems.length === 0) {
+                showMessage("Bill must contain at least one product.");
+                return;
+            }
+
+            let allItemsValid = true;
+            currentItems.forEach((item, index) => {
+                if (!item.product.trim()) {
+                    showMessage(`Product name for item ${index + 1} cannot be empty.`);
+                    allItemsValid = false;
+                } else if (isNaN(item.quantity) || item.quantity <= 0) {
+                    showMessage(`Quantity for product "${item.product}" must be a positive number.`);
+                    allItemsValid = false;
+                } else if (isNaN(item.pricePerUnit) || item.pricePerUnit < 0) {
+                    showMessage(`Price per unit for product "${item.product}" must be a non-negative number.`);
+                    allItemsValid = false;
+                }
+            });
+
+            if (!allItemsValid) {
+                return;
+            }
+
+            const deductFromStock = deductFromStockCheckbox.checked;
+            if (deductFromStock) {
+                let insufficientStockItems = [];
+                currentItems.forEach(item => {
+                    const stockItem = stock.find(s => s.name.toLowerCase() === item.product.trim().toLowerCase());
+                    if (stockItem) {
+                        if (stockItem.quantity < item.quantity) {
+                            insufficientStockItems.push({
+                                product: item.product,
+                                available: stockItem.quantity,
+                                requested: item.quantity
+                            });
+                        }
+                    } else {
+                        insufficientStockItems.push({
+                            product: item.product,
+                            available: 0,
+                            requested: item.quantity
+                        });
+                    }
+                });
+
+                if (insufficientStockItems.length > 0) {
+                    let message = "Insufficient stock for the following items:\n";
+                    insufficientStockItems.forEach(item => {
+                        message += `- ${item.product}: Available ${item.available}, Requested ${item.requested}\n`;
+                    });
+                    message += "\nPlease adjust quantities or uncheck 'Deduct from stock' to proceed.";
+                    showMessage(message);
+                    return;
+                }
+            }
+
+            const newOrder = {
+                id: crypto.randomUUID(),
+                buyerName: buyerNameInput.value.trim(),
+                orderDate: new Date(),
+                items: currentItems.map(item => ({
+                    product: item.product.trim(),
+                    quantity: parseFloat(item.quantity),
+                    pricePerUnit: parseFloat(item.pricePerUnit),
+                    total: parseFloat(item.total)
+                })),
+                grandTotal: parseFloat(grandTotalSpan.textContent),
+                isSeen: false,
+                isDelivered: false,
+                isEditing: false,
+                companyDetails: { ...companyDetails }
+            };
+
+            if (deductFromStock) {
+                currentItems.forEach(item => {
+                    const stockItemIndex = stock.findIndex(s => s.name.toLowerCase() === item.product.trim().toLowerCase());
+                    if (stockItemIndex !== -1) {
+                        stock[stockItemIndex].quantity -= item.quantity;
+                        if (stock[stockItemIndex].quantity < 0) {
+                            stock[stockItemIndex].quantity = 0;
+                        }
+                    }
+                });
+                saveDataToLocalStorage('stock', userId, stock);
+            }
+
+            orders.push(newOrder);
+            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+            showMessage("Order saved successfully!");
+            renderPage('allOrders');
+        });
+
+        buyerNameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentItems.length === 0) {
+                    addItemRow();
+                }
+                productsTableBody.querySelector('input[data-index="0"][data-field="product"]')?.focus();
+            }
+        });
+
+        // --- Stock Management Page Logic ---
+        const addStockForm = document.getElementById('add-stock-form');
+        const stockProductNameInput = document.getElementById('stockProductName');
+        const stockProductPriceInput = document.getElementById('stockProductPrice');
+        const stockProductQuantityInput = document.getElementById('stockProductQuantity');
+        const stockTableBody = document.getElementById('stock-table-body');
+
+        const renderStock = () => {
+            stockTableBody.innerHTML = '';
+            if (stock.length === 0) {
+                stockTableBody.innerHTML = `
+                    <tr class="border-b border-gray-200 last:border-b-0">
+                        <td colspan="4" class="py-3 px-4 text-gray-600 text-center">No stock items yet. Add one above!</td>
+                    </tr>
+                `;
+            } else {
+                stock.forEach(item => {
+                    const row = stockTableBody.insertRow();
+                    row.dataset.stockId = item.id;
+                    const isLowStock = item.quantity <= 5;
+                    if (item.isEditing) {
+                        row.innerHTML = `
+                            <td class="py-3 px-4">
+                                <input type="text" data-field="name" value="${item.name}"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                            </td>
+                            <td class="py-3 px-4">
+                                <input type="number" data-field="price" value="${item.price}" step="0.01" min="0"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                            </td>
+                            <td class="py-3 px-4">
+                                <input type="number" data-field="quantity" value="${item.quantity}" step="1" min="0"
+                                    class="block w-full px-2 py-1 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-black focus:border-black transition-colors mobile-form-input" />
+                            </td>
+                            <td class="py-3 px-4 text-center flex gap-2 justify-center">
+                                <button onclick="window.saveEditedStockItem('${item.id}')" class="bg-black text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-800 transition-colors">Save</button>
+                                <button onclick="window.cancelEditStockItem('${item.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-500 transition-colors">Cancel</button>
+                            </td>
+                        `;
+                    } else {
+                        row.innerHTML = `
+                            <td class="py-3 px-4 text-base">${item.name}</td>
+                            <td class="py-3 px-4 text-base">₹${parseFloat(item.price).toFixed(2)}</td>
+                            <td class="py-3 px-4 text-base ${isLowStock ? 'low-stock' : ''}">${item.quantity}</td>
+                            <td class="py-3 px-4 text-center flex gap-2 justify-center">
+                                <button onclick="window.editStockItem('${item.id}')" class="bg-gray-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-gray-700 transition-colors">Edit</button>
+                                <button onclick="window.deleteStockItem('${item.id}')" class="bg-red-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm hover:bg-red-700 transition-colors">Delete</button>
+                            </td>
+                        `;
+                    }
+                });
+            }
+        };
+
+        addStockForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            const productName = stockProductNameInput.value.trim();
+            const productPrice = parseFloat(stockProductPriceInput.value);
+            const productQuantity = parseInt(stockProductQuantityInput.value);
+
+            if (!productName) {
+                showMessage("Product name cannot be empty.");
+                return;
+            }
+            if (isNaN(productPrice) || productPrice < 0) {
+                showMessage("Please enter a valid non-negative price.");
+                return;
+            }
+            if (isNaN(productQuantity) || productQuantity < 0) {
+                showMessage("Please enter a valid non-negative quantity.");
+                return;
+            }
+
+            const isDuplicate = stock.some(item => item.name.toLowerCase() === productName.toLowerCase());
+            if (isDuplicate) {
+                showMessage("Product with this name already exists in stock.");
+                return;
+            }
+
+            const newStockItem = {
+                id: crypto.randomUUID(),
+                name: productName,
+                price: productPrice,
+                quantity: productQuantity,
+                isEditing: false
+            };
+            stock.push(newStockItem);
+            stock.sort((a, b) => a.name.localeCompare(b.name));
+            saveDataToLocalStorage('stock', userId, stock);
+            showMessage("Stock item added!");
+            stockProductNameInput.value = '';
+            stockProductPriceInput.value = '';
+            stockProductQuantityInput.value = '';
+            renderStock();
+        });
+
+        window.editStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                stock[itemIndex].isEditing = true;
+                renderStock();
+            }
+        };
+
+        window.saveEditedStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                const row = stockTableBody.querySelector(`tr[data-stock-id="${id}"]`);
+                const nameInput = row.querySelector('input[data-field="name"]');
+                const priceInput = row.querySelector('input[data-field="price"]');
+                const quantityInput = row.querySelector('input[data-field="quantity"]');
+
+                const newName = nameInput.value.trim();
+                const newPrice = parseFloat(priceInput.value);
+                const newQuantity = parseInt(quantityInput.value);
+
+                if (!newName) {
+                    showMessage("Product name cannot be empty.");
+                    return;
+                }
+                if (isNaN(newPrice) || newPrice < 0) {
+                    showMessage("Please enter a valid non-negative price.");
+                    return;
+                }
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                    showMessage("Please enter a valid non-negative quantity.");
+                    return;
+                }
+
+                const isDuplicate = stock.some(item => item.id !== id && item.name.toLowerCase() === newName.toLowerCase());
+                if (isDuplicate) {
+                    showMessage("Another product with this name already exists.");
+                    return;
+                }
+
+                stock[itemIndex].name = newName;
+                stock[itemIndex].price = newPrice;
+                stock[itemIndex].quantity = newQuantity;
+                stock[itemIndex].isEditing = false;
+                stock.sort((a, b) => a.name.localeCompare(b.name));
+                saveDataToLocalStorage('stock', userId, stock);
+                showMessage("Stock item updated!");
+                renderStock();
+            }
+        };
+
+        window.cancelEditStockItem = (id) => {
+            const itemIndex = stock.findIndex(item => item.id === id);
+            if (itemIndex > -1) {
+                stock[itemIndex].isEditing = false;
+                renderStock();
+            }
+        };
+
+        window.deleteStockItem = async (id) => {
+            const confirmed = await showConfirmation("Are you sure you want to delete this stock item? This cannot be undone.");
+            if (confirmed) {
+                stock = stock.filter(item => item.id !== id);
+                saveDataToLocalStorage('stock', userId, stock);
+                showMessage("Stock item deleted!");
+                renderStock();
+            }
+        };
+
+        // --- Notes Page Logic ---
+        const newNoteContentInput = document.getElementById('new-note-content');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const notesListDiv = document.getElementById('notes-list');
+
+        const renderNotes = () => {
+            notesListDiv.innerHTML = '';
+            if (notes.length === 0) {
+                notesListDiv.innerHTML = '<p class="text-gray-600">No notes yet. Add one above!</p>';
+            } else {
+                notes.forEach(note => {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 transition-colors';
+                    noteDiv.dataset.noteId = note.id;
+
+                    if (note.isEditing) {
+                        noteDiv.innerHTML = `
+                            <div>
+                                <textarea
+                                    data-note-id="${note.id}"
+                                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-black focus:border-black sm:text-sm mb-3 transition-colors mobile-form-input"
+                                    rows="3"
+                                >${note.content}</textarea>
+                                <div class="flex gap-2 justify-end">
+                                    <button onclick="window.handleSaveEditedNote('${note.id}')" class="bg-black text-white px-3 py-1 rounded-md text-sm hover:bg-gray-800 transition-colors">Save</button>
+                                    <button onclick="window.handleCancelEditNote('${note.id}')" class="bg-gray-400 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-500 transition-colors">Cancel</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        noteDiv.innerHTML = `
+                            <div>
+                                <p class="text-gray-800 text-base ${note.isDone ? 'line-through text-gray-500' : ''}">${note.content}</p>
+                                <p class="text-xs text-gray-500 mt-2">Created: ${new Date(note.createdAt).toLocaleString()}</p>
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    <label class="flex items-center text-sm text-gray-700">
+                                        <input type="checkbox" ${note.isDone ? 'checked' : ''} onchange="window.handleToggleNoteDone('${note.id}', ${note.isDone})" class="form-checkbox h-4 w-4 text-black rounded-md focus:ring-0 mr-1 transition-colors" />
+                                        Done
+                                    </label>
+                                    <button onclick="window.handleEditNote('${note.id}')" class="bg-gray-600 text-white px-3 py-1 rounded-md text-sm hover:bg-gray-700 transition-colors">Edit</button>
+                                    <button onclick="window.handleDeleteNote('${note.id}')" class="bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700 transition-colors">Delete</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    notesListDiv.appendChild(noteDiv);
+                });
+            }
+        };
+
+        addNoteBtn.addEventListener('click', () => {
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            if (!newNoteContentInput.value.trim()) {
+                showMessage("Note content cannot be empty.");
+                return;
+            }
+            const newNote = {
+                id: crypto.randomUUID(),
+                content: newNoteContentInput.value.trim(),
+                createdAt: new Date(),
+                isDone: false,
+                isEditing: false
+            };
+            notes.push(newNote);
+            notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            saveDataToLocalStorage('notes', userId, notes);
+            showMessage("Note added!");
+            newNoteContentInput.value = '';
+            renderNotes();
+        });
+
+        window.handleToggleNoteDone = (noteId, currentStatus) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isDone = !currentStatus;
+                notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                saveDataToLocalStorage('notes', userId, notes);
+                showMessage(`Note marked as ${!currentStatus ? 'done' : 'undone'}.`);
+                renderNotes();
+            }
+        };
+
+        window.handleDeleteNote = async (noteId) => {
+            const confirmed = await showConfirmation("Are you sure you want to delete this note?");
+            if (confirmed) {
+                notes = notes.filter(note => note.id !== noteId);
+                saveDataToLocalStorage('notes', userId, notes);
+                showMessage("Note deleted!");
+                renderNotes();
+            }
+        };
+
+        window.handleEditNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isEditing = true;
+                renderNotes();
+            }
+        };
+
+        window.handleSaveEditedNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                const editedContent = notesListDiv.querySelector(`textarea[data-note-id="${noteId}"]`).value.trim();
+                if (!editedContent) {
+                    showMessage("Note content cannot be empty.");
+                    return;
+                }
+                notes[noteIndex].content = editedContent;
+                notes[noteIndex].isEditing = false;
+                saveDataToLocalStorage('notes', userId, notes);
+                showMessage("Note updated!");
+                renderNotes();
+            }
+        };
+
+        window.handleCancelEditNote = (noteId) => {
+            const noteIndex = notes.findIndex(note => note.id === noteId);
+            if (noteIndex > -1) {
+                notes[noteIndex].isEditing = false;
+                renderNotes();
+            }
+        };
+
+        // --- Settings Page Logic ---
+        const settingsForm = document.getElementById('settings-form');
+        const companyNameInput = document.getElementById('companyName');
+        const addressInput = document.getElementById('address');
+        const phoneInput = document.getElementById('phone');
+        const emailInput = document.getElementById('email');
+        const gstNumberInput = document.getElementById('gstNumber');
+        const defaultBillNotesInput = document.getElementById('defaultBillNotes');
+        const exportDataBtn = document.getElementById('export-data-btn');
+        const importFileInput = document.getElementById('import-file-input');
+        const importDataBtn = document.getElementById('import-data-btn');
+        const resetAppBtn = document.getElementById('reset-app-btn');
+
+        const renderSettings = () => {
+            companyNameInput.value = companyDetails.companyName;
+            addressInput.value = companyDetails.address;
+            phoneInput.value = companyDetails.phone;
+            emailInput.value = companyDetails.email;
+            gstNumberInput.value = companyDetails.gstNumber;
+            defaultBillNotesInput.value = companyDetails.defaultBillNotes;
+        };
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!userId) {
+                showMessage("User not authenticated. Please try again.");
+                return;
+            }
+            companyDetails = {
+                companyName: companyNameInput.value.trim(),
+                address: addressInput.value.trim(),
+                phone: phoneInput.value.trim(),
+                email: emailInput.value.trim(),
+                gstNumber: gstNumberInput.value.trim(),
+                defaultBillNotes: defaultBillNotesInput.value.trim()
+            };
+            saveDataToLocalStorage('companyDetails', userId, companyDetails);
+            showMessage("Company details and bill customization settings saved successfully!");
+        });
+
+        exportDataBtn.addEventListener('click', () => {
+            if (!userId) {
+                showMessage("User not authenticated. Cannot export data.");
+                return;
+            }
+
+            const dataToExport = {
+                companyDetails: companyDetails,
+                orders: [...orders, ...completedOrders].map(order => ({
+                    ...order,
+                    orderDate: new Date(order.orderDate).toISOString()
+                })),
+                notes: notes.map(note => ({
+                    ...note,
+                    createdAt: note.createdAt ? new Date(note.createdAt).toISOString() : new Date().toISOString()
+                })),
+                stock: stock
+            };
+
+            const jsonString = JSON.stringify(dataToExport, null, 2);
+            const blob = new Blob([jsonString], {
+                type: 'application/json'
+            });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `quickbill_data_${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showMessage("All data exported successfully!");
+        });
+
+        importDataBtn.addEventListener('click', () => {
+            importFileInput.click();
+        });
+
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+
+                    if (
+                        !importedData ||
+                        typeof importedData.companyDetails !== 'object' ||
+                        !Array.isArray(importedData.orders) ||
+                        !Array.isArray(importedData.notes) ||
+                        !Array.isArray(importedData.stock)
+                    ) {
+                        showMessage("Invalid data file format. Please upload a valid export file.");
+                        return;
+                    }
+
+                    companyDetails = {
+                        gstNumber: '',
+                        defaultBillNotes: '',
+                        ...importedData.companyDetails
+                    };
+
+                    const processedImportedOrders = importedData.orders.map(order => ({
+                        ...order,
+                        orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
+                    }));
+                    orders = processedImportedOrders.filter(order => !order.isDelivered);
+                    completedOrders = processedImportedOrders.filter(order => order.isDelivered);
+                    orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+                    completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+
+                    const processedImportedNotes = importedData.notes.map(note => ({
+                        ...note,
+                        createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+                    }));
+                    notes = processedImportedNotes;
+                    notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+                    stock = importedData.stock.map(item => ({
+                        ...item,
+                        price: parseFloat(item.price)
+                    }));
+                    stock.sort((a, b) => a.name.localeCompare(b.name));
+
+                    saveDataToLocalStorage('companyDetails', userId, companyDetails);
+                    saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+                    saveDataToLocalStorage('notes', userId, notes);
+                    saveDataToLocalStorage('stock', userId, stock);
+
+                    showMessage("Data imported successfully!");
+                    renderSettings();
+                    renderAllOrders();
+                    renderNotes();
+                    renderStock();
+                } catch (error) {
+                    console.error("Error importing data:", error);
+                    showMessage("Failed to import data. Please ensure the file is a valid JSON.");
+                } finally {
+                    event.target.value = null;
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        resetAppBtn.addEventListener('click', async () => {
+            const confirmed = await showConfirmation("Are you sure you want to reset the application? This will permanently delete ALL your data and reload the site.");
+            if (confirmed) {
+                localStorage.clear();
+                showMessage("Application reset successfully. Reloading...");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        });
+
+        // --- Initial Load and Authentication ---
+        window.addEventListener('load', async () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            loadingOverlay.classList.remove('hidden');
+
+            const authTimeout = setTimeout(() => {
+                if (!isAuthReady) {
+                    loadingOverlay.classList.add('hidden');
+                    loadingOverlay.style.display = 'none';
+                    showMessage("Application failed to initialize authentication. Please check your internet connection or Firebase configuration.");
+                    console.error("Authentication timed out. App might not function correctly.");
+                }
+            }, 10000);
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    clearTimeout(authTimeout);
+                    if (user) {
+                        userId = user.uid;
+                    } else {
+                        try {
+                            const anonymousUserCredential = await signInAnonymously(auth);
+                            userId = anonymousUserCredential.user.uid;
+                        } catch (error) {
+                            console.error("Error signing in anonymously:", error);
+                            showMessage("Error signing in. Please try again.");
+                        }
+                    }
+                    isAuthReady = true;
+                    document.getElementById('user-id-display').textContent = `User ID: ${userId}`;
+                    document.getElementById('mobile-user-id').textContent = `User ID: ${userId}`;
+                    initializeAppData();
+                    renderPage('dashboard');
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+                showMessage("Failed to initialize the application. Please check console for details and Firebase configuration.");
+            } finally {
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.style.display = 'none';
+            }
+
+            // PWA Service Worker Registration (Optional)
+            // If deploying as a single HTML file without PWA features, this will fail gracefully.
+            // To enable PWA: create service-worker.js and update the path below.
+            if ('serviceWorker' in navigator) {
+                const serviceWorkerPath = './service-worker.js';
+                navigator.serviceWorker.register(serviceWorkerPath)
+                    .then(registration => {
+                        // console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            }
+        });
+
+        const initializeAppData = () => {
+            companyDetails = loadDataFromLocalStorage('companyDetails', userId, {
+                companyName: '',
+                address: '',
+                phone: '',
+                email: '',
+                gstNumber: '',
+                defaultBillNotes: ''
+            });
+
+            const storedOrders = loadDataFromLocalStorage('orders', userId, []);
+            const processedOrders = storedOrders.map(order => ({
+                ...order,
+                orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
+            }));
+
+            orders = processedOrders.filter(order => !order.isDelivered);
+            completedOrders = processedOrders.filter(order => order.isDelivered);
+
+            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+
+            const storedNotes = loadDataFromLocalStorage('notes', userId, []);
+            notes = storedNotes.map(note => ({
+                ...note,
+                createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+            }));
+            notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+            const storedStock = loadDataFromLocalStorage('stock', userId, []);
+            stock = storedStock.map(item => ({
+                ...item,
+                price: parseFloat(item.price),
+                quantity: item.quantity !== undefined ? parseInt(item.quantity) : 0
+            }));
+            stock.sort((a, b) => a.name.localeCompare(b.name));
+        };
+
+        // Navigation event listeners
+        document.getElementById('nav-dashboard').addEventListener('click', () => renderPage('dashboard'));
+        document.getElementById('nav-allOrders').addEventListener('click', () => renderPage('allOrders'));
+        document.getElementById('nav-addOrder').addEventListener('click', () => renderPage('addOrder'));
+        document.getElementById('nav-stock').addEventListener('click', () => renderPage('stock'));
+        document.getElementById('nav-notes').addEventListener('click', () => renderPage('notes'));
+        document.getElementById('nav-settings').addEventListener('click', () => renderPage('settings'));
+
+        // Clear completed orders
+        document.getElementById('clear-completed-orders-btn').addEventListener('click', async () => {
+            const confirmed = await showConfirmation("Are you sure you want to clear all delivered orders? This action cannot be undone.");
+            if (confirmed) {
+                completedOrders = [];
+                saveDataToLocalStorage('orders', userId, [...orders, ...completedOrders]);
+                showMessage("All delivered orders cleared!");
+                renderAllOrders();
+            }
+        });
+
+        // Search functionality
+        orderSearchInput.addEventListener('input', renderAllOrders);
+    </script>
+</body>
+
+</html>
