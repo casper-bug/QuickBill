@@ -199,14 +199,16 @@
                 height: 250px;
             }
             
-            /* Hide regular nav on mobile, show hamburger */
-            .nav-full {
-                display: none;
-            }
-            
-            .nav-hamburger {
-                display: flex;
-            }
+        /* Hide regular nav on mobile, show hamburger */
+           @media (max-width: 639px) {
+          .nav-full {
+           display: none !important;
+       }
+    
+         .nav-hamburger {
+         display: flex;
+      }
+   }
         }
 
         @media (min-width: 640px) {
@@ -225,11 +227,11 @@
             
             /* Show regular nav on desktop, hide hamburger */
             .nav-full {
-                display: flex;
+                display: flex !important;
             }
             
             .nav-hamburger {
-                display: none;
+                display: none !important;
             }
         }
         
@@ -3228,3 +3230,4 @@
 </body>
 
 </html>
+
