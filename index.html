@@ -553,6 +553,10 @@
             justify-content: center;
             z-index: 9999;
         }
+        
+        .modal-overlay.hidden {
+            display: none !important;
+        }
 
         .modal-content {
             background-color: var(--bg-secondary);
@@ -1559,8 +1563,16 @@
         let isAuthReady = false;
         let currentPage = 'dashboard';
         let messageTimeout = null;
-        let resolveConfirmationPromise;
+        let resolveConfirmationPromise = null;
         let darkMode = false;
+        
+        // Ensure confirmation modal is hidden on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const confirmationModal = document.getElementById('confirmation-modal');
+            if (confirmationModal) {
+                confirmationModal.classList.add('hidden');
+            }
+        });
 
         // --- Dark Mode Functions ---
         function toggleDarkMode() {
@@ -1630,6 +1642,10 @@
         function showConfirmation(message) {
             const confirmationModal = document.getElementById('confirmation-modal');
             const confirmationMessage = document.getElementById('confirmation-message');
+            if (!confirmationModal || !confirmationMessage) {
+                console.error('Confirmation modal elements not found');
+                return Promise.resolve(false);
+            }
             confirmationMessage.textContent = message;
             confirmationModal.classList.remove('hidden');
             return new Promise(resolve => {
@@ -1637,15 +1653,41 @@
             });
         }
 
-        document.getElementById('confirm-yes').addEventListener('click', () => {
-            document.getElementById('confirmation-modal').classList.add('hidden');
-            resolveConfirmationPromise(true);
-        });
+        // Setup confirmation modal event listeners when DOM is ready
+        function setupConfirmationModal() {
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const confirmYes = document.getElementById('confirm-yes');
+            const confirmNo = document.getElementById('confirm-no');
+            
+            // Ensure modal is hidden on initialization
+            if (confirmationModal) {
+                confirmationModal.classList.add('hidden');
+            }
+            
+            if (confirmYes && confirmNo) {
+                // Remove any existing listeners by cloning
+                const newYes = confirmYes.cloneNode(true);
+                const newNo = confirmNo.cloneNode(true);
+                confirmYes.parentNode.replaceChild(newYes, confirmYes);
+                confirmNo.parentNode.replaceChild(newNo, confirmNo);
+                
+                newYes.addEventListener('click', () => {
+                    document.getElementById('confirmation-modal').classList.add('hidden');
+                    if (resolveConfirmationPromise) {
+                        resolveConfirmationPromise(true);
+                        resolveConfirmationPromise = null;
+                    }
+                });
 
-        document.getElementById('confirm-no').addEventListener('click', () => {
-            document.getElementById('confirmation-modal').classList.add('hidden');
-            resolveConfirmationPromise(false);
-        });
+                newNo.addEventListener('click', () => {
+                    document.getElementById('confirmation-modal').classList.add('hidden');
+                    if (resolveConfirmationPromise) {
+                        resolveConfirmationPromise(false);
+                        resolveConfirmationPromise = null;
+                    }
+                });
+            }
+        }
 
         // --- Local Storage Functions ---
         const getLocalStorageKey = (key) => {
@@ -3892,6 +3934,9 @@ Data: ${btoa(JSON.stringify(billData))}`;
         // --- Initial Load ---
         window.addEventListener('load', () => {
             console.log('App loading started...');
+            
+            // Setup confirmation modal first
+            setupConfirmationModal();
             
             // Wait for Firebase or use demo mode
             const initializeApp = () => {
