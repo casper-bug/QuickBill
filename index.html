@@ -268,11 +268,12 @@
         }
         
         .stat-card {
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 0.75rem;
             padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px var(--shadow);
             border-left: 4px solid #3b82f6;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         .stat-card.revenue {
@@ -295,11 +296,12 @@
             font-size: 2rem;
             font-weight: 700;
             margin: 0.5rem 0;
+            color: var(--text-primary);
         }
         
         .stat-label {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--text-secondary);
             text-transform: uppercase;
             font-weight: 600;
             letter-spacing: 0.05em;
@@ -321,19 +323,20 @@
         }
         
         .chart-container {
-            background: white;
+            background: var(--bg-secondary);
             border-radius: 0.75rem;
             padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px var(--shadow);
             margin-bottom: 1.5rem;
             height: 300px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         
         .chart-title {
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #1f2937;
+            color: var(--text-primary);
         }
         
         .top-products-list {
@@ -347,7 +350,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .top-product-item:last-child {
@@ -388,12 +391,12 @@
         
         .product-sales {
             font-weight: 600;
-            color: #1f2937;
+            color: var(--text-primary);
         }
         
         .progress-bar {
             height: 8px;
-            background: #e5e7eb;
+            background: var(--bg-tertiary);
             border-radius: 4px;
             overflow: hidden;
             margin-top: 0.5rem;
@@ -413,14 +416,14 @@
             font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 1rem;
-            color: #1f2937;
+            color: var(--text-primary);
         }
         
         .recent-activity-item {
             display: flex;
             align-items: center;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .recent-activity-item:last-child {
@@ -433,7 +436,7 @@
             justify-content: center;
             width: 40px;
             height: 40px;
-            background: #f3f4f6;
+            background: var(--bg-tertiary);
             border-radius: 50%;
             margin-right: 1rem;
             color: #3b82f6;
@@ -446,11 +449,12 @@
         .activity-title {
             font-weight: 600;
             margin-bottom: 0.25rem;
+            color: var(--text-primary);
         }
         
         .activity-time {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--text-secondary);
         }
         
         .activity-amount {
@@ -460,29 +464,34 @@
         
         .dashboard-date-filter {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
         }
         
         .date-filter-button {
             padding: 0.5rem 1rem;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
             cursor: pointer;
             font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
             transition: all 0.2s;
+            white-space: nowrap;
         }
         
         .date-filter-button.active {
-            background: #3b82f6;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
-            border-color: #3b82f6;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
         }
         
         .date-filter-button:hover:not(.active) {
-            background: #f9fafb;
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            border-color: var(--accent-color);
         }
         
         /* Simple chart styles */
@@ -512,7 +521,7 @@
             margin-top: 0.5rem;
             font-size: 0.75rem;
             text-align: center;
-            color: #6b7280;
+            color: var(--text-secondary);
         }
         
         .simple-line-chart {
@@ -522,7 +531,7 @@
         }
         
         .chart-grid-line {
-            stroke: #e5e7eb;
+            stroke: var(--border-color);
             stroke-width: 1;
         }
 
@@ -541,10 +550,10 @@
         }
 
         .modal-content {
-            background-color: white;
+            background-color: var(--bg-secondary);
             padding: 1.5rem;
             border-radius: 0.5rem;
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 15px var(--shadow-md);
             max-width: 400px;
             width: 90%;
             text-align: center;
@@ -567,7 +576,7 @@
         /* Autocomplete styles (Optimized) */
         .autocomplete-items {
             position: absolute;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color);
             border-top: none;
             z-index: 99;
             top: 100%;
@@ -575,9 +584,9 @@
             right: 0;
             max-height: 200px;
             overflow-y: auto;
-            background-color: white;
+            background-color: var(--bg-secondary);
             border-radius: 0 0 1rem 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             will-change: opacity;
             transform: translateZ(0);
         }
@@ -585,13 +594,14 @@
         .autocomplete-items div {
             padding: 10px;
             cursor: pointer;
-            background-color: white;
-            border-bottom: 1px solid #f3f4f6;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
             transition: background-color 0.15s ease;
         }
         
         .autocomplete-items div:hover {
-            background-color: #f3f4f6;
+            background-color: var(--bg-tertiary);
         }
         
         .autocomplete-active {
@@ -757,95 +767,281 @@
         
         /* Mobile optimizations */
         @media (max-width: 640px) {
+            /* Page titles - consistent sizing */
+            h2 {
+                font-size: 1.5rem !important; /* 24px */
+                line-height: 1.3;
+                margin-bottom: 1rem !important;
+            }
+            
+            h3 {
+                font-size: 1.125rem !important; /* 18px */
+                line-height: 1.4;
+                margin-bottom: 0.75rem !important;
+            }
+            
+            /* Header logo and title */
+            header h1 {
+                font-size: 1rem !important; /* 16px */
+            }
+            
+            header .w-10 {
+                width: 2rem !important;
+                height: 2rem !important;
+            }
+            
+            header .material-icons {
+                font-size: 1.25rem !important;
+            }
+            
+            /* Checkbox consistency */
+            input[type="checkbox"] {
+                width: 1.25rem !important;
+                height: 1.25rem !important;
+                min-width: 1.25rem;
+                min-height: 1.25rem;
+                cursor: pointer;
+            }
+            
+            /* Labels next to checkboxes */
+            .stock-deduction-container {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .stock-deduction-container label {
+                font-size: 0.875rem !important;
+                line-height: 1.4;
+            }
+            
+            /* Form labels - consistent sizing */
+            label {
+                font-size: 0.75rem !important;
+                line-height: 1.3;
+            }
+            
+            /* Input fields */
+            input[type="text"],
+            input[type="number"],
+            input[type="email"],
+            input[type="tel"],
+            textarea,
+            select {
+                font-size: 1rem !important; /* 16px prevents iOS zoom */
+                padding: 0.875rem !important;
+                line-height: 1.5;
+            }
+            
+            /* Buttons - consistent sizing */
+            button {
+                font-size: 0.875rem !important;
+                padding: 0.75rem 1rem !important;
+                line-height: 1.4;
+            }
+            
+            /* Primary action buttons */
+            button[type="submit"],
+            .bg-black {
+                font-size: 1rem !important;
+                padding: 1rem 1.5rem !important;
+            }
+            
+            /* Date filter buttons */
+            .date-filter-button {
+                font-size: 0.75rem !important;
+                padding: 0.5rem 0.875rem !important;
+                min-width: 3rem;
+            }
+            
+            /* Stat cards */
+            .stat-card {
+                padding: 1rem !important;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem !important; /* 24px */
+                margin: 0.5rem 0;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem !important;
+            }
+            
+            .stat-change {
+                font-size: 0.75rem !important;
+            }
+            
+            .stat-change .material-icons {
+                font-size: 1rem !important;
+            }
+            
+            /* Table consistency */
             .mobile-table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
             
-            /* Optimize table for small screens */
-            table th, table td {
-                font-size: 0.75rem;
-                padding: 0.75rem 0.5rem;
+            table th {
+                font-size: 0.625rem !important; /* 10px */
+                padding: 0.75rem 0.5rem !important;
+                white-space: nowrap;
             }
             
-            /* Adjust stat cards for mobile */
-            .stat-card {
-                padding: 1.25rem;
+            table td {
+                font-size: 0.875rem !important;
+                padding: 0.75rem 0.5rem !important;
             }
             
-            .stat-value {
-                font-size: 1.75rem;
+            table input {
+                font-size: 0.875rem !important;
+                padding: 0.5rem !important;
             }
             
-            /* Optimize form inputs */
-            input, textarea, select {
-                font-size: 16px; /* Prevents zoom on iOS */
+            table button {
+                font-size: 0.75rem !important;
+                padding: 0.5rem 0.75rem !important;
             }
             
-            /* Compact buttons on mobile */
-            button {
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
-            }
-            
-            /* Better spacing for mobile */
-            .p-8 {
-                padding: 1rem !important;
-            }
-            
-            /* Optimize modal for mobile */
-            .modal-content {
-                width: 95%;
-                max-width: none;
-            }
-            
-            /* Adjust navigation for mobile */
-            .nav-button {
-                font-size: 0.7rem;
-                padding: 0.625rem 0.875rem;
-            }
-            
-            /* Optimize chart containers */
+            /* Chart containers */
             .chart-container {
-                padding: 1rem;
+                padding: 1rem !important;
                 height: 250px;
             }
             
-            /* Better product table for mobile */
-            #products-table input {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.875rem;
+            .chart-title {
+                font-size: 1rem !important;
+                margin-bottom: 0.75rem !important;
             }
             
-            /* Optimize stock table */
-            #stock-table-body button {
-                padding: 0.5rem 0.75rem;
-                font-size: 0.75rem;
+            /* Card padding */
+            .p-8, .p-10, .p-12 {
+                padding: 1rem !important;
             }
             
-            /* Better toast notifications */
+            .lg\:p-12 {
+                padding: 1rem !important;
+            }
+            
+            /* Grand total section */
+            #grand-total {
+                font-size: 2rem !important;
+            }
+            
+            /* Material icons consistency */
+            .material-icons {
+                font-size: 1.25rem;
+                vertical-align: middle;
+            }
+            
+            /* Toast notifications */
             #toast-display {
                 max-width: 90%;
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
+                padding: 0.75rem 1rem !important;
+                font-size: 0.875rem !important;
             }
             
-            /* Optimize QR modal */
-            #qr-modal .bg-white {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
+            /* Modal dialogs */
+            .modal-content {
+                width: 95%;
+                max-width: none;
+                padding: 1.25rem !important;
             }
             
-            /* Better order cards */
+            .modal-content p {
+                font-size: 0.875rem !important;
+            }
+            
+            /* Recent activity items */
             .recent-activity-item {
-                padding: 0.75rem;
-                font-size: 0.875rem;
+                padding: 0.75rem !important;
             }
             
-            /* Optimize hamburger button */
+            .activity-icon {
+                width: 2.5rem !important;
+                height: 2.5rem !important;
+            }
+            
+            .activity-icon .material-icons {
+                font-size: 1.25rem !important;
+            }
+            
+            .activity-title {
+                font-size: 0.875rem !important;
+            }
+            
+            .activity-time {
+                font-size: 0.75rem !important;
+            }
+            
+            /* Top products list */
+            .product-rank {
+                width: 1.5rem !important;
+                height: 1.5rem !important;
+                font-size: 0.625rem !important;
+            }
+            
+            .top-product-item {
+                font-size: 0.875rem !important;
+            }
+            
+            /* Notes grid */
+            #notes-list {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Dashboard grid */
+            .dashboard-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            
+            /* Settings page */
+            .grid.lg\:grid-cols-2 {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Hamburger menu */
             #hamburger-toggle {
-                padding: 0.75rem;
-                border-radius: 12px;
+                padding: 0.75rem !important;
+            }
+            
+            #hamburger-toggle .material-icons {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Mobile menu items */
+            .mobile-nav-item {
+                font-size: 1rem !important;
+                padding: 1rem 1.5rem !important;
+            }
+            
+            .mobile-nav-item .material-icons {
+                font-size: 1.5rem !important;
+            }
+            
+            /* Scanner overlay */
+            #scanner-overlay .text-lg {
+                font-size: 1rem !important;
+            }
+            
+            #scanner-overlay button {
+                font-size: 1rem !important;
+                padding: 0.875rem 2rem !important;
+            }
+            
+            /* QR Modal */
+            #qr-modal h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            #qr-modal p {
+                font-size: 0.875rem !important;
+            }
+            
+            /* Stock status items */
+            #stock-status {
+                font-size: 0.875rem !important;
             }
         }
     </style>
@@ -979,7 +1175,7 @@
         
         <!-- Dashboard Section -->
         <div id="page-dashboard" class="page-content space-y-8">
-            <div class="flex justify-between items-end">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
                 <h2 class="text-3xl font-black tracking-tight">Business Hub</h2>
                 <div class="dashboard-date-filter no-print">
                     <button class="date-filter-button active" data-range="7">7D</button>
@@ -1054,7 +1250,7 @@
 
         <!-- Create Bill Section -->
         <div id="page-addOrder" class="page-content max-w-3xl mx-auto">
-            <div class="bg-white p-8 lg:p-12 rounded-[3rem] border border-gray-100 shadow-2xl">
+            <div class="p-8 lg:p-12 rounded-[3rem] shadow-2xl transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <div class="flex justify-between items-center mb-10">
                     <h2 class="text-3xl font-black tracking-tight">Generate Receipt</h2>
                     <button onclick="startScanner()" class="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm shadow-xl shadow-blue-200 hover:scale-105 active:scale-95 transition-all">
@@ -1065,28 +1261,28 @@
                 <form id="add-order-form" class="space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase text-gray-400 px-2">Customer Name</label>
-                            <input type="text" id="buyerName" placeholder="Enter name..." class="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all" required>
+                            <label class="text-[10px] font-black uppercase px-2" style="color: var(--text-tertiary);">Customer Name</label>
+                            <input type="text" id="buyerName" placeholder="Enter name..." class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                         </div>
                         <div class="stock-deduction-container">
                             <input type="checkbox" id="deduct-from-stock" class="h-4 w-4 text-black rounded focus:ring-black" checked>
-                            <label for="deduct-from-stock" class="text-sm font-medium text-gray-700">Deduct items from stock when saving bill</label>
+                            <label for="deduct-from-stock" class="text-sm font-medium" style="color: var(--text-secondary);">Deduct items from stock when saving bill</label>
                         </div>
                     </div>
 
                     <div class="space-y-4">
                         <div class="flex justify-between items-center px-2">
-                            <label class="text-[10px] font-black uppercase text-gray-400">Products & Items</label>
+                            <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Products & Items</label>
                         </div>
                         <div class="overflow-x-auto mb-4 mobile-table-container">
-                            <table id="products-table" class="min-w-full bg-white border border-gray-200 rounded-md">
+                            <table id="products-table" class="min-w-full rounded-md transition-colors" style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
                                 <thead>
-                                    <tr class="bg-gray-100">
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Product</th>
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Qty</th>
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase">Price/Unit</th>
-                                        <th class="py-2 px-2 text-right text-xs sm:text-sm font-semibold uppercase">Total</th>
-                                        <th class="py-2 px-2 text-center text-xs sm:text-sm font-semibold uppercase"></th>
+                                    <tr style="background-color: var(--bg-tertiary);">
+                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Product</th>
+                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Qty</th>
+                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Price/Unit</th>
+                                        <th class="py-2 px-2 text-right text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Total</th>
+                                        <th class="py-2 px-2 text-center text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="bill-items-container">
@@ -1094,14 +1290,14 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button type="button" id="add-item-row-btn" class="w-full py-5 border-2 border-dashed border-gray-200 rounded-3xl text-gray-400 font-bold hover:bg-gray-50 hover:border-black transition-all">
+                        <button type="button" id="add-item-row-btn" class="w-full py-5 border-2 border-dashed rounded-3xl font-bold transition-all" style="border-color: var(--border-color); color: var(--text-tertiary);" onmouseover="this.style.backgroundColor=`var(--bg-tertiary)`; this.style.borderColor=`var(--accent-color)`; this.style.color=`var(--text-primary)`;" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor=`var(--border-color)`; this.style.color=`var(--text-tertiary)`;">
                             <i class="material-icons mr-2">add_circle_outline</i> Add Product
                         </button>
                     </div>
 
-                    <div class="pt-10 border-t border-gray-50 flex flex-col sm:flex-row justify-between items-center gap-6">
+                    <div class="pt-10 flex flex-col sm:flex-row justify-between items-center gap-6" style="border-top: 1px solid var(--border-color);">
                         <div class="text-center sm:text-left">
-                            <p class="text-[10px] font-black uppercase text-gray-400">Grand Total</p>
+                            <p class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Grand Total</p>
                             <p class="text-4xl font-black tracking-tighter">₹<span id="grand-total">0.00</span></p>
                         </div>
                         <button type="submit" class="w-full sm:w-auto bg-black text-white px-12 py-5 rounded-[2rem] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all">Save & Finalize</button>
@@ -1112,26 +1308,26 @@
 
         <!-- Inventory Section -->
         <div id="page-stock" class="page-content space-y-8">
-            <div class="bg-white p-8 lg:p-12 rounded-[3rem] border border-gray-100 shadow-sm">
+            <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <h2 class="text-2xl font-black mb-8">Stock Intake</h2>
                 <form id="stock-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" required>
-                    <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" required>
-                    <input type="number" id="stockProductQuantity" placeholder="Initial Stock" class="p-5 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" required>
+                    <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
+                    <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
+                    <input type="number" id="stockProductQuantity" placeholder="Initial Stock" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                     <button type="submit" class="bg-black text-white p-5 rounded-2xl font-black tracking-tight">Register Item</button>
                 </form>
             </div>
 
-            <div class="bg-white rounded-[3rem] border border-gray-100 shadow-sm overflow-hidden">
+            <div class="rounded-[3rem] shadow-sm overflow-hidden transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <div class="mobile-table-container">
                     <table class="w-full text-left border-collapse">
-                        <thead class="bg-gray-50/50">
+                        <thead style="background-color: var(--bg-tertiary);">
                             <tr>
-                                <th class="p-8 text-[10px] font-black uppercase text-gray-400">Product</th>
-                                <th class="p-8 text-[10px] font-black uppercase text-gray-400">Price</th>
-                                <th class="p-8 text-[10px] font-black uppercase text-gray-400">Qty</th>
-                                <th class="p-8 text-[10px] font-black uppercase text-gray-400">Barcode</th>
-                                <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-right">Actions</th>
+                                <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Product</th>
+                                <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Price</th>
+                                <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Qty</th>
+                                <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Barcode</th>
+                                <th class="p-8 text-[10px] font-black uppercase text-right" style="color: var(--text-secondary);">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="stock-table-body"></tbody>
@@ -1147,9 +1343,9 @@
                 <button onclick="createNewNote()" class="bg-black text-white px-8 py-4 rounded-2xl font-black text-sm">+ New Note</button>
             </div>
             
-            <div class="bg-white p-8 lg:p-12 rounded-[3rem] border border-gray-100 shadow-sm mb-8">
+            <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm mb-8 transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <h3 class="text-xl font-black mb-6">Add New Note</h3>
-                <textarea id="new-note-content" rows="4" class="block w-full px-6 py-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black mb-6" placeholder="Write your note here..."></textarea>
+                <textarea id="new-note-content" rows="4" class="block w-full px-6 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 mb-6 transition-all" placeholder="Write your note here..." style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);"></textarea>
                 <button onclick="addNote()" class="w-full bg-black text-white px-6 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 active:scale-95 transition-all">Add Note</button>
             </div>
 
@@ -1162,20 +1358,20 @@
         <div id="page-allOrders" class="page-content space-y-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <h2 class="text-3xl font-black">Order Archive</h2>
-                <input type="text" id="order-search-input" oninput="renderAllOrders()" placeholder="Search client or ID..." class="w-full md:w-80 p-5 bg-white rounded-2xl border border-gray-100 outline-none focus:ring-2 focus:ring-black">
+                <input type="text" id="order-search-input" oninput="renderAllOrders()" placeholder="Search client or ID..." class="w-full md:w-80 p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
             </div>
             
             <div class="mb-8">
                 <h3 class="text-2xl font-black mb-6 border-b pb-4">Active Orders</h3>
                 <div id="active-orders-list">
-                    <p class="text-gray-600">No active orders found. Start by adding a new order!</p>
+                    <p style="color: var(--text-secondary);">No active orders found. Start by adding a new order!</p>
                 </div>
             </div>
 
             <div class="mt-8">
                 <h3 class="text-2xl font-black mb-6 border-b pb-4">Completed Orders</h3>
                 <div id="completed-orders-list">
-                    <p class="text-gray-600">No completed orders yet.</p>
+                    <p style="color: var(--text-secondary);">No completed orders yet.</p>
                 </div>
                 <div class="mt-8 text-center">
                     <button id="clear-completed-orders-btn" class="bg-red-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-red-600 transition-colors shadow-xl hidden">
