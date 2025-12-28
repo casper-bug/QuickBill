@@ -135,12 +135,16 @@
 
         .nav-button.active {
             background: var(--nav-active, #000);
-            color: #fff;
+            color: #ffffff !important;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
         
         .nav-button:not(.active):hover {
             background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        .nav-button {
             color: var(--text-primary);
         }
         
@@ -1092,7 +1096,7 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 flex flex-col items-center justify-center z-[1000] transition-opacity duration-500" style="background-color: var(--bg-secondary);">
         <div class="relative w-16 h-16">
-            <div class="absolute inset-0 border-4 rounded-full" style="border-color: var(--bg-tertiary);"></div>
+            <div class="absolute inset-0 border-4 rounded-full opacity-20" style="border-color: var(--accent-color);"></div>
             <div class="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style="border-color: var(--accent-color);"></div>
         </div>
         <p class="mt-6 font-black tracking-tighter text-lg" style="color: var(--text-primary);">QUICKBILL PRO</p>
