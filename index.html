@@ -1571,9 +1571,6 @@
             const toggle = document.getElementById('dark-mode-toggle');
             const slider = document.getElementById('dark-mode-slider');
             
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'applyDarkMode:1603',message:'Applying dark mode',data:{darkMode:darkMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-            // #endregion
             if (darkMode) {
                 html.setAttribute('data-theme', 'dark');
                 if (toggle) toggle.style.backgroundColor = '#3b82f6';
@@ -1589,12 +1586,6 @@
                     slider.style.backgroundColor = '#ffffff';
                 }
             }
-            // #region agent log
-            const testInput = document.querySelector('input[style*="--input-bg"]');
-            const inputBg = testInput ? window.getComputedStyle(testInput).backgroundColor : 'N/A';
-            const inputColor = testInput ? window.getComputedStyle(testInput).color : 'N/A';
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'applyDarkMode:1620',message:'Dark mode applied',data:{dataTheme:html.getAttribute('data-theme'),inputBg:inputBg,inputColor:inputColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-            // #endregion
         }
         
         function loadDarkMode() {
@@ -1830,20 +1821,12 @@
         }
         
         function showAutocompleteImmediate(input, value, index) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'showAutocompleteImmediate:1854',message:'Autocomplete shown',data:{value:value,index:index,stockLength:stock.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             closeAllLists();
             if (!value) return;
             
             const autocompleteList = document.createElement('div');
             autocompleteList.setAttribute('id', `autocomplete-list-${index}`);
             autocompleteList.className = 'autocomplete-items';
-            // #region agent log
-            const computedZIndex = window.getComputedStyle(autocompleteList).zIndex;
-            const parentZIndex = window.getComputedStyle(input.parentElement).zIndex;
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'showAutocompleteImmediate:1859',message:'Autocomplete z-index',data:{autocompleteZIndex:computedZIndex,parentZIndex:parentZIndex,parentElement:input.parentElement?.tagName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-            // #endregion
             
             // Optimize: Limit results to 10 for better performance
             const matches = stock
@@ -1895,9 +1878,6 @@
 
         // --- Navigation (Optimized) ---
         function renderPage(id) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'renderPage:1854',message:'renderPage called',data:{pageId:id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
             // Use requestAnimationFrame for smooth transitions
             requestAnimationFrame(() => {
                 document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
@@ -1910,9 +1890,6 @@
                 const navBtn = document.getElementById(`nav-${id}`);
                 if(navBtn) {
                     navBtn.classList.add('active');
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'renderPage:1865',message:'Nav button active',data:{navBtnId:`nav-${id}`,hasActive:navBtn.classList.contains('active'),computedColor:window.getComputedStyle(navBtn).color,inlineColor:navBtn.style.color},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                    // #endregion
                 }
 
                 const mobileNavItem = document.querySelector(`.mobile-nav-item[data-page="${id}"]`);
@@ -2463,14 +2440,8 @@
         }
 
         function attachProductInputListeners() {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'attachProductInputListeners:2414',message:'Attaching listeners',data:{containerExists:!!document.getElementById('bill-items-container')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
             const container = document.getElementById('bill-items-container');
             const inputs = container.querySelectorAll('input[data-field]');
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'attachProductInputListeners:2416',message:'Inputs found',data:{inputCount:inputs.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
             inputs.forEach(input => {
                 input.oninput = (e) => {
                     const index = parseInt(e.target.dataset.index);
@@ -3882,18 +3853,12 @@
                         console.log('Using demo user ID:', userId);
                     }
                     
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initializeApp:3904',message:'UserId set',data:{userId:userId,isFirebaseReady:window.isFirebaseReady,firebaseUserId:window.firebaseUserId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-                    // #endregion
                     
                     document.getElementById('mobile-user-id').textContent = `User ID: ${userId.substr(0, 12)}...`;
                     isAuthReady = true;
 
                     // Load data from localStorage
                     companyDetails = loadDataFromLocalStorage('companyDetails', companyDetails);
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initializeApp:3916',message:'Company details loaded',data:{companyName:companyDetails.companyName,userId:userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
-                    // #endregion
 
                     const storedOrders = loadDataFromLocalStorage('orders', []);
                     const processedOrders = storedOrders.map(order => ({
