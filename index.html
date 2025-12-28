@@ -8,6 +8,11 @@
     <meta name="description" content="QuickBill Pro - Fast, Modern Order Management System">
     <title>QuickBill Pro - Enterprise Order Management</title>
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" />
+    <link rel="icon" href="./icons/favicon.png" type="image/x-icon">
+    
     <!-- Preconnect to external resources for faster loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,10 +23,10 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Essential Libraries - Loaded asynchronously when needed -->
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
     <style>
         /* CSS Variables for Dark Mode */
@@ -1215,6 +1220,80 @@
     </main>
 
     <div id="bill-to-print" class="p-12"></div>
+
+    <!-- Firebase Configuration -->
+    <script>
+        // Define Firebase config - Users can customize with their own Firebase project credentials
+        window.__firebase_config = JSON.stringify({
+            apiKey: "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc",
+            authDomain: "quickbill-33bf7.firebaseapp.com",
+            projectId: "quickbill-33bf7",
+            storageBucket: "quickbill-33bf7.firebasestorage.app",
+            messagingSenderId: "749941620593",
+            appId: "1:749941620593:web:4ae8ba14e6b5291dfd00d0"
+        });
+    </script>
+
+    <!-- Firebase Authentication Module -->
+    <script type="module">
+        // Firebase imports (using module syntax for direct browser use)
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Parse Firebase configuration
+        const firebaseConfig = JSON.parse(typeof window.__firebase_config !== 'undefined' ? window.__firebase_config : '{}');
+
+        if (!firebaseConfig.projectId) {
+            console.warn("Firebase config not fully provided. Using default values.");
+            firebaseConfig.apiKey = firebaseConfig.apiKey || "AIzaSyAyX3Y9TJaTW5HDz0Hb1Z_o6YmpucB9fqc";
+            firebaseConfig.authDomain = firebaseConfig.authDomain || "quickbill-33bf7.firebaseapp.com";
+            firebaseConfig.projectId = firebaseConfig.projectId || "quickbill-33bf7";
+            firebaseConfig.storageBucket = firebaseConfig.storageBucket || "quickbill-33bf7.firebasestorage.app";
+            firebaseConfig.messagingSenderId = firebaseConfig.messagingSenderId || "749941620593";
+            firebaseConfig.appId = firebaseConfig.appId || "1:749941620593:web:4ae8ba14e6b5291dfd00d0";
+        }
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Global Firebase state
+        window.firebaseAuth = auth;
+        window.firebaseUserId = null;
+        window.isFirebaseReady = false;
+
+        // Firebase Authentication
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.firebaseUserId = user.uid;
+                window.isFirebaseReady = true;
+                console.log('Firebase user authenticated:', user.uid);
+                
+                // Trigger app initialization if load event already fired
+                if (document.readyState === 'complete') {
+                    const event = new Event('firebase-ready');
+                    window.dispatchEvent(event);
+                }
+            } else {
+                // Sign in anonymously
+                signInAnonymously(auth)
+                    .then(() => {
+                        console.log('Firebase anonymous sign-in successful');
+                    })
+                    .catch((error) => {
+                        console.error('Firebase authentication error:', error);
+                        // Fall back to demo mode
+                        window.isFirebaseReady = false;
+                    });
+            }
+        });
+    </script>
 
     <script>
         // --- Core State ---
@@ -3473,65 +3552,112 @@ ${itemsList}`;
 
         // --- Initial Load ---
         window.addEventListener('load', () => {
-            try {
-                // Load dark mode preference first
-                loadDarkMode();
-                
-                // Initialize with a default user ID (for demo purposes)
-                // In a real app, you would implement proper authentication
-                userId = 'demo-user-' + Math.random().toString(36).substr(2, 9);
-                document.getElementById('mobile-user-id').textContent = `User ID: ${userId}`;
-                isAuthReady = true;
-
-                // Load data from localStorage
-                companyDetails = loadDataFromLocalStorage('companyDetails', companyDetails);
-
-                const storedOrders = loadDataFromLocalStorage('orders', []);
-                const processedOrders = storedOrders.map(order => ({
-                    ...order,
-                    orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
-                }));
-
-                orders = processedOrders.filter(order => !order.isDelivered);
-                completedOrders = processedOrders.filter(order => order.isDelivered);
-
-                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-                completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-
-                const storedNotes = loadDataFromLocalStorage('notes', []);
-                notes = storedNotes.map(note => ({
-                    ...note,
-                    createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
-                }));
-                notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-                const storedStock = loadDataFromLocalStorage('stock', []);
-                stock = storedStock.map(item => ({
-                    ...item,
-                    price: parseFloat(item.price),
-                    quantity: item.quantity !== undefined ? parseInt(item.quantity) : 0,
-                    barcode: item.barcode || `${Date.now()}${Math.floor(Math.random() * 10000)}` // Assign barcode to old items
-                }));
-                stock.sort((a, b) => a.name.localeCompare(b.name));
-                
-                // Save stock with new barcodes
-                saveDataToLocalStorage('stock', stock);
-            } catch (error) {
-                console.error('Initialization error:', error);
-            } finally {
-                // Always hide loading overlay even if there's an error
-                setTimeout(() => {
-                    const loadingOverlay = document.getElementById('loading-overlay');
-                    if (loadingOverlay) {
-                        loadingOverlay.style.opacity = '0';
-                        setTimeout(() => {
-                            loadingOverlay.classList.add('hidden');
-                            renderPage('dashboard');
-                        }, 250);
+            console.log('App loading started...');
+            
+            // Wait for Firebase or use demo mode
+            const initializeApp = () => {
+                try {
+                    // Load dark mode preference first
+                    loadDarkMode();
+                    console.log('Dark mode loaded');
+                    
+                    // Use Firebase userId if available, otherwise generate demo ID
+                    if (window.isFirebaseReady && window.firebaseUserId) {
+                        userId = window.firebaseUserId;
+                        console.log('Using Firebase user ID:', userId);
+                    } else {
+                        userId = 'demo-user-' + Math.random().toString(36).substr(2, 9);
+                        console.log('Using demo user ID:', userId);
                     }
-                }, 600);
+                    
+                    document.getElementById('mobile-user-id').textContent = `User ID: ${userId.substr(0, 12)}...`;
+                    isAuthReady = true;
+
+                    // Load data from localStorage
+                    companyDetails = loadDataFromLocalStorage('companyDetails', companyDetails);
+
+                    const storedOrders = loadDataFromLocalStorage('orders', []);
+                    const processedOrders = storedOrders.map(order => ({
+                        ...order,
+                        orderDate: order.orderDate ? new Date(order.orderDate) : new Date()
+                    }));
+
+                    orders = processedOrders.filter(order => !order.isDelivered);
+                    completedOrders = processedOrders.filter(order => order.isDelivered);
+
+                    orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+                    completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+
+                    const storedNotes = loadDataFromLocalStorage('notes', []);
+                    notes = storedNotes.map(note => ({
+                        ...note,
+                        createdAt: note.createdAt ? new Date(note.createdAt) : new Date()
+                    }));
+                    notes.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+                    const storedStock = loadDataFromLocalStorage('stock', []);
+                    stock = storedStock.map(item => ({
+                        ...item,
+                        price: parseFloat(item.price),
+                        quantity: item.quantity !== undefined ? parseInt(item.quantity) : 0,
+                        barcode: item.barcode || `${Date.now()}${Math.floor(Math.random() * 10000)}` // Assign barcode to old items
+                    }));
+                    stock.sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    // Save stock with new barcodes
+                    saveDataToLocalStorage('stock', stock);
+                    console.log('Data loaded successfully');
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                } finally {
+                    // Always hide loading overlay even if there's an error
+                    setTimeout(() => {
+                        console.log('Hiding loading overlay...');
+                        const loadingOverlay = document.getElementById('loading-overlay');
+                        if (loadingOverlay) {
+                            loadingOverlay.style.opacity = '0';
+                            setTimeout(() => {
+                                loadingOverlay.classList.add('hidden');
+                                console.log('Rendering dashboard...');
+                                renderPage('dashboard');
+                                console.log('App loaded successfully!');
+                            }, 250);
+                        } else {
+                            console.error('Loading overlay element not found!');
+                        }
+                    }, 400);
+                }
+            };
+            
+            // Initialize immediately or wait for Firebase
+            if (window.isFirebaseReady) {
+                initializeApp();
+            } else {
+                // Wait for Firebase with timeout
+                const firebaseTimeout = setTimeout(() => {
+                    console.log('Firebase timeout - using demo mode');
+                    initializeApp();
+                }, 2000);
+                
+                window.addEventListener('firebase-ready', () => {
+                    clearTimeout(firebaseTimeout);
+                    initializeApp();
+                });
             }
         });
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
 
         // Navigation event listeners
         document.getElementById('nav-dashboard').addEventListener('click', () => renderPage('dashboard'));
