@@ -24,7 +24,6 @@
 
     <!-- Essential Libraries - Loaded asynchronously when needed -->
     <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
@@ -237,6 +236,7 @@
             opacity: 0;
             pointer-events: none;
         }
+        
         
         #bill-to-print {
             position: absolute;
@@ -1054,14 +1054,6 @@
                 padding: 0.875rem 2rem !important;
             }
             
-            /* QR Modal */
-            #qr-modal h3 {
-                font-size: 1.25rem !important;
-            }
-            
-            #qr-modal p {
-                font-size: 0.875rem !important;
-            }
             
             /* Stock status items */
             #stock-status {
@@ -1096,8 +1088,8 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="fixed inset-0 flex flex-col items-center justify-center z-[1000] transition-opacity duration-500" style="background-color: var(--bg-secondary);">
         <div class="relative w-16 h-16">
-            <div class="absolute inset-0 border-4 rounded-full opacity-20" style="border-color: var(--accent-color);"></div>
-            <div class="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style="border-color: var(--accent-color);"></div>
+            <div class="absolute inset-0 border-4 rounded-full" style="border-color: rgba(59, 130, 246, 0.2);"></div>
+            <div class="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style="border-color: #3b82f6; border-top-color: transparent;"></div>
         </div>
         <p class="mt-6 font-black tracking-tighter text-lg" style="color: var(--text-primary);">QUICKBILL PRO</p>
     </div>
@@ -1113,18 +1105,6 @@
         <button onclick="stopScanner()" class="mt-10 px-12 py-4 rounded-2xl font-black shadow-2xl hover:scale-105 active:scale-95 transition-transform" style="background-color: var(--bg-secondary); color: var(--text-primary);">Cancel</button>
     </div>
 
-    <!-- QR Share Modal -->
-    <div id="qr-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] hidden items-center justify-center p-4" onclick="this.classList.add('hidden')">
-        <div class="p-10 rounded-[3rem] shadow-2xl max-w-sm w-full text-center" onclick="event.stopPropagation()" style="background-color: var(--bg-secondary);">
-            <div class="w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-6" style="background-color: var(--bg-tertiary); color: var(--accent-color);">
-                <i class="material-icons text-3xl">qr_code_2</i>
-            </div>
-            <h3 class="text-2xl font-black mb-2" style="color: var(--text-primary);">Share Bill</h3>
-            <p class="text-sm mb-8" style="color: var(--text-secondary);">Scan this code to view receipt</p>
-            <div id="qrcode-canvas" class="flex justify-center mb-8 p-4 rounded-3xl border" style="background-color: var(--bg-tertiary); border-color: var(--border-color);"></div>
-            <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="w-full py-4 rounded-2xl font-bold shadow-xl" style="background-color: var(--text-primary); color: var(--bg-secondary);">Close</button>
-        </div>
-    </div>
 
     <!-- Toast Notification -->
     <div id="toast-display" class="fixed top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-[6000] flex items-center gap-4 hidden animate-fade-in-down">
@@ -1158,12 +1138,12 @@
 
             <!-- Desktop Navigation -->
             <nav class="hidden lg:flex gap-1.5 p-1.5 rounded-2xl transition-colors" style="background-color: var(--bg-tertiary);">
-                <button id="nav-dashboard" onclick="renderPage('dashboard')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">Dashboard</button>
-                <button id="nav-addOrder" onclick="renderPage('addOrder')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">New Bill</button>
-                <button id="nav-stock" onclick="renderPage('stock')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">Inventory</button>
-                <button id="nav-notes" onclick="renderPage('notes')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">Notes</button>
-                <button id="nav-allOrders" onclick="renderPage('allOrders')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">History</button>
-                <button id="nav-settings" onclick="renderPage('settings')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all" style="color: var(--text-primary);">Settings</button>
+                <button id="nav-dashboard" onclick="renderPage('dashboard')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">Dashboard</button>
+                <button id="nav-addOrder" onclick="renderPage('addOrder')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">New Bill</button>
+                <button id="nav-stock" onclick="renderPage('stock')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">Inventory</button>
+                <button id="nav-notes" onclick="renderPage('notes')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">Notes</button>
+                <button id="nav-allOrders" onclick="renderPage('allOrders')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">History</button>
+                <button id="nav-settings" onclick="renderPage('settings')" class="nav-button px-5 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-wider transition-all">Settings</button>
             </nav>
 
             <!-- Mobile Hamburger Button -->
@@ -1319,17 +1299,17 @@
                             <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Products & Items</label>
                         </div>
                         <div class="overflow-x-auto mb-4 mobile-table-container">
-                            <table id="products-table" class="min-w-full rounded-md transition-colors" style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                            <table id="products-table" class="min-w-full rounded-2xl overflow-hidden transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                                 <thead>
                                     <tr style="background-color: var(--bg-tertiary);">
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Product</th>
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Qty</th>
-                                        <th class="py-2 px-2 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Price/Unit</th>
-                                        <th class="py-2 px-2 text-right text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Total</th>
-                                        <th class="py-2 px-2 text-center text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);"></th>
+                                        <th class="py-3 px-4 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Product</th>
+                                        <th class="py-3 px-4 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Qty</th>
+                                        <th class="py-3 px-4 text-left text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Price/Unit</th>
+                                        <th class="py-3 px-4 text-right text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);">Total</th>
+                                        <th class="py-3 px-4 text-center text-xs sm:text-sm font-semibold uppercase" style="color: var(--text-secondary);"></th>
                                     </tr>
                                 </thead>
-                                <tbody id="bill-items-container">
+                                <tbody id="bill-items-container" style="background-color: var(--bg-secondary);">
                                     <!-- Items will be added here -->
                                 </tbody>
                             </table>
@@ -1591,6 +1571,9 @@
             const toggle = document.getElementById('dark-mode-toggle');
             const slider = document.getElementById('dark-mode-slider');
             
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'applyDarkMode:1603',message:'Applying dark mode',data:{darkMode:darkMode},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
             if (darkMode) {
                 html.setAttribute('data-theme', 'dark');
                 if (toggle) toggle.style.backgroundColor = '#3b82f6';
@@ -1606,6 +1589,12 @@
                     slider.style.backgroundColor = '#ffffff';
                 }
             }
+            // #region agent log
+            const testInput = document.querySelector('input[style*="--input-bg"]');
+            const inputBg = testInput ? window.getComputedStyle(testInput).backgroundColor : 'N/A';
+            const inputColor = testInput ? window.getComputedStyle(testInput).color : 'N/A';
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'applyDarkMode:1620',message:'Dark mode applied',data:{dataTheme:html.getAttribute('data-theme'),inputBg:inputBg,inputColor:inputColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+            // #endregion
         }
         
         function loadDarkMode() {
@@ -1676,20 +1665,20 @@
                 confirmNo.parentNode.replaceChild(newNo, confirmNo);
                 
                 newYes.addEventListener('click', () => {
-                    document.getElementById('confirmation-modal').classList.add('hidden');
+            document.getElementById('confirmation-modal').classList.add('hidden');
                     if (resolveConfirmationPromise) {
-                        resolveConfirmationPromise(true);
+            resolveConfirmationPromise(true);
                         resolveConfirmationPromise = null;
                     }
-                });
+        });
 
                 newNo.addEventListener('click', () => {
-                    document.getElementById('confirmation-modal').classList.add('hidden');
+            document.getElementById('confirmation-modal').classList.add('hidden');
                     if (resolveConfirmationPromise) {
-                        resolveConfirmationPromise(false);
+            resolveConfirmationPromise(false);
                         resolveConfirmationPromise = null;
                     }
-                });
+        });
             }
         }
 
@@ -1764,9 +1753,9 @@
                 // Set up detection handler after initialization
                 Quagga.onDetected(function(data) {
                     if (!isScannerActive) return;
-                    const code = data.codeResult.code;
-                    console.log('Scanned barcode:', code);
-                    
+            const code = data.codeResult.code;
+            console.log('Scanned barcode:', code);
+            
                     // Normalize the scanned code (remove whitespace, convert to string)
                     const normalizedCode = code.toString().trim();
                     
@@ -1805,7 +1794,7 @@
                     if (item) {
                         addItemRowWithData(item.name, item.price);
                         showToast(`Added: ${item.name} (₹${item.price.toFixed(2)})`);
-                        stopScanner();
+            stopScanner();
                     } else {
                         // Debug: show available barcodes
                         const barcodes = stock.filter(s => s.barcode).map(s => ({ name: s.name, barcode: s.barcode.toString() }));
@@ -1822,7 +1811,7 @@
             if (!isScannerActive) return;
             isScannerActive = false;
             try {
-                Quagga.stop();
+            Quagga.stop();
             } catch(e) {
                 console.log('Scanner already stopped');
             }
@@ -1841,12 +1830,20 @@
         }
         
         function showAutocompleteImmediate(input, value, index) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'showAutocompleteImmediate:1854',message:'Autocomplete shown',data:{value:value,index:index,stockLength:stock.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
             closeAllLists();
             if (!value) return;
             
             const autocompleteList = document.createElement('div');
             autocompleteList.setAttribute('id', `autocomplete-list-${index}`);
             autocompleteList.className = 'autocomplete-items';
+            // #region agent log
+            const computedZIndex = window.getComputedStyle(autocompleteList).zIndex;
+            const parentZIndex = window.getComputedStyle(input.parentElement).zIndex;
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'showAutocompleteImmediate:1859',message:'Autocomplete z-index',data:{autocompleteZIndex:computedZIndex,parentZIndex:parentZIndex,parentElement:input.parentElement?.tagName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+            // #endregion
             
             // Optimize: Limit results to 10 for better performance
             const matches = stock
@@ -1898,6 +1895,9 @@
 
         // --- Navigation (Optimized) ---
         function renderPage(id) {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'renderPage:1854',message:'renderPage called',data:{pageId:id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
             // Use requestAnimationFrame for smooth transitions
             requestAnimationFrame(() => {
                 document.querySelectorAll('.page-content').forEach(p => p.style.display = 'none');
@@ -1908,7 +1908,12 @@
                 if(target) target.style.display = 'block';
                 
                 const navBtn = document.getElementById(`nav-${id}`);
-                if(navBtn) navBtn.classList.add('active');
+                if(navBtn) {
+                    navBtn.classList.add('active');
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'renderPage:1865',message:'Nav button active',data:{navBtnId:`nav-${id}`,hasActive:navBtn.classList.contains('active'),computedColor:window.getComputedStyle(navBtn).color,inlineColor:navBtn.style.color},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                    // #endregion
+                }
 
                 const mobileNavItem = document.querySelector(`.mobile-nav-item[data-page="${id}"]`);
                 if(mobileNavItem) mobileNavItem.classList.add('active');
@@ -2391,19 +2396,19 @@
                     <td class="py-3 px-4">
                         <div class="autocomplete-container">
                             <input type="text" data-field="product" data-index="${index}" value="${item.product}"
-                                class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                                style="background-color: var(--input-bg); color: var(--text-primary);" placeholder="Product Name" required />
+                                class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" placeholder="Product Name" required />
                         </div>
                     </td>
                     <td class="py-3 px-4">
                         <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity || ''}" step="1" min="1"
-                            class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                            style="background-color: var(--input-bg); color: var(--text-primary);" required />
+                            class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required />
                     </td>
                     <td class="py-3 px-4">
                         <input type="number" data-field="pricePerUnit" data-index="${index}" value="${item.pricePerUnit || ''}" step="0.01"
-                            class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                            style="background-color: var(--input-bg); color: var(--text-primary);" min="0" required />
+                            class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" min="0" required />
                     </td>
                     <td class="py-3 px-4 text-right font-medium text-lg">
                         ₹<span class="item-total">${item.total.toFixed(2)}</span>
@@ -2458,8 +2463,15 @@
         }
 
         function attachProductInputListeners() {
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'attachProductInputListeners:2414',message:'Attaching listeners',data:{containerExists:!!document.getElementById('bill-items-container')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
             const container = document.getElementById('bill-items-container');
-            container.querySelectorAll('input[data-field]').forEach(input => {
+            const inputs = container.querySelectorAll('input[data-field]');
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'attachProductInputListeners:2416',message:'Inputs found',data:{inputCount:inputs.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+            inputs.forEach(input => {
                 input.oninput = (e) => {
                     const index = parseInt(e.target.dataset.index);
                     const field = e.target.dataset.field;
@@ -3088,9 +3100,6 @@
                     <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2">
                         <i class="material-icons">image</i> Export Photo
                     </button>
-                    <button onclick="shareQR('${order.id}')" class="bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-2">
-                        <i class="material-icons">qr_code</i> Share QR
-                    </button>
                     <button onclick="handleToggleDelivered('${order.id}', true)" class="bg-gray-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center gap-2">
                         <i class="material-icons">unarchive</i> Move to Active
                     </button>
@@ -3156,9 +3165,6 @@
                     actionsHtml = `
                         <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2">
                             <i class="material-icons">image</i> Photo
-                        </button>
-                        <button onclick="shareQR('${order.id}')" class="bg-blue-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-blue-700 transition-colors shadow-sm flex items-center justify-center gap-2">
-                            <i class="material-icons">qr_code</i> Share QR
                         </button>
                         <button onclick="handleEditOrder('${order.id}')" class="bg-gray-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center gap-2">
                             <i class="material-icons">edit</i> Edit
@@ -3539,73 +3545,73 @@
             const billNotes = companyDetails.defaultBillNotes || '';
 
             billToPrintDiv.innerHTML = `
-                <div class="p-8 bg-white text-black" style="min-height: 297mm; width: 210mm; box-sizing: border-box; font-family: 'Inter', sans-serif; position: relative; color: #000000; background: #ffffff;">
-                    <!-- Header - Simple Box -->
-                    <div style="border: 1px solid #000000; padding: 1.5rem; margin-bottom: 2rem; background: #ffffff;">
-                        <h1 style="font-size: 1.5rem; font-weight: 700; color: #000000; text-align: center; margin: 0 0 1rem 0;">
+                <div class="p-8 bg-white text-black" style="min-height: 297mm; width: 210mm; box-sizing: border-box; font-family: 'Inter', sans-serif; position: relative; color: #1f2937; background: #ffffff;">
+                    <!-- Header - Friendly Design -->
+                    <div style="border: 2px solid #e5e7eb; border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; background: #f9fafb;">
+                        <h1 style="font-size: 1.75rem; font-weight: 700; color: #111827; text-align: center; margin: 0 0 1rem 0; letter-spacing: -0.02em;">
                             ${companyDetails.companyName || 'QuickBill Pro'}
                         </h1>
-                        <div style="text-align: center; color: #000000; font-size: 0.8rem; line-height: 1.8;">
-                            ${companyDetails.address ? `<p style="margin: 0.25rem 0; color:#000000;">${companyDetails.address}</p>` : ''}
-                            ${companyDetails.phone ? `<p style="margin:0.25rem 0; color:#000000;">Phone: ${companyDetails.phone}</p>` : ''}
-                            ${companyDetails.email ? `<p style="margin:0.25rem 0; color:#000000;">Email: ${companyDetails.email}</p>` : ''}
-                            ${companyDetails.gstNumber ? `<p style="margin:0.25rem 0; color:#000000; font-weight:600;">GSTIN: ${companyDetails.gstNumber}</p>` : ''}
+                        <div style="text-align: center; color: #4b5563; font-size: 0.875rem; line-height: 1.8;">
+                            ${companyDetails.address ? `<p style="margin: 0.3rem 0; color: #4b5563;">${companyDetails.address}</p>` : ''}
+                            ${companyDetails.phone ? `<p style="margin: 0.3rem 0; color: #4b5563;">Phone: ${companyDetails.phone}</p>` : ''}
+                            ${companyDetails.email ? `<p style="margin: 0.3rem 0; color: #4b5563;">Email: ${companyDetails.email}</p>` : ''}
+                            ${companyDetails.gstNumber ? `<p style="margin: 0.3rem 0; color: #111827; font-weight: 600;">GSTIN: ${companyDetails.gstNumber}</p>` : ''}
                         </div>
                     </div>
 
-                    <!-- Bill Info Section - Simple Box -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding: 1rem; border: 1px solid #000000; background: #ffffff;">
+                    <!-- Bill Info Section - Friendly Design -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding: 1.5rem; border: 2px solid #e5e7eb; border-radius: 1rem; background: #ffffff;">
                         <div style="flex: 1;">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; margin: 0 0 0.5rem 0;">Bill To</p>
-                            <p style="font-size: 1.1rem; font-weight: 700; color: #000000; margin: 0;">${order.buyerName}</p>
+                            <p style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin: 0 0 0.5rem 0; letter-spacing: 0.05em;">Bill To</p>
+                            <p style="font-size: 1.125rem; font-weight: 700; color: #111827; margin: 0;">${order.buyerName}</p>
                         </div>
                         <div style="text-align: right;">
-                            <p style="font-size: 0.75rem; color: #000000; margin: 0.25rem 0;">Date: ${new Date(order.orderDate).toLocaleDateString(undefined, dateOptions)}</p>
-                            <p style="font-size: 0.75rem; color: #000000; margin: 0.25rem 0;">Time: ${new Date(order.orderDate).toLocaleTimeString(undefined, timeOptions)}</p>
-                            <p style="font-size: 0.8rem; font-weight: 700; color: #000000; margin: 0.5rem 0 0 0;">Bill ID: #${order.id || 'N/A'}</p>
+                            <p style="font-size: 0.8125rem; color: #4b5563; margin: 0.3rem 0;">Date: ${new Date(order.orderDate).toLocaleDateString(undefined, dateOptions)}</p>
+                            <p style="font-size: 0.8125rem; color: #4b5563; margin: 0.3rem 0;">Time: ${new Date(order.orderDate).toLocaleTimeString(undefined, timeOptions)}</p>
+                            <p style="font-size: 0.875rem; font-weight: 600; color: #111827; margin: 0.5rem 0 0 0;">Bill ID: #${order.id || 'N/A'}</p>
                         </div>
                     </div>
 
-                    <!-- Items Table - Simple Box Design -->
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 2rem;">
+                    <!-- Items Table - Friendly Design -->
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 2rem; border-radius: 0.75rem; overflow: hidden; border: 2px solid #e5e7eb;">
                         <thead>
-                            <tr>
-                                <th style="padding: 0.75rem; text-align: left; font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; border: 1px solid #000000; background: #ffffff;">Product</th>
-                                <th style="padding: 0.75rem; text-align: center; font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; border: 1px solid #000000; background: #ffffff;">Qty</th>
-                                <th style="padding: 0.75rem; text-align: center; font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; border: 1px solid #000000; background: #ffffff;">Price/Unit</th>
-                                <th style="padding: 0.75rem; text-align: right; font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; border: 1px solid #000000; background: #ffffff;">Total</th>
+                            <tr style="background: #f9fafb;">
+                                <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Product</th>
+                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Qty</th>
+                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Price/Unit</th>
+                                <th style="padding: 1rem; text-align: right; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Total</th>
                             </tr>
                         </thead>
                         <tbody style="background: #ffffff;">
                             ${order.items.map((item, index) => `
-                                <tr>
-                                    <td style="padding: 0.75rem; font-size: 0.85rem; font-weight: 500; color: #000000; border: 1px solid #000000;">${item.product}</td>
-                                    <td style="padding: 0.75rem; text-align: center; font-size: 0.85rem; color: #000000; border: 1px solid #000000;">${item.quantity}</td>
-                                    <td style="padding: 0.75rem; text-align: center; font-size: 0.85rem; color: #000000; border: 1px solid #000000;">₹${item.pricePerUnit.toFixed(2)}</td>
-                                    <td style="padding: 0.75rem; text-align: right; font-size: 0.85rem; font-weight: 600; color: #000000; border: 1px solid #000000;">₹${item.total.toFixed(2)}</td>
+                                <tr style="${index < order.items.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''}">
+                                    <td style="padding: 1rem; font-size: 0.9rem; font-weight: 500; color: #111827;">${item.product}</td>
+                                    <td style="padding: 1rem; text-align: center; font-size: 0.9rem; color: #4b5563;">${item.quantity}</td>
+                                    <td style="padding: 1rem; text-align: center; font-size: 0.9rem; color: #4b5563;">₹${item.pricePerUnit.toFixed(2)}</td>
+                                    <td style="padding: 1rem; text-align: right; font-size: 0.9rem; font-weight: 600; color: #111827;">₹${item.total.toFixed(2)}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
 
-                    <!-- Grand Total Section - Simple Box -->
+                    <!-- Grand Total Section - Friendly Design -->
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
-                        <div style="border: 1px solid #000000; padding: 1rem 2rem; background: #ffffff;">
-                            <p style="font-size: 0.75rem; color: #000000; margin: 0 0 0.25rem 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Grand Total</p>
-                            <p style="font-size: 1.5rem; font-weight: 700; color: #000000; margin: 0;">₹${order.grandTotal.toFixed(2)}</p>
+                        <div style="border: 2px solid #111827; border-radius: 0.75rem; padding: 1.25rem 2rem; background: #f9fafb;">
+                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Grand Total</p>
+                            <p style="font-size: 1.75rem; font-weight: 700; color: #111827; margin: 0;">₹${order.grandTotal.toFixed(2)}</p>
                         </div>
                     </div>
 
                     ${billNotes ? `
-                        <div style="border: 1px solid #000000; padding: 1rem; margin-bottom: 2rem; background: #ffffff;">
-                            <p style="font-size: 0.7rem; font-weight: 700; color: #000000; text-transform: uppercase; margin: 0 0 0.5rem 0;">Notes</p>
-                            <p style="font-size: 0.85rem; color: #000000; margin: 0; line-height: 1.6;">${billNotes}</p>
+                        <div style="border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 2rem; background: #f9fafb;">
+                            <p style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin: 0 0 0.75rem 0; letter-spacing: 0.05em;">Notes</p>
+                            <p style="font-size: 0.875rem; color: #4b5563; margin: 0; line-height: 1.7;">${billNotes}</p>
                         </div>
                     ` : ''}
 
-                    <!-- Footer - Simple -->
-                    <div style="position: absolute; bottom: 1rem; left: 0; right: 0; border-top: 1px solid #000000; padding-top: 1rem; text-align: center;">
-                        <p style="font-size: 0.7rem; color: #000000; margin: 0;">Generated with QuickBill Pro</p>
+                    <!-- Footer - Friendly -->
+                    <div style="position: absolute; bottom: 1rem; left: 0; right: 0; border-top: 2px solid #e5e7eb; padding-top: 1rem; text-align: center;">
+                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Generated with QuickBill Pro</p>
                     </div>
                 </div>
             `;
@@ -3641,88 +3647,6 @@
             }, 50);
         };
 
-        // --- QR Sharing ---
-        function shareQR(id) {
-            const order = orders.find(o => o.id === id) || completedOrders.find(o => o.id === id);
-            if (!order) {
-                showToast("Order not found.");
-                return;
-            }
-            
-            // Create a shareable bill data structure
-            const billData = {
-                type: 'QuickBill',
-                id: order.id,
-                buyer: order.buyerName,
-                total: order.grandTotal,
-                date: new Date(order.orderDate).toISOString(),
-                company: companyDetails.companyName || 'QuickBill Pro',
-                address: companyDetails.address || '',
-                phone: companyDetails.phone || '',
-                email: companyDetails.email || '',
-                gst: companyDetails.gstNumber || '',
-                items: order.items.map(item => ({
-                    p: item.product,
-                    q: item.quantity,
-                    u: item.pricePerUnit,
-                    t: item.total
-                }))
-            };
-            
-            // Create human-readable text for QR code
-            const itemsList = order.items.map(item => `${item.product} x${item.quantity} @ ₹${item.pricePerUnit.toFixed(2)} = ₹${item.total.toFixed(2)}`).join('\n');
-            const shareText = `BILL RECEIPT
-Bill ID: #${order.id}
-Customer: ${order.buyerName}
-Date: ${new Date(order.orderDate).toLocaleDateString()}
-Time: ${new Date(order.orderDate).toLocaleTimeString()}
-
-${companyDetails.companyName ? `Company: ${companyDetails.companyName}` : ''}
-${companyDetails.address ? `Address: ${companyDetails.address}` : ''}
-${companyDetails.phone ? `Phone: ${companyDetails.phone}` : ''}
-${companyDetails.email ? `Email: ${companyDetails.email}` : ''}
-${companyDetails.gstNumber ? `GSTIN: ${companyDetails.gstNumber}` : ''}
-
-ITEMS:
-${itemsList}
-
-GRAND TOTAL: ₹${order.grandTotal.toFixed(2)}
-
---- 
-Scan this QR code to view bill details
-Data: ${btoa(JSON.stringify(billData))}`;
-            
-            const qrCanvas = document.getElementById('qrcode-canvas');
-            if (!qrCanvas) {
-                showToast("QR code container not found.");
-                return;
-            }
-            
-            qrCanvas.innerHTML = '';
-            
-            try {
-                // Check if QRCode library is loaded
-                if (typeof QRCode === 'undefined') {
-                    showToast("QR code library not loaded. Please refresh the page.");
-                    return;
-                }
-                
-                new QRCode(qrCanvas, {
-                    text: shareText, 
-                    width: 220, 
-                    height: 220, 
-                    colorDark: "#000000", 
-                    colorLight: "#ffffff", 
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-                
-                document.getElementById('qr-modal').classList.remove('hidden');
-            } catch (error) {
-                console.error('QR code generation error:', error);
-                showToast("Failed to generate QR code. Please try again.");
-            }
-        }
-        
         // --- Barcode Generation ---
         window.generateBarcode = (stockId) => {
             const item = stock.find(s => s.id === stockId);
@@ -3958,11 +3882,18 @@ Data: ${btoa(JSON.stringify(billData))}`;
                         console.log('Using demo user ID:', userId);
                     }
                     
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initializeApp:3904',message:'UserId set',data:{userId:userId,isFirebaseReady:window.isFirebaseReady,firebaseUserId:window.firebaseUserId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                    // #endregion
+                    
                     document.getElementById('mobile-user-id').textContent = `User ID: ${userId.substr(0, 12)}...`;
                     isAuthReady = true;
 
                     // Load data from localStorage
                     companyDetails = loadDataFromLocalStorage('companyDetails', companyDetails);
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/ed758aa2-8e51-48e7-a270-ac88c8ffdf0a',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'initializeApp:3916',message:'Company details loaded',data:{companyName:companyDetails.companyName,userId:userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                    // #endregion
 
                     const storedOrders = loadDataFromLocalStorage('orders', []);
                     const processedOrders = storedOrders.map(order => ({
