@@ -1669,13 +1669,30 @@
                 addItemRowWithData(item.name, item.price);
                 showToast(`Added: ${item.name} (₹${item.price.toFixed(2)})`);
             } else {
-                // Fallback: try to find by name for backward compatibility
-                const itemByName = stock.find(s => s.name === code);
-                if (itemByName) {
-                    addItemRowWithData(itemByName.name, itemByName.price);
-                    showToast(`Added: ${itemByName.name}`);
+                // Try exact match first (in case of formatting issues)
+                const exactMatch = stock.find(s => s.name && s.name.trim() === code.trim());
+                if (exactMatch) {
+                    addItemRowWithData(exactMatch.name, exactMatch.price);
+                    showToast(`Added: ${exactMatch.name}`);
                 } else {
-                    showToast(`Product not found. Barcode: ${code}`);
+                    // Try partial match for cases where scanner reads part of product name
+                    const partialMatch = stock.find(s => s.name && s.name.toLowerCase().includes(code.toLowerCase()) || code.toLowerCase().includes(s.name.toLowerCase()));
+                    if (partialMatch) {
+                        addItemRowWithData(partialMatch.name, partialMatch.price);
+                        showToast(`Added: ${partialMatch.name} (Partial match)`);
+                    } else {
+                        // Check if the scanned code might be a numeric ID
+                        const numericMatch = stock.find(s => s.barcode && s.barcode.toString() === code.toString());
+                        if (numericMatch) {
+                            addItemRowWithData(numericMatch.name, numericMatch.price);
+                            showToast(`Added: ${numericMatch.name} (Numeric match)`);
+                        } else {
+                            // Fallback: show all available barcodes for debugging
+                            const barcodes = stock.filter(s => s.barcode).map(s => s.barcode);
+                            console.log('Available barcodes:', barcodes);
+                            showToast(`Product not found. Scanned: ${code}`);
+                        }
+                    }
                 }
             }
             stopScanner();
