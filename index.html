@@ -45,6 +45,8 @@
             --nav-active: #000000;
             --logo-bg: #000000;
             --card-bg: #ffffff;
+            --button-bg: #000000;
+            --button-text: #ffffff;
         }
         
         [data-theme="dark"] {
@@ -65,6 +67,8 @@
             --nav-active: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             --logo-bg: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             --card-bg: #111827;
+            --button-bg: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --button-text: #ffffff;
         }
         
         body {
@@ -233,6 +237,7 @@
             box-shadow: 0 4px 6px var(--shadow);
             border-left: 4px solid #3b82f6;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
         }
         
         .stat-card.revenue {
@@ -289,6 +294,7 @@
             margin-bottom: 1.5rem;
             height: 300px;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
         }
         
         .chart-title {
@@ -296,7 +302,6 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text-primary);
-            padding: 0;
         }
         
         .top-products-list {
@@ -377,7 +382,6 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text-primary);
-            padding: 0;
         }
         
         .recent-activity-item {
@@ -608,7 +612,7 @@
             max-height: 200px;
             overflow-y: auto;
             background-color: var(--bg-secondary);
-            border-radius: 0 0 1rem 1rem;
+            border-radius: 0 0 0.5rem 0.5rem;
             box-shadow: 0 4px 6px var(--shadow);
             will-change: opacity;
             transform: translateZ(0);
@@ -795,41 +799,136 @@
             text-align: center;
         }
 
+        /* Button styles */
+        .primary-button {
+            background: var(--button-bg, #000000);
+            color: var(--button-text, #ffffff);
+            border: none;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .primary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .primary-button:active {
+            transform: translateY(0);
+        }
+        
+        .secondary-button {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .secondary-button:hover {
+            background: var(--hover-bg);
+        }
+        
+        .danger-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .danger-button:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .status-badge.active {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-badge.delivered {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .status-badge.pending {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-badge.seen {
+            background: #8b5cf6;
+            color: white;
+        }
+
         /* Mobile optimizations */
         @media (max-width: 640px) {
+            /* Consistent spacing with desktop */
+            .page-content {
+                padding: 1rem 0;
+            }
+            
             /* Page titles - consistent sizing */
             h2 {
-                font-size: 1.5rem !important;
+                font-size: 1.75rem !important;
                 line-height: 1.3;
-                margin-bottom: 1rem !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+                margin-bottom: 1.5rem !important;
+                font-weight: 800;
             }
             
             h3 {
-                font-size: 1.125rem !important;
+                font-size: 1.25rem !important;
                 line-height: 1.4;
-                margin-bottom: 0.75rem !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+                margin-bottom: 1rem !important;
+                font-weight: 700;
             }
             
             /* Chart titles */
             .chart-title {
-                font-size: 1rem !important;
-                margin-bottom: 0.75rem !important;
-                padding: 0 !important;
+                font-size: 1.125rem !important;
+                margin-bottom: 1rem !important;
             }
             
             /* Header logo and title */
             header h1 {
                 font-size: 1rem !important;
-                padding-left: 0;
-                padding-right: 0;
             }
             
             header .w-10 {
@@ -855,7 +954,6 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
-                padding: 0;
             }
             
             .stock-deduction-container label {
@@ -865,10 +963,11 @@
             
             /* Form labels - consistent sizing */
             label {
-                font-size: 0.75rem !important;
+                font-size: 0.875rem !important;
                 line-height: 1.3;
-                padding-left: 0;
-                padding-right: 0;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                display: block;
             }
             
             /* Input fields */
@@ -881,8 +980,8 @@
                 font-size: 1rem !important;
                 padding: 0.875rem !important;
                 line-height: 1.5;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+                border-radius: 0.75rem;
+                border: 1px solid var(--border-color);
             }
             
             /* Buttons - consistent sizing */
@@ -890,13 +989,15 @@
                 font-size: 0.875rem !important;
                 padding: 0.75rem 1rem !important;
                 line-height: 1.4;
+                border-radius: 0.75rem;
             }
             
             /* Primary action buttons */
-            button[type="submit"],
-            .bg-black {
-                font-size: 1rem !important;
-                padding: 1rem 1.5rem !important;
+            .primary-button,
+            button[type="submit"] {
+                font-size: 0.875rem !important;
+                padding: 0.875rem 1.5rem !important;
+                border-radius: 1rem;
             }
             
             /* Date filter buttons */
@@ -908,7 +1009,8 @@
             
             /* Stat cards */
             .stat-card {
-                padding: 1rem !important;
+                padding: 1.25rem !important;
+                border-radius: 0.75rem;
             }
             
             .stat-value {
@@ -935,9 +1037,10 @@
             }
             
             table th {
-                font-size: 0.625rem !important;
+                font-size: 0.75rem !important;
                 padding: 0.75rem 0.5rem !important;
                 white-space: nowrap;
+                font-weight: 700;
             }
             
             table td {
@@ -957,17 +1060,19 @@
             
             /* Chart containers */
             .chart-container {
-                padding: 1rem !important;
+                padding: 1.25rem !important;
                 height: 250px;
+                border-radius: 0.75rem;
             }
             
             /* Card padding */
-            .p-8, .p-10, .p-12 {
-                padding: 1rem !important;
+            .rounded-\[3rem\] {
+                padding: 1.5rem !important;
+                border-radius: 1.5rem !important;
             }
             
             .lg\:p-12 {
-                padding: 1rem !important;
+                padding: 1.5rem !important;
             }
             
             /* Grand total section */
@@ -1035,6 +1140,7 @@
             /* Notes grid */
             #notes-list {
                 grid-template-columns: 1fr !important;
+                gap: 1rem;
             }
             
             /* Dashboard grid */
@@ -1046,6 +1152,7 @@
             /* Settings page */
             .grid.lg\:grid-cols-2 {
                 grid-template-columns: 1fr !important;
+                gap: 1rem;
             }
             
             /* Hamburger menu */
@@ -1070,24 +1177,6 @@
             /* Stock status items */
             #stock-status {
                 font-size: 0.875rem !important;
-            }
-            
-            /* Fix titles in rounded cards on mobile */
-            .rounded-\[3rem\] h2,
-            .rounded-\[3rem\] h3,
-            .rounded-\[2rem\] h2,
-            .rounded-\[2rem\] h3,
-            .rounded-\[1rem\] h2,
-            .rounded-\[1rem\] h3 {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-            }
-            
-            /* Fix padding for all rounded containers */
-            .rounded-\[3rem\] {
-                padding: 1rem !important;
             }
             
             /* Dark mode switch on mobile */
@@ -1126,28 +1215,9 @@
                 font-size: 1.125rem !important;
             }
             
-            /* Fix padding in forms on mobile */
-            form {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-            }
-            
-            /* Fix spacing in cards */
-            .space-y-8 > * + * {
+            /* Fix spacing in forms */
+            form .space-y-8 > * + * {
                 margin-top: 1.5rem !important;
-            }
-            
-            .space-y-6 > * + * {
-                margin-top: 1rem !important;
-            }
-            
-            .space-y-4 > * + * {
-                margin-top: 0.75rem !important;
-            }
-            
-            /* Ensure proper spacing in rounded containers */
-            .rounded-\[3rem\] > *:first-child {
-                padding-top: 0 !important;
             }
             
             /* Make line chart scrollable on mobile */
@@ -1155,10 +1225,57 @@
                 min-width: 600px;
             }
             
-            /* Adjust chart title spacing */
-            .chart-container > .chart-title {
-                margin-left: 0.5rem;
-                margin-right: 0.5rem;
+            /* Button adjustments */
+            .status-badge {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.625rem;
+            }
+            
+            /* Autocomplete positioning */
+            .autocomplete-items {
+                z-index: 10001 !important;
+            }
+        }
+        
+        /* Desktop specific */
+        @media (min-width: 641px) {
+            /* Consistent spacing */
+            .page-content {
+                padding: 2rem 0;
+            }
+            
+            h2 {
+                font-size: 2.25rem;
+                margin-bottom: 2rem;
+                font-weight: 800;
+            }
+            
+            h3 {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+                font-weight: 700;
+            }
+            
+            .chart-title {
+                font-size: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            /* Button alignment fix */
+            .add-item-button {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            
+            .add-item-button .material-icons {
+                font-size: 1.25rem;
+                line-height: 1;
+            }
+            
+            .add-item-button span {
+                line-height: 1.5;
             }
         }
     </style>
@@ -1264,12 +1381,12 @@
         </div>
     </div>
 
-    <main class="flex-grow max-w-7xl mx-auto w-full p-4 lg:p-8">
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 lg:px-8">
         
         <!-- Dashboard Section -->
         <div id="page-dashboard" class="page-content space-y-8">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-                <h2 class="text-3xl font-black tracking-tight">Business Hub</h2>
+                <h2>Business Hub</h2>
                 <div class="dashboard-date-filter no-print">
                     <button class="date-filter-button active" data-range="7">7D</button>
                     <button class="date-filter-button" data-range="30">30D</button>
@@ -1343,16 +1460,16 @@
 
         <!-- Create Bill Section -->
         <div id="page-addOrder" class="page-content max-w-3xl mx-auto">
-            <div class="p-8 lg:p-12 rounded-[3rem] shadow-2xl transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="p-8 lg:p-12 rounded-[2rem] shadow-2xl transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <div class="flex justify-between items-center mb-10">
-                    <h2 class="text-3xl font-black tracking-tight">Generate Receipt</h2>
+                    <h2>Generate Receipt</h2>
                 </div>
 
                 <form id="add-order-form" class="space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Customer Name</label>
-                            <input type="text" id="buyerName" placeholder="Enter name..." class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
+                            <input type="text" id="buyerName" placeholder="Enter Name" class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                         </div>
                         <div class="stock-deduction-container">
                             <input type="checkbox" id="deduct-from-stock" class="h-4 w-4 text-black rounded focus:ring-black" checked>
@@ -1380,7 +1497,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <button type="button" id="add-item-row-btn" class="w-full py-5 border-2 border-dashed rounded-3xl font-bold transition-all" style="border-color: var(--border-color); color: var(--text-tertiary);" onmouseover="this.style.backgroundColor=`var(--bg-tertiary)`; this.style.borderColor=`var(--accent-color)`; this.style.color=`var(--text-primary)`;" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor=`var(--border-color)`; this.style.color=`var(--text-tertiary)`;">
+                        <button type="button" id="add-item-row-btn" class="w-full py-5 border-2 border-dashed rounded-3xl font-bold transition-all add-item-button" style="border-color: var(--border-color); color: var(--text-tertiary);" onmouseover="this.style.backgroundColor=`var(--bg-tertiary)`; this.style.borderColor=`var(--accent-color)`; this.style.color=`var(--text-primary)`;" onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor=`var(--border-color)`; this.style.color=`var(--text-tertiary)`;">
                             <i class="material-icons mr-2">add_circle_outline</i> Add Product
                         </button>
                     </div>
@@ -1390,7 +1507,7 @@
                             <p class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Grand Total</p>
                             <p class="text-4xl font-black tracking-tighter">₹<span id="grand-total">0.00</span></p>
                         </div>
-                        <button type="submit" class="w-full sm:w-auto bg-black text-white px-12 py-5 rounded-[2rem] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all">Save & Finalize</button>
+                        <button type="submit" class="primary-button px-12 py-5 rounded-[2rem] text-lg shadow-2xl hover:scale-105 active:scale-95 transition-all">Save & Finalize</button>
                     </div>
                 </form>
             </div>
@@ -1398,17 +1515,17 @@
 
         <!-- Inventory Section -->
         <div id="page-stock" class="page-content space-y-8">
-            <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="p-8 lg:p-12 rounded-[2rem] shadow-sm transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <h2 class="text-2xl font-black mb-8">Stock Intake</h2>
                 <form id="stock-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                     <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                     <input type="number" id="stockProductQuantity" placeholder="Initial Stock (Optional)" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
-                    <button type="submit" class="bg-black text-white p-5 rounded-2xl font-black tracking-tight">Register Item</button>
+                    <button type="submit" class="primary-button p-5 rounded-2xl tracking-tight">Register Item</button>
                 </form>
             </div>
 
-            <div class="rounded-[3rem] shadow-sm overflow-hidden transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="rounded-[2rem] shadow-sm overflow-hidden transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <div class="mobile-table-container">
                     <table class="w-full text-left border-collapse">
                         <thead style="background-color: var(--bg-tertiary);">
@@ -1428,14 +1545,14 @@
         <!-- Notes Section -->
         <div id="page-notes" class="page-content space-y-8">
             <div class="flex justify-between items-center">
-                <h2 class="text-3xl font-black">Business Notes</h2>
-                <button onclick="createNewNote()" class="bg-black text-white px-8 py-4 rounded-2xl font-black text-sm">+ New Note</button>
+                <h2>Business Notes</h2>
+                <button onclick="createNewNote()" class="primary-button px-8 py-4 text-sm">+ New Note</button>
             </div>
             
-            <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm mb-8 transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="p-8 lg:p-12 rounded-[2rem] shadow-sm mb-8 transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
                 <h3 class="text-xl font-black mb-6">Add New Note</h3>
                 <textarea id="new-note-content" rows="4" class="block w-full px-6 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 mb-6 transition-all" placeholder="Write your note here..." style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);"></textarea>
-                <button onclick="addNote()" class="w-full bg-black text-white px-6 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 active:scale-95 transition-all">Add Note</button>
+                <button onclick="addNote()" class="primary-button w-full px-6 py-4 text-lg shadow-xl hover:scale-105 active:scale-95 transition-all">Add Note</button>
             </div>
 
             <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1446,7 +1563,7 @@
         <!-- History Section -->
         <div id="page-allOrders" class="page-content space-y-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-                <h2 class="text-3xl font-black">Order Archive</h2>
+                <h2>Order Archive</h2>
                 <input type="text" id="order-search-input" oninput="renderAllOrders()" placeholder="Search client or ID..." class="w-full md:w-80 p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
             </div>
             
@@ -1463,7 +1580,7 @@
                     <p style="color: var(--text-secondary);">No completed orders yet.</p>
                 </div>
                 <div class="mt-8 text-center">
-                    <button id="clear-completed-orders-btn" class="bg-red-500 text-white px-8 py-4 rounded-2xl font-black hover:bg-red-600 transition-colors shadow-xl hidden">
+                    <button id="clear-completed-orders-btn" class="danger-button px-8 py-4 hover:bg-red-600 transition-colors shadow-xl hidden">
                         Clear All Delivered Orders
                     </button>
                 </div>
@@ -1472,12 +1589,12 @@
 
         <!-- Settings Section -->
         <div id="page-settings" class="page-content space-y-8">
-            <h2 class="text-3xl font-black">Settings & Cloud</h2>
+            <h2>Settings & Cloud</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Dark Mode Toggle Card -->
-                <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                <div class="p-10 rounded-[2rem] shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color); border: 1px solid var(--border-color);">
                     <h3 class="text-xl font-black">Appearance</h3>
-                    <div class="flex items-center justify-between p-6 bg-gray-50 rounded-2xl" style="background-color: var(--bg-tertiary);">
+                    <div class="flex items-center justify-between p-6 rounded-2xl" style="background-color: var(--bg-tertiary);">
                         <div>
                             <p class="font-bold text-lg">Dark Mode</p>
                             <p class="text-sm" style="color: var(--text-secondary);">Toggle between light and dark theme</p>
@@ -1488,27 +1605,27 @@
                     </div>
                 </div>
                 
-                <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                <div class="p-10 rounded-[2rem] shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color); border: 1px solid var(--border-color);">
                     <h3 class="text-xl font-black">Company Identity</h3>
                     <form id="settings-form" class="space-y-4">
-                        <input type="text" id="companyName" placeholder="Company Name" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
-                        <input type="text" id="address" placeholder="Address" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
-                        <input type="tel" id="phone" placeholder="Phone Number" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
-                        <input type="email" id="email" placeholder="Email Address" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
-                        <input type="text" id="gstNumber" placeholder="Tax ID / GSTIN" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
-                        <textarea id="defaultBillNotes" placeholder="Default Bill Notes" class="w-full p-4 bg-gray-50 rounded-2xl outline-none min-h-[100px] focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);"></textarea>
-                        <button type="submit" class="w-full bg-black text-white py-5 rounded-2xl font-black">Update Identity</button>
+                        <input type="text" id="companyName" placeholder="Company Name" class="w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <input type="text" id="address" placeholder="Address" class="w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <input type="tel" id="phone" placeholder="Phone Number" class="w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <input type="email" id="email" placeholder="Email Address" class="w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <input type="text" id="gstNumber" placeholder="Tax ID / GSTIN" class="w-full p-4 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <textarea id="defaultBillNotes" placeholder="Default Bill Notes" class="w-full p-4 rounded-2xl outline-none min-h-[100px] focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);"></textarea>
+                        <button type="submit" class="primary-button w-full py-5">Update Identity</button>
                     </form>
                 </div>
-                <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                <div class="p-10 rounded-[2rem] shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color); border: 1px solid var(--border-color);">
                     <h3 class="text-xl font-black">Data Utility</h3>
                     <div class="space-y-4">
-                        <button onclick="exportData()" class="w-full bg-gray-100 py-5 rounded-2xl font-black text-sm hover:bg-gray-200 transition-colors" style="background-color: var(--bg-tertiary);">Download Backup (JSON)</button>
-                        <label class="block w-full text-center bg-gray-100 py-5 rounded-2xl font-black text-sm cursor-pointer hover:bg-gray-200 transition-colors" style="background-color: var(--bg-tertiary);">
+                        <button onclick="exportData()" class="secondary-button w-full py-5">Download Backup (JSON)</button>
+                        <label class="block w-full text-center secondary-button py-5 cursor-pointer">
                             Import Recovery File
                             <input type="file" id="import-file-input" class="hidden" onchange="importData(event)">
                         </label>
-                        <button onclick="resetApp()" class="w-full bg-red-50 text-red-500 py-5 rounded-2xl font-black text-sm hover:bg-red-100 transition-colors">Wipe Local Storage</button>
+                        <button onclick="resetApp()" class="danger-button w-full py-5">Wipe Local Storage</button>
                     </div>
                 </div>
             </div>
@@ -1643,6 +1760,11 @@
                     slider.style.transform = 'translateX(32px)';
                     slider.style.backgroundColor = '#ffffff';
                 }
+                
+                // Update all primary buttons to use gradient in dark mode
+                document.querySelectorAll('.primary-button').forEach(btn => {
+                    btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)';
+                });
             } else {
                 html.removeAttribute('data-theme');
                 if (toggle) toggle.style.backgroundColor = '#cbd5e1';
@@ -1650,6 +1772,11 @@
                     slider.style.transform = 'translateX(0)';
                     slider.style.backgroundColor = '#ffffff';
                 }
+                
+                // Update all primary buttons to use black in light mode
+                document.querySelectorAll('.primary-button').forEach(btn => {
+                    btn.style.background = '#000000';
+                });
             }
         }
         
@@ -1984,7 +2111,7 @@
             const previousCustomers = [...new Set(previousPeriodOrders.map(order => order.buyerName))].length;
             const customersChange = previousCustomers > 0 ? ((currentCustomers - previousCustomers) / previousCustomers * 100) : 0;
             
-            const lowStockCount = stock.filter(item => item.quantity <= 5).length;
+            const lowStockCount = stock.filter(item => item.quantity !== null && item.quantity !== undefined && item.quantity <= 5).length;
             
             document.getElementById('total-revenue').textContent = `₹${currentRevenue.toFixed(2)}`;
             document.getElementById('total-orders').textContent = currentOrdersCount;
@@ -2013,7 +2140,7 @@
             `;
             
             if (type === 'stock') {
-                const lowStockCount = stock.filter(item => item.quantity <= 5).length;
+                const lowStockCount = stock.filter(item => item.quantity !== null && item.quantity !== undefined && item.quantity <= 5).length;
                 element.querySelector('span').textContent = `${lowStockCount} items need restocking`;
             }
         }
@@ -2109,11 +2236,11 @@
             }
             
             const values = Object.values(groupedData);
-            const maxValue = Math.max(...values, 1);
+            const maxValue = Math.max(...values.filter(v => v > 0), 1);
             
             labels.forEach((label, index) => {
                 const value = groupedData[label] || 0;
-                const barHeight = (value / maxValue) * 150;
+                const barHeight = value > 0 ? (value / maxValue) * 150 : 0;
                 
                 const barContainer = document.createElement('div');
                 barContainer.className = 'bar-container';
@@ -2247,11 +2374,11 @@
             }
             
             const counts = dataPoints.map(dp => dp.count);
-            const maxCount = Math.max(...counts, 1);
+            const maxCount = Math.max(...counts.filter(c => c > 0), 1);
             
-            // Draw grid lines
-            for (let i = 0; i <= 4; i++) {
-                const y = 40 + (i * 40);
+            // Draw grid lines (skip the 0th line)
+            for (let i = 1; i <= 4; i++) {
+                const y = 40 + ((i - 1) * 40);
                 const line = document.createElementNS(svgNS, "line");
                 line.setAttribute("x1", "40");
                 line.setAttribute("y1", y);
@@ -2266,14 +2393,14 @@
                 text.setAttribute("text-anchor", "end");
                 text.setAttribute("font-size", "10");
                 text.setAttribute("fill", "#6b7280");
-                text.textContent = Math.round((maxCount / 4) * (4 - i));
+                text.textContent = Math.round((maxCount / 4) * (5 - i));
                 svg.appendChild(text);
             }
             
             // Create points for the line
             const points = dataPoints.map((dp, i) => {
                 const x = 40 + (i * (720 / (dataPoints.length - 1 || 1)));
-                const y = 200 - 40 - (dp.count / maxCount * 160);
+                const y = dp.count > 0 ? (200 - 40 - (dp.count / maxCount * 160)) : 200 - 40;
                 return `${x},${y}`;
             }).join(' ');
             
@@ -2294,15 +2421,17 @@
             // Draw points and labels
             dataPoints.forEach((dp, i) => {
                 const x = 40 + (i * (720 / (dataPoints.length - 1 || 1)));
-                const y = 200 - 40 - (dp.count / maxCount * 160);
+                const y = dp.count > 0 ? (200 - 40 - (dp.count / maxCount * 160)) : 200 - 40;
                 
-                // Draw circle at data point
-                const circle = document.createElementNS(svgNS, "circle");
-                circle.setAttribute("cx", x);
-                circle.setAttribute("cy", y);
-                circle.setAttribute("r", "4");
-                circle.setAttribute("fill", "#3b82f6");
-                svg.appendChild(circle);
+                // Draw circle at data point only if count > 0
+                if (dp.count > 0) {
+                    const circle = document.createElementNS(svgNS, "circle");
+                    circle.setAttribute("cx", x);
+                    circle.setAttribute("cy", y);
+                    circle.setAttribute("r", "4");
+                    circle.setAttribute("fill", "#3b82f6");
+                    svg.appendChild(circle);
+                }
                 
                 // Draw label
                 const text = document.createElementNS(svgNS, "text");
@@ -2413,7 +2542,7 @@
             stockContainer.innerHTML = '';
             
             const lowStockItems = stock
-                .filter(item => item.quantity <= 10)
+                .filter(item => item.quantity !== null && item.quantity !== undefined && item.quantity <= 10)
                 .sort((a, b) => a.quantity - b.quantity)
                 .slice(0, 5);
             
@@ -2483,18 +2612,18 @@
                         <div class="autocomplete-container">
                             <input type="text" data-field="product" data-index="${index}" value="${item.product}"
                                 class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all autocomplete-input"
-                                style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" placeholder="Product Name" required />
+                                style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.75rem;" placeholder="Product Name" required />
                         </div>
                     </td>
                     <td class="py-3 px-4">
                         <input type="number" data-field="quantity" data-index="${index}" value="${item.quantity || ''}" step="1" min="1"
                             class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required />
+                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.75rem;" required />
                     </td>
                     <td class="py-3 px-4">
                         <input type="number" data-field="pricePerUnit" data-index="${index}" value="${item.pricePerUnit || ''}" step="0.01"
                             class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" min="0" required />
+                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 0.75rem;" min="0" required />
                     </td>
                     <td class="py-3 px-4 text-right font-medium text-lg">
                         ₹<span class="item-total">${item.total.toFixed(2)}</span>
@@ -2787,20 +2916,23 @@
                         row.innerHTML = `
                             <td class="p-8">
                                 <input type="text" data-field="name" value="${item.name}"
-                                    class="block w-full px-4 py-3 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all" />
+                                    class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                             </td>
                             <td class="p-8">
                                 <input type="number" data-field="price" value="${item.price}" step="0.01" min="0"
-                                    class="block w-full px-4 py-3 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all" />
+                                    class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                             </td>
                             <td class="p-8">
                                 <input type="number" data-field="quantity" value="${item.quantity !== null && item.quantity !== undefined ? item.quantity : ''}" step="1" min="0"
-                                    class="block w-full px-4 py-3 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all" placeholder="Optional" />
+                                    class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" placeholder="Optional" />
                             </td>
                             <td class="p-8 text-right">
                                 <div class="flex gap-2 justify-end">
-                                    <button onclick="saveEditedStockItem('${item.id}')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors">Save</button>
-                                    <button onclick="cancelEditStockItem('${item.id}')" class="bg-gray-400 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-500 transition-colors">Cancel</button>
+                                    <button onclick="saveEditedStockItem('${item.id}')" class="primary-button px-6 py-3 text-sm">Save</button>
+                                    <button onclick="cancelEditStockItem('${item.id}')" class="secondary-button px-6 py-3 text-sm">Cancel</button>
                                 </div>
                             </td>
                         `;
@@ -2810,7 +2942,7 @@
                         const quantityDisplay = quantity === 'N/A' ? 'No stock' : `${quantity} units`;
                         row.innerHTML = `
                             <td class="p-8 font-black text-sm">${item.name}</td>
-                            <td class="p-8 font-bold text-gray-500">₹${item.price.toFixed(2)}</td>
+                            <td class="p-8 font-bold" style="color: var(--text-secondary);">₹${item.price.toFixed(2)}</td>
                             <td class="p-8">
                                 <span class="px-4 py-2 rounded-xl text-sm font-bold ${quantity === 'N/A' ? 'bg-gray-100 text-gray-600' : isLowStock ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}">
                                     ${quantityDisplay}
@@ -2818,8 +2950,8 @@
                             </td>
                             <td class="p-8 text-right">
                                 <div class="flex gap-2 justify-end">
-                                    <button onclick="editStockItem('${item.id}')" class="bg-gray-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-700 transition-colors">Edit</button>
-                                    <button onclick="deleteStockItem('${item.id}')" class="bg-red-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-red-700 transition-colors">Delete</button>
+                                    <button onclick="editStockItem('${item.id}')" class="secondary-button px-6 py-3 text-sm">Edit</button>
+                                    <button onclick="deleteStockItem('${item.id}')" class="danger-button px-6 py-3 text-sm">Delete</button>
                                 </div>
                             </td>
                         `;
@@ -2959,21 +3091,22 @@
             } else {
                 notes.forEach(note => {
                     const noteDiv = document.createElement('div');
-                    noteDiv.className = 'p-8 rounded-[2rem] border shadow-sm relative group';
+                    noteDiv.className = 'p-8 rounded-[1.5rem] border shadow-sm relative group';
                     noteDiv.style.backgroundColor = 'var(--bg-secondary)';
                     noteDiv.style.borderColor = 'var(--border-color)';
+                    noteDiv.style.border = '1px solid var(--border-color)';
                     noteDiv.dataset.noteId = note.id;
 
                     if (note.isEditing) {
                         noteDiv.innerHTML = `
                             <div class="mb-6">
                                 <textarea data-note-id="${note.id}"
-                                    class="block w-full px-4 py-3 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                                    rows="3">${note.content}</textarea>
+                                    class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" rows="3">${note.content}</textarea>
                             </div>
                             <div class="flex gap-2 justify-end">
-                                <button onclick="saveEditedNote('${note.id}')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors">Save</button>
-                                <button onclick="cancelEditNote('${note.id}')" class="bg-gray-400 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-500 transition-colors">Cancel</button>
+                                <button onclick="saveEditedNote('${note.id}')" class="primary-button px-6 py-3 text-sm">Save</button>
+                                <button onclick="cancelEditNote('${note.id}')" class="secondary-button px-6 py-3 text-sm">Cancel</button>
                             </div>
                         `;
                     } else {
@@ -2981,15 +3114,15 @@
                             <button onclick="deleteNote('${note.id}')" class="absolute top-4 right-4 text-gray-200 group-hover:text-red-500 transition-colors">
                                 <i class="material-icons">close</i>
                             </button>
-                            <p class="text-gray-800 font-medium ${note.isDone ? 'line-through text-gray-500' : ''}">${note.content}</p>
+                            <p class="font-medium ${note.isDone ? 'line-through text-gray-500' : ''}" style="color: var(--text-primary);">${note.content}</p>
                             <div class="flex items-center justify-between mt-6">
-                                <p class="text-[10px] font-black uppercase text-gray-400">${new Date(note.createdAt).toLocaleDateString()}</p>
+                                <p class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">${new Date(note.createdAt).toLocaleDateString()}</p>
                                 <div class="flex gap-2">
-                                    <label class="flex items-center text-sm text-gray-700">
+                                    <label class="flex items-center text-sm" style="color: var(--text-secondary);">
                                         <input type="checkbox" ${note.isDone ? 'checked' : ''} onchange="toggleNoteDone('${note.id}', ${note.isDone})" class="form-checkbox h-4 w-4 text-black rounded-md focus:ring-0 mr-1 transition-colors" />
                                         Done
                                     </label>
-                                    <button onclick="editNote('${note.id}')" class="bg-gray-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-gray-700 transition-colors">Edit</button>
+                                    <button onclick="editNote('${note.id}')" class="secondary-button px-3 py-1 text-sm">Edit</button>
                                 </div>
                             </div>
                         `;
@@ -3113,16 +3246,15 @@
                 activeOrdersList.innerHTML = '<p class="text-gray-600">No active orders found. Start by adding a new order!</p>';
             } else {
                 activeOrdersList.innerHTML = `
-                    <div class="overflow-x-auto rounded-[2rem] shadow-md mobile-table-container">
-                        <table class="min-w-full border" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                    <div class="overflow-x-auto rounded-[1.5rem] shadow-md mobile-table-container">
+                        <table class="min-w-full" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 1rem;">
                             <thead style="background-color: var(--bg-tertiary);">
                                 <tr>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400">Buyer Name</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400">Date</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Seen</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Delivered</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Actions</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Details</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Buyer Name</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Date</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary); text-center">Status</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary); text-center">Actions</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary); text-center">Details</th>
                                 </tr>
                             </thead>
                             <tbody id="active-orders-tbody"></tbody>
@@ -3140,14 +3272,14 @@
                 clearCompletedOrdersBtn.classList.add('hidden');
             } else {
                 completedOrdersList.innerHTML = `
-                    <div class="overflow-x-auto rounded-[2rem] shadow-md mobile-table-container">
-                        <table class="min-w-full border" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                    <div class="overflow-x-auto rounded-[1.5rem] shadow-md mobile-table-container">
+                        <table class="min-w-full" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 1rem;">
                             <thead style="background-color: var(--bg-tertiary);">
                                 <tr>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400">Buyer Name</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400">Date</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Actions</th>
-                                    <th class="p-8 text-[10px] font-black uppercase text-gray-400 text-center">Details</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Buyer Name</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Date</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary); text-center">Actions</th>
+                                    <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary); text-center">Details</th>
                                 </tr>
                             </thead>
                             <tbody id="completed-orders-tbody"></tbody>
@@ -3172,17 +3304,19 @@
             let actionsHtml = '';
             let buyerNameCellContent;
             let itemsDetailsHtml = '';
+            let statusHtml = '';
 
             if (isCompleted) {
                 actionsHtml = `
-                    <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2">
+                    <button onclick="handlePrintBill('${order.id}', 'photo')" class="secondary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                         <i class="material-icons">image</i> Export Photo
                     </button>
-                    <button onclick="handleToggleDelivered('${order.id}', true)" class="bg-gray-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center gap-2">
-                        <i class="material-icons">unarchive</i> Move to Active
+                    <button onclick="handleUndoDelivered('${order.id}')" class="primary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
+                        <i class="material-icons">undo</i> Undo Delivered
                     </button>
                 `;
                 buyerNameCellContent = order.buyerName;
+                statusHtml = `<span class="status-badge delivered">Delivered</span>`;
                 itemsDetailsHtml = order.items.map(item => `
                     <tr class="border-t" style="border-color: var(--border-color);">
                         <td class="p-6" style="color: var(--text-primary);">${item.product}</td>
@@ -3195,35 +3329,45 @@
                 if (isEditing) {
                     buyerNameCellContent = `
                         <input type="text" value="${order.buyerName}" data-order-field="buyerName"
-                            class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                            style="background-color: var(--input-bg); color: var(--text-primary);" />
+                            class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                            style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                     `;
                     actionsHtml = `
-                        <button onclick="handleSaveEditedOrder('${order.id}')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <button onclick="handleSaveEditedOrder('${order.id}')" class="primary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                             <i class="material-icons">save</i> Save
                         </button>
-                        <button onclick="handleCancelEditOrder('${order.id}')" class="bg-gray-400 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-500 transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <button onclick="handleCancelEditOrder('${order.id}')" class="secondary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                             <i class="material-icons">cancel</i> Cancel
                         </button>
+                    `;
+                    statusHtml = `
+                        <div class="flex flex-col gap-2">
+                            <button onclick="handleToggleSeen('${order.id}', ${order.isSeen})" class="status-badge ${order.isSeen ? 'seen' : 'pending'}">
+                                ${order.isSeen ? 'Seen' : 'Unseen'}
+                            </button>
+                            <button onclick="handleToggleDelivered('${order.id}', ${order.isDelivered})" class="status-badge ${order.isDelivered ? 'delivered' : 'active'}">
+                                ${order.isDelivered ? 'Delivered' : 'Active'}
+                            </button>
+                        </div>
                     `;
                     itemsDetailsHtml = order.items.map((item, itemIndex) => `
                         <tr class="border-t" style="border-color: var(--border-color);" data-item-index="${itemIndex}">
                             <td class="p-6">
                                 <div class="autocomplete-container">
                                     <input type="text" value="${item.product}" data-item-field="product"
-                                        class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all autocomplete-input"
-                                        style="background-color: var(--input-bg); color: var(--text-primary);" />
+                                        class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all autocomplete-input"
+                                        style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                                 </div>
                             </td>
                             <td class="p-6">
                                 <input type="number" value="${item.quantity || ''}" data-item-field="quantity" step="1" min="1"
-                                    class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                                    style="background-color: var(--input-bg); color: var(--text-primary);" required />
+                                    class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required />
                             </td>
                             <td class="p-6">
                                 <input type="number" value="${item.pricePerUnit}" data-item-field="pricePerUnit" step="0.01" min="0"
-                                    class="block w-full px-4 py-3 rounded-2xl border-none outline-none focus:ring-2 focus:ring-black transition-all"
-                                    style="background-color: var(--input-bg); color: var(--text-primary);" />
+                                    class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
+                                    style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                             </td>
                             <td class="p-6 text-right text-lg">₹<span class="edited-item-total">${item.total.toFixed(2)}</span></td>
                             <td class="p-6 text-center">
@@ -3235,7 +3379,7 @@
                     `).join('') + `
                     <tr>
                         <td colspan="5" class="p-6 text-center">
-                            <button onclick="handleAddOrderItem('${order.id}')" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-2xl text-sm hover:bg-gray-300 transition-colors flex items-center justify-center gap-2">
+                            <button onclick="handleAddOrderItem('${order.id}')" class="secondary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                                 <i class="material-icons">add_circle_outline</i> Add Item Row
                             </button>
                         </td>
@@ -3243,14 +3387,24 @@
                     `;
                 } else {
                     actionsHtml = `
-                        <button onclick="handlePrintBill('${order.id}', 'photo')" class="bg-black text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <button onclick="handlePrintBill('${order.id}', 'photo')" class="secondary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                             <i class="material-icons">image</i> Photo
                         </button>
-                        <button onclick="handleEditOrder('${order.id}')" class="bg-gray-600 text-white px-6 py-3 rounded-2xl text-sm font-black hover:bg-gray-700 transition-colors shadow-sm flex items-center justify-center gap-2">
+                        <button onclick="handleEditOrder('${order.id}')" class="secondary-button px-4 py-2 text-sm flex items-center justify-center gap-2">
                             <i class="material-icons">edit</i> Edit
                         </button>
                     `;
                     buyerNameCellContent = order.buyerName;
+                    statusHtml = `
+                        <div class="flex flex-col gap-2">
+                            <button onclick="handleToggleSeen('${order.id}', ${order.isSeen})" class="status-badge ${order.isSeen ? 'seen' : 'pending'}">
+                                ${order.isSeen ? 'Seen' : 'Unseen'}
+                            </button>
+                            <button onclick="handleToggleDelivered('${order.id}', ${order.isDelivered})" class="status-badge ${order.isDelivered ? 'delivered' : 'active'}">
+                                ${order.isDelivered ? 'Delivered' : 'Active'}
+                            </button>
+                        </div>
+                    `;
                     itemsDetailsHtml = order.items.map(item => `
                         <tr class="border-t" style="border-color: var(--border-color);">
                             <td class="p-6" style="color: var(--text-primary);">${item.product}</td>
@@ -3265,15 +3419,12 @@
             return `
                 <tr class="border-t transition-colors" style="border-color: var(--border-color);" onmouseover="this.style.backgroundColor='var(--bg-tertiary)'" onmouseout="this.style.backgroundColor='var(--bg-secondary)'">
                     <td class="p-8 font-black text-sm">${buyerNameCellContent}</td>
-                    <td class="p-8 text-sm">${orderDate.toLocaleDateString()}</td>
-                    ${!isCompleted && !isEditing ? `
+                    <td class="p-8 text-sm" style="color: var(--text-secondary);">${orderDate.toLocaleDateString()}</td>
+                    ${!isCompleted ? `
                     <td class="p-8 text-center">
-                        <input type="checkbox" ${order.isSeen ? 'checked' : ''} onchange="handleToggleSeen('${order.id}', ${order.isSeen})" class="form-checkbox h-5 w-5 text-black rounded-md focus:ring-0 transition-colors" />
+                        ${statusHtml}
                     </td>
-                    <td class="p-8 text-center">
-                        <input type="checkbox" ${order.isDelivered ? 'checked' : ''} onchange="handleToggleDelivered('${order.id}', ${order.isDelivered})" class="form-checkbox h-5 w-5 text-black rounded-md focus:ring-0 transition-colors" />
-                    </td>
-                    ` : isEditing ? `<td colspan="2"></td>` : ''}
+                    ` : ''}
                     <td class="p-8 text-center">
                         <div class="flex gap-2 justify-center">
                             ${actionsHtml}
@@ -3287,25 +3438,25 @@
                 </tr>
                 ${isExpanded ? `
                 <tr>
-                    <td colspan="${isCompleted || isEditing ? '5' : '7'}" class="p-8 border-t" style="background-color: var(--bg-tertiary); border-color: var(--border-color);">
-                        <h4 class="font-black text-lg mb-4">Bill Details for ${order.buyerName}:</h4>
+                    <td colspan="${isCompleted ? '4' : '5'}" class="p-8 border-t" style="background-color: var(--bg-tertiary); border-color: var(--border-color); border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+                        <h4 class="font-black text-lg mb-4" style="color: var(--text-primary);">Bill Details for ${order.buyerName}:</h4>
                         <div class="overflow-x-auto mobile-table-container">
-                            <table class="min-w-full border rounded-[2rem]" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                            <table class="min-w-full" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 1rem;">
                                 <thead>
                                     <tr style="background-color: var(--bg-tertiary);">
-                                        <th class="p-6 text-left text-sm font-black uppercase">Product</th>
-                                        <th class="p-6 text-left text-sm font-black uppercase">Qty</th>
-                                        <th class="p-6 text-left text-sm font-black uppercase">Price/Unit</th>
-                                        <th class="p-6 text-right text-sm font-black uppercase">Total</th>
-                                        ${isEditing ? '<th class="p-6 text-center text-sm font-black uppercase"></th>' : ''}
+                                        <th class="p-6 text-left text-sm font-black uppercase" style="color: var(--text-secondary);">Product</th>
+                                        <th class="p-6 text-left text-sm font-black uppercase" style="color: var(--text-secondary);">Qty</th>
+                                        <th class="p-6 text-left text-sm font-black uppercase" style="color: var(--text-secondary);">Price/Unit</th>
+                                        <th class="p-6 text-right text-sm font-black uppercase" style="color: var(--text-secondary);">Total</th>
+                                        ${isEditing ? '<th class="p-6 text-center text-sm font-black uppercase" style="color: var(--text-secondary);"></th>' : ''}
                                     </tr>
                                 </thead>
-                                <tbody id="order-items-tbody-${order.id}">
+                                <tbody id="order-items-tbody-${order.id}" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
                                     ${itemsDetailsHtml}
                                 </tbody>
                             </table>
                         </div>
-                        <div class="text-right font-black text-2xl mt-6 pr-6">
+                        <div class="text-right font-black text-2xl mt-6 pr-6" style="color: var(--text-primary);">
                             Grand Total: ₹<span id="order-grand-total-${order.id}">${order.grandTotal.toFixed(2)}</span>
                         </div>
                     </td>
@@ -3419,34 +3570,61 @@
             if (orderIndex > -1) {
                 orders[orderIndex].isSeen = !currentStatus;
                 saveDataToLocalStorage('orders', [...orders, ...completedOrders]);
-                showToast(`Order ${orderId} marked as ${!currentStatus ? 'seen' : 'unseen'}.`);
+                showToast(`Order marked as ${!currentStatus ? 'seen' : 'unseen'}.`);
                 renderAllOrders();
             }
         };
 
         window.handleToggleDelivered = (orderId, currentStatus) => {
-            const orderToMove = orders.find(order => order.id === orderId) || completedOrders.find(o => o.id === orderId);
+            const orderToMove = orders.find(order => order.id === orderId);
             if (!orderToMove) return;
 
-            const newStatus = !currentStatus;
-            const updatedOrder = {
-                ...orderToMove,
-                isDelivered: newStatus,
-                isEditing: false
-            };
+            const confirmed = showConfirmation(`Are you sure you want to mark this order as ${!currentStatus ? 'delivered' : 'active'}?`);
+            confirmed.then(shouldProceed => {
+                if (!shouldProceed) return;
 
-            if (newStatus) {
-                orders = orders.filter(order => order.id !== orderId);
-                completedOrders.push(updatedOrder);
-                completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            } else {
+                const updatedOrder = {
+                    ...orderToMove,
+                    isDelivered: !currentStatus,
+                    isEditing: false
+                };
+
+                if (!currentStatus) {
+                    // Mark as delivered
+                    orders = orders.filter(order => order.id !== orderId);
+                    completedOrders.push(updatedOrder);
+                    completedOrders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+                    showToast(`Order marked as delivered.`);
+                } else {
+                    // Mark as active (should be handled by undo delivered)
+                    return;
+                }
+                saveDataToLocalStorage('orders', [...orders, ...completedOrders]);
+                renderAllOrders();
+            });
+        };
+
+        window.handleUndoDelivered = (orderId) => {
+            const orderToMove = completedOrders.find(o => o.id === orderId);
+            if (!orderToMove) return;
+
+            const confirmed = showConfirmation("Are you sure you want to undo delivered status?");
+            confirmed.then(shouldProceed => {
+                if (!shouldProceed) return;
+
+                const updatedOrder = {
+                    ...orderToMove,
+                    isDelivered: false,
+                    isEditing: false
+                };
+
                 completedOrders = completedOrders.filter(order => order.id !== orderId);
                 orders.push(updatedOrder);
                 orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            }
-            saveDataToLocalStorage('orders', [...orders, ...completedOrders]);
-            showToast(`Order ${orderToMove.buyerName} marked as ${newStatus ? 'delivered' : 'active'}.`);
-            renderAllOrders();
+                saveDataToLocalStorage('orders', [...orders, ...completedOrders]);
+                showToast(`Order moved back to active orders.`);
+                renderAllOrders();
+            });
         };
 
         window.handleEditOrder = (orderId) => {
@@ -3639,8 +3817,8 @@
 
             billToPrintDiv.innerHTML = `
                 <div class="p-8 bg-white text-black" style="min-height: 297mm; width: 210mm; box-sizing: border-box; font-family: 'Inter', sans-serif; position: relative; color: #1f2937; background: #ffffff;">
-                    <!-- Header - Friendly Design -->
-                    <div style="border: 2px solid #e5e7eb; border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; background: #f9fafb;">
+                    <!-- Header - Professional Design -->
+                    <div style="border-bottom: 2px solid #e5e7eb; padding-bottom: 1.5rem; margin-bottom: 2rem;">
                         <h1 style="font-size: 1.75rem; font-weight: 700; color: #111827; text-align: center; margin: 0 0 1rem 0; letter-spacing: -0.02em;">
                             ${companyDetails.companyName || 'QuickBill'}
                         </h1>
@@ -3652,8 +3830,8 @@
                         </div>
                     </div>
 
-                    <!-- Bill Info Section - Friendly Design -->
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding: 1.5rem; border: 2px solid #e5e7eb; border-radius: 1rem; background: #ffffff;">
+                    <!-- Bill Info Section - Professional Design -->
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 2rem; padding: 1.5rem; background: #f9fafb; border-radius: 0.5rem;">
                         <div style="flex: 1;">
                             <p style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin: 0 0 0.5rem 0; letter-spacing: 0.05em;">Bill To</p>
                             <p style="font-size: 1.125rem; font-weight: 700; color: #111827; margin: 0;">${order.buyerName}</p>
@@ -3665,14 +3843,14 @@
                         </div>
                     </div>
 
-                    <!-- Items Table - Friendly Design -->
-                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 2rem; border-radius: 0.75rem; overflow: hidden; border: 2px solid #e5e7eb;">
+                    <!-- Items Table - Professional Design -->
+                    <table style="width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 2rem; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e5e7eb;">
                         <thead>
                             <tr style="background: #f9fafb;">
-                                <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Product</th>
-                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Qty</th>
-                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Price/Unit</th>
-                                <th style="padding: 1rem; text-align: right; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e5e7eb;">Total</th>
+                                <th style="padding: 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Product</th>
+                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Qty</th>
+                                <th style="padding: 1rem; text-align: center; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Price/Unit</th>
+                                <th style="padding: 1rem; text-align: right; font-size: 0.75rem; font-weight: 600; color: #374151; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #e5e7eb;">Total</th>
                             </tr>
                         </thead>
                         <tbody style="background: #ffffff;">
@@ -3687,23 +3865,23 @@
                         </tbody>
                     </table>
 
-                    <!-- Grand Total Section - Improved Design -->
+                    <!-- Grand Total Section - Professional Design -->
                     <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
-                        <div style="border: 2px solid #111827; border-radius: 0.75rem; padding: 1.25rem 2rem; background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: white; min-width: 250px; text-align: center;">
-                            <p style="font-size: 0.75rem; color: #9ca3af; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Grand Total</p>
+                        <div style="border: 2px solid #111827; border-radius: 0.5rem; padding: 1.25rem 2rem; background: #ffffff; color: #111827; min-width: 250px; text-align: center;">
+                            <p style="font-size: 0.75rem; color: #6b7280; margin: 0 0 0.5rem 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Grand Total</p>
                             <p style="font-size: 1.75rem; font-weight: 700; margin: 0; letter-spacing: -0.02em;">₹${order.grandTotal.toFixed(2)}</p>
                         </div>
                     </div>
 
                     ${billNotes ? `
-                        <div style="border: 2px solid #e5e7eb; border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 2rem; background: #f9fafb;">
+                        <div style="border-top: 1px solid #e5e7eb; padding-top: 1.5rem; margin-bottom: 2rem;">
                             <p style="font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; margin: 0 0 0.75rem 0; letter-spacing: 0.05em;">Notes</p>
                             <p style="font-size: 0.875rem; color: #4b5563; margin: 0; line-height: 1.7;">${billNotes}</p>
                         </div>
                     ` : ''}
 
-                    <!-- Footer - Friendly -->
-                    <div style="position: absolute; bottom: 1rem; left: 0; right: 0; border-top: 2px solid #e5e7eb; padding-top: 1rem; text-align: center;">
+                    <!-- Footer - Professional -->
+                    <div style="position: absolute; bottom: 1rem; left: 0; right: 0; border-top: 1px solid #e5e7eb; padding-top: 1rem; text-align: center;">
                         <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Thank you for your business!</p>
                         <p style="font-size: 0.75rem; color: #9ca3af; margin: 0.25rem 0 0 0;">Generated with QuickBill • ${new Date().toLocaleDateString()}</p>
                     </div>
