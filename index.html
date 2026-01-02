@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#3b82f6">
-    <meta name="description" content="QuickBill Pro - Fast, Modern Order Management System">
-    <title>QuickBill Pro - Enterprise Order Management</title>
+    <meta name="description" content="QuickBill - Fast, Modern Order Management System">
+    <title>QuickBill - Enterprise Order Management</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json" />
@@ -23,9 +23,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Essential Libraries - Loaded asynchronously when needed -->
-    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
     <style>
         /* CSS Variables for Dark Mode */
@@ -158,49 +156,6 @@
                 min-height: 44px;
                 min-width: 44px;
             }
-        }
-
-        /* --- Scanner Styling --- */
-        #scanner-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #interactive.viewport {
-            width: 100%;
-            height: 65vh;
-            position: relative;
-            overflow: hidden;
-            border-radius: 2rem;
-        }
-
-        #interactive.viewport video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .scanner-laser {
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            width: 90%;
-            height: 2px;
-            background: #ef4444;
-            box-shadow: 0 0 15px #ef4444;
-            z-index: 10;
-            animation: laserMove 2s infinite ease-in-out;
-        }
-
-        @keyframes laserMove {
-            0%, 100% { top: 20%; opacity: 0.2; }
-            50% { top: 80%; opacity: 1; }
         }
 
         /* --- Chart Visuals (Optimized) --- */
@@ -341,6 +296,7 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text-primary);
+            padding: 0 0.5rem;
         }
         
         .top-products-list {
@@ -421,6 +377,7 @@
             font-weight: 600;
             margin-bottom: 1rem;
             color: var(--text-primary);
+            padding: 0 0.5rem;
         }
         
         .recent-activity-item {
@@ -509,18 +466,37 @@
             align-items: flex-end;
             height: 200px;
             gap: 0.5rem;
-            padding: 1rem 0;
+            padding: 1rem 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-color) transparent;
+        }
+        
+        .simple-bar-chart::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .simple-bar-chart::-webkit-scrollbar-track {
+            background: transparent;
+            border-radius: 3px;
+        }
+        
+        .simple-bar-chart::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 3px;
         }
         
         .bar-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1;
+            flex: 0 0 auto;
+            min-width: 40px;
         }
         
         .bar {
-            width: 100%;
+            width: 30px;
             background: #3b82f6;
             border-radius: 4px 4px 0 0;
             transition: height 0.3s ease;
@@ -528,15 +504,26 @@
         
         .bar-label {
             margin-top: 0.5rem;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-align: center;
             color: var(--text-secondary);
+            white-space: nowrap;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .simple-line-chart {
             position: relative;
             height: 200px;
             width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 0.5rem;
+        }
+        
+        .simple-line-chart svg {
+            min-width: 600px;
         }
         
         .chart-grid-line {
@@ -588,13 +575,10 @@
 
         /* Autocomplete styles (Optimized) */
         .autocomplete-items {
-            position: absolute;
+            position: fixed !important;
             border: 1px solid var(--border-color);
             border-top: none;
             z-index: 10000;
-            top: 100%;
-            left: 0;
-            right: 0;
             max-height: 200px;
             overflow-y: auto;
             background-color: var(--bg-secondary);
@@ -624,17 +608,17 @@
         
         .autocomplete-container {
             position: relative;
-            z-index: 1;
+            z-index: 100;
         }
         
         #products-table {
             position: relative;
-            z-index: 0;
+            z-index: 1;
         }
         
         #bill-items-container {
             position: relative;
-            z-index: 0;
+            z-index: 1;
         }
 
         /* Hamburger Menu Styles */
@@ -788,7 +772,7 @@
             background: rgba(0, 0, 0, 0.3);
             text-align: center;
         }
-        
+
         /* Mobile optimizations */
         @media (max-width: 640px) {
             /* Page titles - consistent sizing */
@@ -796,17 +780,27 @@
                 font-size: 1.5rem !important; /* 24px */
                 line-height: 1.3;
                 margin-bottom: 1rem !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             
             h3 {
                 font-size: 1.125rem !important; /* 18px */
                 line-height: 1.4;
                 margin-bottom: 0.75rem !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             
             /* Header logo and title */
             header h1 {
                 font-size: 1rem !important; /* 16px */
+                padding-left: 0;
+                padding-right: 0;
             }
             
             header .w-10 {
@@ -832,6 +826,7 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
+                padding: 0 0.5rem;
             }
             
             .stock-deduction-container label {
@@ -843,6 +838,8 @@
             label {
                 font-size: 0.75rem !important;
                 line-height: 1.3;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
             }
             
             /* Input fields */
@@ -855,6 +852,8 @@
                 font-size: 1rem !important; /* 16px prevents iOS zoom */
                 padding: 0.875rem !important;
                 line-height: 1.5;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
             }
             
             /* Buttons - consistent sizing */
@@ -936,6 +935,7 @@
             .chart-title {
                 font-size: 1rem !important;
                 margin-bottom: 0.75rem !important;
+                padding: 0 0.5rem !important;
             }
             
             /* Card padding */
@@ -1044,17 +1044,6 @@
                 font-size: 1.5rem !important;
             }
             
-            /* Scanner overlay */
-            #scanner-overlay .text-lg {
-                font-size: 1rem !important;
-            }
-            
-            #scanner-overlay button {
-                font-size: 1rem !important;
-                padding: 0.875rem 2rem !important;
-            }
-            
-            
             /* Stock status items */
             #stock-status {
                 font-size: 0.875rem !important;
@@ -1062,11 +1051,20 @@
             
             /* Fix titles in rounded cards on mobile */
             .rounded-\[3rem\] h2,
-            .rounded-\[3rem\] h3 {
-                padding-left: 0 !important;
-                padding-right: 0 !important;
+            .rounded-\[3rem\] h3,
+            .rounded-\[2rem\] h2,
+            .rounded-\[2rem\] h3,
+            .rounded-\[1rem\] h2,
+            .rounded-\[1rem\] h3 {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
                 margin-left: 0 !important;
                 margin-right: 0 !important;
+            }
+            
+            /* Fix padding for all rounded containers */
+            .rounded-\[3rem\] {
+                padding: 1rem !important;
             }
             
             /* Dark mode switch on mobile */
@@ -1078,6 +1076,53 @@
             #dark-mode-slider {
                 width: 24px !important;
                 height: 24px !important;
+            }
+            
+            /* Chart scroll on mobile */
+            .simple-bar-chart {
+                padding: 1rem 0.5rem !important;
+            }
+            
+            .bar-container {
+                min-width: 35px;
+            }
+            
+            .bar {
+                width: 25px;
+            }
+            
+            .bar-label {
+                font-size: 0.65rem;
+                max-width: 50px;
+            }
+            
+            /* Fix mobile menu title */
+            .mobile-menu-title {
+                font-size: 1.125rem !important;
+            }
+            
+            /* Fix padding in forms on mobile */
+            form {
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            /* Fix spacing in cards */
+            .space-y-8 > * + * {
+                margin-top: 1.5rem !important;
+            }
+            
+            .space-y-6 > * + * {
+                margin-top: 1rem !important;
+            }
+            
+            .space-y-4 > * + * {
+                margin-top: 0.75rem !important;
+            }
+            
+            /* Ensure proper spacing in rounded containers */
+            .rounded-\[3rem\] > *:first-child {
+                padding-top: 0 !important;
             }
         }
     </style>
@@ -1091,20 +1136,8 @@
             <div class="absolute inset-0 border-4 rounded-full" style="border-color: rgba(59, 130, 246, 0.2);"></div>
             <div class="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style="border-color: #3b82f6; border-top-color: transparent;"></div>
         </div>
-        <p class="mt-6 font-black tracking-tighter text-lg" style="color: var(--text-primary);">QUICKBILL PRO</p>
+        <p class="mt-6 font-black tracking-tighter text-lg" style="color: var(--text-primary);">QUICKBILL</p>
     </div>
-
-    <!-- Scanner UI -->
-    <div id="scanner-overlay">
-        <div class="text-white text-lg font-bold mb-6">Align Barcode</div>
-        <div class="w-full max-w-lg px-4">
-            <div id="interactive" class="viewport border-2 border-white/10">
-                <div class="scanner-laser"></div>
-            </div>
-        </div>
-        <button onclick="stopScanner()" class="mt-10 px-12 py-4 rounded-2xl font-black shadow-2xl hover:scale-105 active:scale-95 transition-transform" style="background-color: var(--bg-secondary); color: var(--text-primary);">Cancel</button>
-    </div>
-
 
     <!-- Toast Notification -->
     <div id="toast-display" class="fixed top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-[6000] flex items-center gap-4 hidden animate-fade-in-down">
@@ -1133,7 +1166,7 @@
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style="background: var(--logo-bg, linear-gradient(135deg, #000 0%, #3b82f6 100%));">
                     <i class="material-icons text-white">receipt_long</i>
                 </div>
-                <h1 class="text-xl font-black tracking-tighter" style="color: var(--text-primary);">QUICKBILL<span class="text-blue-600">PRO</span></h1>
+                <h1 class="text-xl font-black tracking-tighter" style="color: var(--text-primary);">QUICKBILL</h1>
             </div>
 
             <!-- Desktop Navigation -->
@@ -1159,7 +1192,7 @@
     <!-- Mobile Hamburger Menu -->
     <div class="mobile-menu" id="mobile-menu">
         <div class="mobile-menu-header">
-            <div class="mobile-menu-title">QUICKBILL<span style="color: #3b82f6;">PRO</span></div>
+            <div class="mobile-menu-title">QUICKBILL</div>
             <button class="mobile-menu-close" id="mobile-menu-close">
                 <i class="material-icons">close</i>
             </button>
@@ -1199,7 +1232,7 @@
         
         <!-- Dashboard Section -->
         <div id="page-dashboard" class="page-content space-y-8">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 px-1">
                 <h2 class="text-3xl font-black tracking-tight">Business Hub</h2>
                 <div class="dashboard-date-filter no-print">
                     <button class="date-filter-button active" data-range="7">7D</button>
@@ -1275,27 +1308,24 @@
         <!-- Create Bill Section -->
         <div id="page-addOrder" class="page-content max-w-3xl mx-auto">
             <div class="p-8 lg:p-12 rounded-[3rem] shadow-2xl transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
-                <div class="flex justify-between items-center mb-10">
+                <div class="flex justify-between items-center mb-10 px-2">
                     <h2 class="text-3xl font-black tracking-tight">Generate Receipt</h2>
-                    <button onclick="startScanner()" class="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-2xl font-black text-sm shadow-xl hover:scale-105 active:scale-95 transition-all" style="box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);">
-                        <i class="material-icons">qr_code_scanner</i> Scan Barcode
-                    </button>
                 </div>
 
                 <form id="add-order-form" class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 px-2">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase px-2" style="color: var(--text-tertiary);">Customer Name</label>
+                            <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Customer Name</label>
                             <input type="text" id="buyerName" placeholder="Enter name..." class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                         </div>
-                        <div class="stock-deduction-container">
+                        <div class="stock-deduction-container px-2">
                             <input type="checkbox" id="deduct-from-stock" class="h-4 w-4 text-black rounded focus:ring-black" checked>
                             <label for="deduct-from-stock" class="text-sm font-medium" style="color: var(--text-secondary);">Deduct items from stock when saving bill</label>
                         </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center px-2">
+                    <div class="space-y-4 px-2">
+                        <div class="flex justify-between items-center">
                             <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Products & Items</label>
                         </div>
                         <div class="overflow-x-auto mb-4 mobile-table-container">
@@ -1319,7 +1349,7 @@
                         </button>
                     </div>
 
-                    <div class="pt-10 flex flex-col sm:flex-row justify-between items-center gap-6" style="border-top: 1px solid var(--border-color);">
+                    <div class="pt-10 flex flex-col sm:flex-row justify-between items-center gap-6 px-2" style="border-top: 1px solid var(--border-color);">
                         <div class="text-center sm:text-left">
                             <p class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Grand Total</p>
                             <p class="text-4xl font-black tracking-tighter">₹<span id="grand-total">0.00</span></p>
@@ -1333,8 +1363,8 @@
         <!-- Inventory Section -->
         <div id="page-stock" class="page-content space-y-8">
             <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-black mb-8">Stock Intake</h2>
-                <form id="stock-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <h2 class="text-2xl font-black mb-8 px-2">Stock Intake</h2>
+                <form id="stock-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 px-2">
                     <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                     <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
                     <input type="number" id="stockProductQuantity" placeholder="Initial Stock" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
@@ -1350,7 +1380,6 @@
                                 <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Product</th>
                                 <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Price</th>
                                 <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Qty</th>
-                                <th class="p-8 text-[10px] font-black uppercase" style="color: var(--text-secondary);">Barcode</th>
                                 <th class="p-8 text-[10px] font-black uppercase text-right" style="color: var(--text-secondary);">Actions</th>
                             </tr>
                         </thead>
@@ -1362,13 +1391,13 @@
 
         <!-- Notes Section -->
         <div id="page-notes" class="page-content space-y-8">
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center px-2">
                 <h2 class="text-3xl font-black">Business Notes</h2>
                 <button onclick="createNewNote()" class="bg-black text-white px-8 py-4 rounded-2xl font-black text-sm">+ New Note</button>
             </div>
             
             <div class="p-8 lg:p-12 rounded-[3rem] shadow-sm mb-8 transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
-                <h3 class="text-xl font-black mb-6">Add New Note</h3>
+                <h3 class="text-xl font-black mb-6 px-2">Add New Note</h3>
                 <textarea id="new-note-content" rows="4" class="block w-full px-6 py-4 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 mb-6 transition-all" placeholder="Write your note here..." style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);"></textarea>
                 <button onclick="addNote()" class="w-full bg-black text-white px-6 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 active:scale-95 transition-all">Add Note</button>
             </div>
@@ -1380,19 +1409,19 @@
 
         <!-- History Section -->
         <div id="page-allOrders" class="page-content space-y-8">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 px-2">
                 <h2 class="text-3xl font-black">Order Archive</h2>
                 <input type="text" id="order-search-input" oninput="renderAllOrders()" placeholder="Search client or ID..." class="w-full md:w-80 p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
             </div>
             
-            <div class="mb-8">
+            <div class="mb-8 px-2">
                 <h3 class="text-2xl font-black mb-6 border-b pb-4">Active Orders</h3>
                 <div id="active-orders-list">
                     <p style="color: var(--text-secondary);">No active orders found. Start by adding a new order!</p>
                 </div>
             </div>
 
-            <div class="mt-8">
+            <div class="mt-8 px-2">
                 <h3 class="text-2xl font-black mb-6 border-b pb-4">Completed Orders</h3>
                 <div id="completed-orders-list">
                     <p style="color: var(--text-secondary);">No completed orders yet.</p>
@@ -1407,13 +1436,13 @@
 
         <!-- Settings Section -->
         <div id="page-settings" class="page-content space-y-8">
-            <h2 class="text-3xl font-black">Settings & Cloud</h2>
+            <h2 class="text-3xl font-black px-2">Settings & Cloud</h2>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Dark Mode Toggle Card -->
                 <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
-                    <h3 class="text-xl font-black">Appearance</h3>
+                    <h3 class="text-xl font-black px-2">Appearance</h3>
                     <div class="flex items-center justify-between p-6 bg-gray-50 rounded-2xl" style="background-color: var(--bg-tertiary);">
-                        <div>
+                        <div class="px-2">
                             <p class="font-bold text-lg">Dark Mode</p>
                             <p class="text-sm" style="color: var(--text-secondary);">Toggle between light and dark theme</p>
                         </div>
@@ -1424,7 +1453,7 @@
                 </div>
                 
                 <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
-                    <h3 class="text-xl font-black">Company Identity</h3>
+                    <h3 class="text-xl font-black px-2">Company Identity</h3>
                     <form id="settings-form" class="space-y-4">
                         <input type="text" id="companyName" placeholder="Company Name" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
                         <input type="text" id="address" placeholder="Address" class="w-full p-4 bg-gray-50 rounded-2xl outline-none focus:ring-2 focus:ring-black" style="background-color: var(--input-bg); color: var(--text-primary);">
@@ -1436,7 +1465,7 @@
                     </form>
                 </div>
                 <div class="bg-white p-10 rounded-[3rem] border border-gray-100 shadow-sm space-y-8" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
-                    <h3 class="text-xl font-black">Data Utility</h3>
+                    <h3 class="text-xl font-black px-2">Data Utility</h3>
                     <div class="space-y-4">
                         <button onclick="exportData()" class="w-full bg-gray-100 py-5 rounded-2xl font-black text-sm hover:bg-gray-200 transition-colors" style="background-color: var(--bg-tertiary);">Download Backup (JSON)</button>
                         <label class="block w-full text-center bg-gray-100 py-5 rounded-2xl font-black text-sm cursor-pointer hover:bg-gray-200 transition-colors" style="background-color: var(--bg-tertiary);">
@@ -1656,20 +1685,20 @@
                 confirmNo.parentNode.replaceChild(newNo, confirmNo);
                 
                 newYes.addEventListener('click', () => {
-            document.getElementById('confirmation-modal').classList.add('hidden');
+                    document.getElementById('confirmation-modal').classList.add('hidden');
                     if (resolveConfirmationPromise) {
-            resolveConfirmationPromise(true);
+                        resolveConfirmationPromise(true);
                         resolveConfirmationPromise = null;
                     }
-        });
+                });
 
                 newNo.addEventListener('click', () => {
-            document.getElementById('confirmation-modal').classList.add('hidden');
+                    document.getElementById('confirmation-modal').classList.add('hidden');
                     if (resolveConfirmationPromise) {
-            resolveConfirmationPromise(false);
+                        resolveConfirmationPromise(false);
                         resolveConfirmationPromise = null;
                     }
-        });
+                });
             }
         }
 
@@ -1713,102 +1742,6 @@
             }
         };
 
-        // --- Barcode Engine ---
-        let isScannerActive = false;
-        
-        function startScanner() {
-            if (isScannerActive) return;
-            isScannerActive = true;
-            document.getElementById('scanner-overlay').style.display = 'flex';
-            
-            Quagga.init({
-                inputStream: { 
-                    name: "Live", 
-                    type: "LiveStream", 
-                    target: document.querySelector('#interactive'), 
-                    constraints: { facingMode: "environment" } 
-                },
-                decoder: { 
-                    readers: ["code_128_reader", "ean_reader", "upc_reader", "ean_8_reader", "code_39_reader"] 
-                },
-                locate: true
-            }, function(err) {
-                if(err) { 
-                    showToast("Camera Error: " + err); 
-                    isScannerActive = false;
-                    document.getElementById('scanner-overlay').style.display = 'none';
-                    return; 
-                }
-                Quagga.start();
-                
-                // Set up detection handler after initialization
-                Quagga.onDetected(function(data) {
-                    if (!isScannerActive) return;
-            const code = data.codeResult.code;
-            console.log('Scanned barcode:', code);
-            
-                    // Normalize the scanned code (remove whitespace, convert to string)
-                    const normalizedCode = code.toString().trim();
-                    
-                    // Look up product by barcode ID - try multiple matching strategies
-                    let item = null;
-                    
-                    // Strategy 1: Exact barcode match (string comparison)
-                    item = stock.find(s => s.barcode && s.barcode.toString().trim() === normalizedCode);
-                    
-                    // Strategy 2: Numeric barcode match (if barcode is stored as number)
-                    if (!item) {
-                        const numericCode = parseInt(normalizedCode);
-                        if (!isNaN(numericCode)) {
-                            item = stock.find(s => s.barcode && (parseInt(s.barcode.toString()) === numericCode || s.barcode.toString().trim() === normalizedCode));
-                        }
-                    }
-                    
-                    // Strategy 3: Try matching with leading zeros removed
-                    if (!item && normalizedCode.length > 0) {
-                        const codeWithoutLeadingZeros = normalizedCode.replace(/^0+/, '');
-                        if (codeWithoutLeadingZeros !== normalizedCode) {
-                            item = stock.find(s => s.barcode && s.barcode.toString().trim().replace(/^0+/, '') === codeWithoutLeadingZeros);
-                        }
-                    }
-                    
-                    // Strategy 4: Try exact product name match
-                    if (!item) {
-                        item = stock.find(s => s.name && s.name.trim().toLowerCase() === normalizedCode.toLowerCase());
-                    }
-                    
-                    // Strategy 5: Try partial product name match
-                    if (!item) {
-                        item = stock.find(s => s.name && (s.name.toLowerCase().includes(normalizedCode.toLowerCase()) || normalizedCode.toLowerCase().includes(s.name.toLowerCase())));
-                    }
-                    
-                    if (item) {
-                        addItemRowWithData(item.name, item.price);
-                        showToast(`Added: ${item.name} (₹${item.price.toFixed(2)})`);
-            stopScanner();
-                    } else {
-                        // Debug: show available barcodes
-                        const barcodes = stock.filter(s => s.barcode).map(s => ({ name: s.name, barcode: s.barcode.toString() }));
-                        console.log('Scanned code:', normalizedCode);
-                        console.log('Available barcodes:', barcodes);
-                        showToast(`Product not found. Scanned: ${normalizedCode}`);
-                        stopScanner();
-                    }
-                });
-            });
-        }
-
-        function stopScanner() {
-            if (!isScannerActive) return;
-            isScannerActive = false;
-            try {
-            Quagga.stop();
-            } catch(e) {
-                console.log('Scanner already stopped');
-            }
-            document.getElementById('scanner-overlay').style.display = 'none';
-        }
-
         // --- Autocomplete Functions (Optimized with Debouncing) ---
         let autocompleteTimer;
         
@@ -1827,6 +1760,15 @@
             const autocompleteList = document.createElement('div');
             autocompleteList.setAttribute('id', `autocomplete-list-${index}`);
             autocompleteList.className = 'autocomplete-items';
+            
+            // Calculate position relative to input
+            const inputRect = input.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            autocompleteList.style.top = `${inputRect.bottom + scrollTop}px`;
+            autocompleteList.style.left = `${inputRect.left + scrollLeft}px`;
+            autocompleteList.style.width = `${inputRect.width}px`;
             
             // Optimize: Limit results to 10 for better performance
             const matches = stock
@@ -1868,7 +1810,7 @@
             });
             
             autocompleteList.appendChild(fragment);
-            input.parentNode.appendChild(autocompleteList);
+            document.body.appendChild(autocompleteList);
         }
         
         function closeAllLists() {
@@ -2035,6 +1977,7 @@
             const now = new Date();
             
             if (daysRange <= 30) {
+                // Daily data for 30 days or less
                 for (let i = daysRange - 1; i >= 0; i--) {
                     const date = new Date(now);
                     date.setDate(date.getDate() - i);
@@ -2048,12 +1991,19 @@
                         groupedData[orderDate] += order.grandTotal;
                     }
                 });
-            } else {
+                
+                // Shorten labels for daily view
+                Object.keys(groupedData).forEach(key => {
+                    const date = new Date(key);
+                    const shortLabel = `${date.getDate()}/${date.getMonth() + 1}`;
+                    groupedData[shortLabel] = groupedData[key];
+                    delete groupedData[key];
+                });
+            } else if (daysRange === 90) {
+                // Weekly data for 90 days
                 const weeks = Math.ceil(daysRange / 7);
                 for (let i = weeks - 1; i >= 0; i--) {
-                    const weekStart = new Date(now);
-                    weekStart.setDate(weekStart.getDate() - (i * 7));
-                    groupedData[`Week ${weeks - i}`] = 0;
+                    groupedData[`W${weeks - i}`] = 0;
                 }
                 
                 orders.forEach(order => {
@@ -2061,7 +2011,41 @@
                     const diffTime = Math.abs(now - orderDate);
                     const diffWeeks = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
                     if (diffWeeks <= weeks) {
-                        groupedData[`Week ${weeks - diffWeeks + 1}`] += order.grandTotal;
+                        groupedData[`W${weeks - diffWeeks + 1}`] += order.grandTotal;
+                    }
+                });
+            } else if (daysRange === 365) {
+                // Monthly data for 1 year
+                const months = 12;
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                for (let i = months - 1; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setMonth(date.getMonth() - i);
+                    const monthKey = monthNames[date.getMonth()];
+                    groupedData[monthKey] = 0;
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate);
+                    const diffMonths = (now.getFullYear() - orderDate.getFullYear()) * 12 + (now.getMonth() - orderDate.getMonth());
+                    if (diffMonths < months) {
+                        const monthName = monthNames[orderDate.getMonth()];
+                        groupedData[monthName] += order.grandTotal;
+                    }
+                });
+            } else if (daysRange === 'all') {
+                // Yearly data for all time
+                const allYears = [...new Set(orders.map(order => new Date(order.orderDate).getFullYear()))].sort();
+                
+                allYears.forEach(year => {
+                    groupedData[year.toString()] = 0;
+                });
+                
+                orders.forEach(order => {
+                    const year = new Date(order.orderDate).getFullYear().toString();
+                    if (groupedData[year] !== undefined) {
+                        groupedData[year] += order.grandTotal;
                     }
                 });
             }
@@ -2082,14 +2066,33 @@
                 
                 const barLabel = document.createElement('div');
                 barLabel.className = 'bar-label';
-                barLabel.textContent = daysRange <= 30 ? 
-                    new Date(label).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }) : 
-                    label;
+                barLabel.textContent = label;
                 
                 barContainer.appendChild(bar);
                 barContainer.appendChild(barLabel);
                 chartContainer.appendChild(barContainer);
             });
+            
+            // Add more bars if needed for scroll
+            if (Object.keys(groupedData).length < 8) {
+                const extraBars = 8 - Object.keys(groupedData).length;
+                for (let i = 0; i < extraBars; i++) {
+                    const barContainer = document.createElement('div');
+                    barContainer.className = 'bar-container';
+                    
+                    const bar = document.createElement('div');
+                    bar.className = 'bar';
+                    bar.style.height = '0px';
+                    
+                    const barLabel = document.createElement('div');
+                    barLabel.className = 'bar-label';
+                    barLabel.textContent = '-';
+                    
+                    barContainer.appendChild(bar);
+                    barContainer.appendChild(barLabel);
+                    chartContainer.appendChild(barContainer);
+                }
+            }
         }
 
         function renderOrdersChart(orders, daysRange) {
@@ -2100,13 +2103,15 @@
             const svg = document.createElementNS(svgNS, "svg");
             svg.setAttribute("width", "100%");
             svg.setAttribute("height", "100%");
-            svg.setAttribute("viewBox", "0 0 400 200");
+            svg.setAttribute("viewBox", "0 0 600 200");
+            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
             
             let groupedData = {};
             const now = new Date();
             const dataPoints = [];
             
             if (daysRange <= 30) {
+                // Daily data
                 for (let i = 0; i < daysRange; i++) {
                     const date = new Date(now);
                     date.setDate(date.getDate() - (daysRange - 1 - i));
@@ -2122,10 +2127,17 @@
                         dataPoint.count++;
                     }
                 });
-            } else {
+                
+                // Shorten labels
+                dataPoints.forEach(dp => {
+                    const date = new Date(dp.date);
+                    dp.label = `${date.getDate()}/${date.getMonth() + 1}`;
+                });
+            } else if (daysRange === 90) {
+                // Weekly data
                 const weeks = Math.ceil(daysRange / 7);
                 for (let i = 0; i < weeks; i++) {
-                    dataPoints.push({ label: `Week ${i + 1}`, count: 0 });
+                    dataPoints.push({ label: `W${i + 1}`, count: 0 });
                 }
                 
                 orders.forEach(order => {
@@ -2136,17 +2148,56 @@
                         dataPoints[weeks - diffWeeks].count++;
                     }
                 });
+            } else if (daysRange === 365) {
+                // Monthly data
+                const months = 12;
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                for (let i = months - 1; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setMonth(date.getMonth() - i);
+                    const monthKey = monthNames[date.getMonth()];
+                    dataPoints.push({ label: monthKey, count: 0 });
+                }
+                
+                orders.forEach(order => {
+                    const orderDate = new Date(order.orderDate);
+                    const diffMonths = (now.getFullYear() - orderDate.getFullYear()) * 12 + (now.getMonth() - orderDate.getMonth());
+                    if (diffMonths < months) {
+                        const monthName = monthNames[orderDate.getMonth()];
+                        const dataPoint = dataPoints.find(dp => dp.label === monthName);
+                        if (dataPoint) {
+                            dataPoint.count++;
+                        }
+                    }
+                });
+            } else if (daysRange === 'all') {
+                // Yearly data
+                const allYears = [...new Set(orders.map(order => new Date(order.orderDate).getFullYear()))].sort();
+                
+                allYears.forEach(year => {
+                    dataPoints.push({ label: year.toString(), count: 0 });
+                });
+                
+                orders.forEach(order => {
+                    const year = new Date(order.orderDate).getFullYear().toString();
+                    const dataPoint = dataPoints.find(dp => dp.label === year);
+                    if (dataPoint) {
+                        dataPoint.count++;
+                    }
+                });
             }
             
             const counts = dataPoints.map(dp => dp.count);
             const maxCount = Math.max(...counts, 1);
             
+            // Draw grid lines
             for (let i = 0; i <= 4; i++) {
                 const y = 40 + (i * 40);
                 const line = document.createElementNS(svgNS, "line");
                 line.setAttribute("x1", "40");
                 line.setAttribute("y1", y);
-                line.setAttribute("x2", "360");
+                line.setAttribute("x2", "560");
                 line.setAttribute("y2", y);
                 line.setAttribute("class", "chart-grid-line");
                 svg.appendChild(line);
@@ -2161,28 +2212,33 @@
                 svg.appendChild(text);
             }
             
+            // Create points for the line
             const points = dataPoints.map((dp, i) => {
-                const x = 40 + (i * (320 / (dataPoints.length - 1)));
+                const x = 40 + (i * (520 / (dataPoints.length - 1 || 1)));
                 const y = 200 - 40 - (dp.count / maxCount * 160);
                 return `${x},${y}`;
             }).join(' ');
             
+            // Draw the line
             const polyline = document.createElementNS(svgNS, "polyline");
             polyline.setAttribute("points", points);
             polyline.setAttribute("class", "line-path");
             polyline.setAttribute("fill", "none");
             svg.appendChild(polyline);
             
-            const areaPoints = `${points} 360,200 40,200`;
+            // Draw the area under the line
+            const areaPoints = `${points} 560,200 40,200`;
             const polygon = document.createElementNS(svgNS, "polygon");
             polygon.setAttribute("points", areaPoints);
             polygon.setAttribute("class", "area-path");
             svg.appendChild(polygon);
             
+            // Draw points and labels
             dataPoints.forEach((dp, i) => {
-                const x = 40 + (i * (320 / (dataPoints.length - 1)));
+                const x = 40 + (i * (520 / (dataPoints.length - 1 || 1)));
                 const y = 200 - 40 - (dp.count / maxCount * 160);
                 
+                // Draw circle at data point
                 const circle = document.createElementNS(svgNS, "circle");
                 circle.setAttribute("cx", x);
                 circle.setAttribute("cy", y);
@@ -2190,20 +2246,14 @@
                 circle.setAttribute("fill", "#3b82f6");
                 svg.appendChild(circle);
                 
+                // Draw label
                 const text = document.createElementNS(svgNS, "text");
                 text.setAttribute("x", x);
                 text.setAttribute("y", "195");
                 text.setAttribute("text-anchor", "middle");
                 text.setAttribute("font-size", "10");
                 text.setAttribute("fill", "#6b7280");
-                
-                if (daysRange <= 30) {
-                    const date = new Date(dp.date);
-                    text.textContent = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-                } else {
-                    text.textContent = dp.label;
-                }
-                
+                text.textContent = dp.label;
                 svg.appendChild(text);
             });
             
@@ -2373,7 +2423,7 @@
                     <td class="py-3 px-4">
                         <div class="autocomplete-container">
                             <input type="text" data-field="product" data-index="${index}" value="${item.product}"
-                                class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all autocomplete-input"
                                 style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" placeholder="Product Name" required />
                         </div>
                     </td>
@@ -2689,7 +2739,6 @@
                         `;
                     } else {
                         const isLowStock = item.quantity <= 5;
-                        const barcodeDisplay = item.barcode || 'Not generated';
                         row.innerHTML = `
                             <td class="p-8 font-black text-sm">${item.name}</td>
                             <td class="p-8 font-bold text-gray-500">₹${item.price.toFixed(2)}</td>
@@ -2697,14 +2746,6 @@
                                 <span class="px-4 py-2 rounded-xl text-sm font-bold ${isLowStock ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-600'}">
                                     ${item.quantity} units
                                 </span>
-                            </td>
-                            <td class="p-8">
-                                <div class="flex flex-col items-start gap-2">
-                                    <button onclick="generateBarcode('${item.id}')" class="bg-indigo-600 text-white px-4 py-2 rounded-2xl text-sm font-black hover:bg-indigo-700 transition-colors shadow-sm flex items-center justify-center gap-2">
-                                        <i class="material-icons text-lg">qr_code</i> Generate
-                                    </button>
-                                    <span class="text-xs text-gray-500 font-mono">${barcodeDisplay}</span>
-                                </div>
                             </td>
                             <td class="p-8 text-right">
                                 <div class="flex gap-2 justify-end">
@@ -2752,7 +2793,6 @@
 
             const newStockItem = {
                 id: crypto.randomUUID(),
-                barcode: `${Date.now()}${Math.floor(Math.random() * 10000)}`, // Unique numeric barcode
                 name: productName,
                 price: productPrice,
                 quantity: productQuantity,
@@ -2813,10 +2853,6 @@
                 stock[itemIndex].price = newPrice;
                 stock[itemIndex].quantity = newQuantity;
                 stock[itemIndex].isEditing = false;
-                // Preserve barcode when editing
-                if (!stock[itemIndex].barcode) {
-                    stock[itemIndex].barcode = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
-                }
                 stock.sort((a, b) => a.name.localeCompare(b.name));
                 saveDataToLocalStorage('stock', stock);
                 showToast("Stock item updated!");
@@ -3520,7 +3556,7 @@
                     <!-- Header - Friendly Design -->
                     <div style="border: 2px solid #e5e7eb; border-radius: 1rem; padding: 2rem; margin-bottom: 2rem; background: #f9fafb;">
                         <h1 style="font-size: 1.75rem; font-weight: 700; color: #111827; text-align: center; margin: 0 0 1rem 0; letter-spacing: -0.02em;">
-                            ${companyDetails.companyName || 'QuickBill Pro'}
+                            ${companyDetails.companyName || 'QuickBill'}
                         </h1>
                         <div style="text-align: center; color: #4b5563; font-size: 0.875rem; line-height: 1.8;">
                             ${companyDetails.address ? `<p style="margin: 0.3rem 0; color: #4b5563;">${companyDetails.address}</p>` : ''}
@@ -3582,7 +3618,7 @@
 
                     <!-- Footer - Friendly -->
                     <div style="position: absolute; bottom: 1rem; left: 0; right: 0; border-top: 2px solid #e5e7eb; padding-top: 1rem; text-align: center;">
-                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Generated with QuickBill Pro</p>
+                        <p style="font-size: 0.75rem; color: #9ca3af; margin: 0;">Generated with QuickBill</p>
                     </div>
                 </div>
             `;
@@ -3616,53 +3652,6 @@
                     billToPrintDiv.innerHTML = '';
                 }
             }, 50);
-        };
-
-        // --- Barcode Generation ---
-        window.generateBarcode = (stockId) => {
-            const item = stock.find(s => s.id === stockId);
-            if (!item) {
-                showToast("Stock item not found.");
-                return;
-            }
-            
-            // Ensure item has a barcode
-            if (!item.barcode) {
-                item.barcode = `${Date.now()}${Math.floor(Math.random() * 10000)}`;
-                saveDataToLocalStorage('stock', stock);
-            }
-            
-            // Create a canvas for barcode
-            const canvas = document.createElement('canvas');
-            
-            try {
-                // Generate barcode using the numeric barcode ID
-                JsBarcode(canvas, item.barcode, {
-                    format: "CODE128",
-                    width: 2,
-                    height: 100,
-                    displayValue: true,
-                    fontSize: 16,
-                    margin: 10,
-                    text: `${item.name} - ${item.barcode}`
-                });
-                
-                // Convert canvas to image and download
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `barcode_${item.name.replace(/\s+/g, '_')}_${item.barcode}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                    showToast(`Barcode for "${item.name}" downloaded! ID: ${item.barcode}`);
-                });
-            } catch (error) {
-                console.error('Barcode generation error:', error);
-                showToast("Failed to generate barcode. Please try again.");
-            }
         };
 
         // --- Settings Page Logic ---
@@ -3722,7 +3711,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `quickbill_pro_backup_${new Date().toISOString().slice(0, 10)}.json`;
+            link.download = `quickbill_backup_${new Date().toISOString().slice(0, 10)}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -3883,13 +3872,10 @@
                     stock = storedStock.map(item => ({
                         ...item,
                         price: parseFloat(item.price),
-                        quantity: item.quantity !== undefined ? parseInt(item.quantity) : 0,
-                        barcode: item.barcode || `${Date.now()}${Math.floor(Math.random() * 10000)}` // Assign barcode to old items
+                        quantity: item.quantity !== undefined ? parseInt(item.quantity) : 0
                     }));
                     stock.sort((a, b) => a.name.localeCompare(b.name));
                     
-                    // Save stock with new barcodes
-                    saveDataToLocalStorage('stock', stock);
                     console.log('Data loaded successfully');
                 } catch (error) {
                     console.error('Initialization error:', error);
