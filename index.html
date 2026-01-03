@@ -207,9 +207,13 @@
 
         .mobile-table-container {
             overflow-x: auto;
+            overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             contain: layout style paint;
             will-change: scroll-position;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         /* Optimize table rendering */
@@ -226,8 +230,15 @@
         /* Dashboard specific styles */
         .dashboard-grid {
             display: grid;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
         }
         
         .stat-card {
@@ -267,7 +278,7 @@
             font-size: 0.875rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.05em;
         }
         
@@ -289,25 +300,39 @@
         .chart-container {
             background: var(--bg-secondary);
             border-radius: 0.75rem;
-            padding: 1.5rem;
+            padding: 1rem;
             box-shadow: 0 4px 6px var(--shadow);
-            margin-bottom: 1.5rem;
-            height: 300px;
+            margin-bottom: 1rem;
+            height: 280px;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
             border: 1px solid var(--border-color);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
         }
         
         .chart-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 0.75rem;
             color: var(--text-primary);
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
         }
         
         .top-products-list {
             list-style-type: none;
-            padding: 0;
+            padding: 0 1rem 0 0;
             margin: 0;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
         }
         
         .top-product-item {
@@ -355,8 +380,9 @@
         }
         
         .product-sales {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-primary);
+            font-size: 0.9375rem;
         }
         
         .progress-bar {
@@ -378,10 +404,22 @@
         }
         
         .section-title {
-            font-size: 1.5rem;
-            font-weight: 600;
+            font-size: 2rem;
+            font-weight: 900;
             margin-bottom: 1rem;
             color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        
+        #recent-activity,
+        #stock-status {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            padding-right: 1rem;
         }
         
         .recent-activity-item {
@@ -412,19 +450,22 @@
         }
         
         .activity-title {
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 0.25rem;
             color: var(--text-primary);
+            font-size: 0.9375rem;
         }
         
         .activity-time {
-            font-size: 0.875rem;
+            font-size: 0.8125rem;
             color: var(--text-secondary);
+            font-weight: 500;
         }
         
         .activity-amount {
-            font-weight: 600;
+            font-weight: 700;
             color: #10b981;
+            font-size: 0.9375rem;
         }
         
         .dashboard-date-filter {
@@ -464,62 +505,105 @@
             border-color: var(--accent-color);
         }
         
-        /* Simple chart styles */
-        .simple-bar-chart {
-            display: flex;
-            align-items: flex-end;
-            height: 200px;
-            gap: 0.5rem;
-            padding: 1rem 0.5rem;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        /* Unified Scrollbar Styling */
+        .simple-bar-chart,
+        .simple-line-chart,
+        .top-products-list,
+        #recent-activity,
+        #stock-status,
+        .mobile-table-container,
+        .autocomplete-items {
             scrollbar-width: thin;
             scrollbar-color: var(--border-color) transparent;
         }
         
-        .simple-bar-chart::-webkit-scrollbar {
-            height: 6px;
+        .simple-bar-chart::-webkit-scrollbar,
+        .simple-line-chart::-webkit-scrollbar,
+        .top-products-list::-webkit-scrollbar,
+        #recent-activity::-webkit-scrollbar,
+        #stock-status::-webkit-scrollbar,
+        .mobile-table-container::-webkit-scrollbar,
+        .autocomplete-items::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
         
-        .simple-bar-chart::-webkit-scrollbar-track {
+        .simple-bar-chart::-webkit-scrollbar-track,
+        .simple-line-chart::-webkit-scrollbar-track,
+        .top-products-list::-webkit-scrollbar-track,
+        #recent-activity::-webkit-scrollbar-track,
+        #stock-status::-webkit-scrollbar-track,
+        .mobile-table-container::-webkit-scrollbar-track,
+        .autocomplete-items::-webkit-scrollbar-track {
             background: transparent;
-            border-radius: 3px;
+            border-radius: 4px;
         }
         
-        .simple-bar-chart::-webkit-scrollbar-thumb {
+        .simple-bar-chart::-webkit-scrollbar-thumb,
+        .simple-line-chart::-webkit-scrollbar-thumb,
+        .top-products-list::-webkit-scrollbar-thumb,
+        #recent-activity::-webkit-scrollbar-thumb,
+        #stock-status::-webkit-scrollbar-thumb,
+        .mobile-table-container::-webkit-scrollbar-thumb,
+        .autocomplete-items::-webkit-scrollbar-thumb {
             background-color: var(--border-color);
-            border-radius: 3px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .simple-bar-chart::-webkit-scrollbar-thumb:hover,
+        .simple-line-chart::-webkit-scrollbar-thumb:hover,
+        .top-products-list::-webkit-scrollbar-thumb:hover,
+        #recent-activity::-webkit-scrollbar-thumb:hover,
+        #stock-status::-webkit-scrollbar-thumb:hover,
+        .mobile-table-container::-webkit-scrollbar-thumb:hover,
+        .autocomplete-items::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-tertiary);
+        }
+        
+        /* Simple chart styles */
+        .simple-bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 180px;
+            gap: 0.5rem;
+            padding: 0.75rem 0.5rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            min-width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .simple-line-chart {
             display: flex;
             align-items: flex-end;
-            height: 200px;
-            padding: 1rem 0.5rem;
+            height: 180px;
+            padding: 0.75rem 0.5rem;
             overflow-x: auto;
+            overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-color) transparent;
             position: relative;
-        }
-        
-        .simple-line-chart::-webkit-scrollbar {
-            height: 6px;
-        }
-        
-        .simple-line-chart::-webkit-scrollbar-track {
-            background: transparent;
-            border-radius: 3px;
-        }
-        
-        .simple-line-chart::-webkit-scrollbar-thumb {
-            background-color: var(--border-color);
-            border-radius: 3px;
+            width: 100%;
+            min-width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         
         .line-chart-svg-container {
             min-width: 800px;
             height: 100%;
+            width: auto;
+            max-width: none;
+        }
+        
+        @media (max-width: 640px) {
+            .line-chart-svg-container {
+                min-width: 600px;
+                max-width: none;
+            }
         }
         
         .bar-container {
@@ -587,36 +671,143 @@
             font-weight: 600;
         }
 
-        /* Stock deduction checkbox styling */
+        /* Stock deduction toggle switch styling */
         .stock-deduction-container {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            justify-content: flex-start;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 4.5rem;
+            height: 100%;
+        }
+        
+        .stock-deduction-container .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stock-deduction-label {
+            display: flex;
+            align-items: center;
+            line-height: 1.5;
+        }
+        
+        .stock-deduction-container.active {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+        }
+        
+        .stock-deduction-container:not(.active) {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        
+        .stock-deduction-container.not-active {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ef4444;
+            transition: 0.3s;
+            border-radius: 34px;
+            border: 2px solid transparent;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #10b981;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .toggle-slider:active:before {
+            width: 28px;
+        }
+        
+        .stock-deduction-label {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: var(--text-primary);
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .stock-deduction-container.active .stock-deduction-label {
+            color: #10b981;
+        }
+        
+        .stock-deduction-container:not(.active) .stock-deduction-label {
+            color: #ef4444;
         }
 
         /* Autocomplete styles (Optimized) */
         .autocomplete-container {
-            position: relative;
+            position: relative !important;
             width: 100%;
+            z-index: 100000 !important;
         }
         
         .autocomplete-items {
-            position: absolute !important;
-            top: 100%;
-            left: 0;
-            right: 0;
-            border: 1px solid var(--border-color);
-            border-top: none;
-            z-index: 10000;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: var(--bg-secondary);
-            border-radius: 0 0 0.5rem 0.5rem;
-            box-shadow: 0 4px 6px var(--shadow);
-            will-change: opacity;
-            transform: translateZ(0);
-            margin-top: -1px;
+            position: fixed !important;
+            z-index: 999999 !important;
+            max-height: 300px !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            background-color: var(--bg-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-top: none !important;
+            border-radius: 0 0 0.5rem 0.5rem !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+            will-change: transform, opacity !important;
+            transform: translateZ(0) !important;
+            -webkit-overflow-scrolling: touch !important;
+            pointer-events: auto !important;
+            isolation: isolate !important;
+            margin-top: -1px !important;
         }
         
         .autocomplete-items div {
@@ -643,6 +834,11 @@
         }
         
         #bill-items-container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        #add-item-row-btn {
             position: relative;
             z-index: 1;
         }
@@ -902,28 +1098,58 @@
         @media (max-width: 640px) {
             /* Consistent spacing with desktop */
             .page-content {
-                padding: 1rem 0;
+                padding: 0.75rem 0.5rem !important;
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+                box-sizing: border-box !important;
             }
             
-            /* Page titles - consistent sizing */
-            h2 {
-                font-size: 1.75rem !important;
-                line-height: 1.3;
+            /* Dashboard grid spacing */
+            .grid {
+                gap: 1rem !important;
+            }
+            
+            .dashboard-grid {
+                gap: 1rem !important;
+            }
+            
+            /* Page titles - consistent sizing across ALL pages */
+            h2,
+            #page-stock h2,
+            #page-allOrders h2,
+            #page-addOrder h2,
+            #page-notes h2,
+            #page-settings h2,
+            .page-content h2 {
+                font-size: 2.5rem !important;
+                line-height: 1.2 !important;
                 margin-bottom: 1.5rem !important;
-                font-weight: 800;
+                font-weight: 900 !important;
+                letter-spacing: -0.03em !important;
+                color: var(--text-primary) !important;
             }
             
-            h3 {
-                font-size: 1.25rem !important;
-                line-height: 1.4;
+            h3,
+            #page-allOrders h3,
+            #page-addOrder h3,
+            #page-notes h3,
+            #page-settings h3,
+            .page-content h3 {
+                font-size: 1.875rem !important;
+                line-height: 1.3 !important;
                 margin-bottom: 1rem !important;
-                font-weight: 700;
+                font-weight: 900 !important;
+                letter-spacing: -0.02em !important;
+                color: var(--text-primary) !important;
             }
             
-            /* Chart titles */
+            /* Chart titles - consistent across all charts */
             .chart-title {
-                font-size: 1.125rem !important;
-                margin-bottom: 1rem !important;
+                font-size: 1.5rem !important;
+                margin-bottom: 0.75rem !important;
+                font-weight: 900 !important;
+                color: var(--text-primary) !important;
+                letter-spacing: -0.02em !important;
             }
             
             /* Header logo and title */
@@ -954,9 +1180,24 @@
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
+                padding: 0.75rem !important;
             }
             
-            .stock-deduction-container label {
+            .toggle-switch {
+                width: 48px !important;
+                height: 28px !important;
+            }
+            
+            .toggle-slider:before {
+                height: 20px !important;
+                width: 20px !important;
+            }
+            
+            input:checked + .toggle-slider:before {
+                transform: translateX(20px) !important;
+            }
+            
+            .stock-deduction-label {
                 font-size: 0.875rem !important;
                 line-height: 1.4;
             }
@@ -982,6 +1223,9 @@
                 line-height: 1.5;
                 border-radius: 0.75rem;
                 border: 1px solid var(--border-color);
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
             }
             
             /* Buttons - consistent sizing */
@@ -1030,22 +1274,35 @@
                 font-size: 1rem !important;
             }
             
-            /* Table consistency */
+            /* Table consistency - make all tables scrollable */
             .mobile-table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                width: 100% !important;
+                max-width: 100vw !important;
+                box-sizing: border-box !important;
+            }
+            
+            .mobile-table-container table {
+                width: max-content !important;
+                min-width: 100% !important;
+                table-layout: auto !important;
             }
             
             table th {
-                font-size: 0.75rem !important;
-                padding: 0.75rem 0.5rem !important;
-                white-space: nowrap;
-                font-weight: 700;
+                font-size: 0.8125rem !important;
+                padding: 0.875rem 0.75rem !important;
+                white-space: nowrap !important;
+                font-weight: 700 !important;
+                min-width: 100px !important;
             }
             
             table td {
                 font-size: 0.875rem !important;
-                padding: 0.75rem 0.5rem !important;
+                padding: 0.875rem 0.75rem !important;
+                white-space: nowrap !important;
+                min-width: 100px !important;
             }
             
             table input {
@@ -1058,11 +1315,348 @@
                 padding: 0.5rem 0.75rem !important;
             }
             
-            /* Chart containers */
+            /* Chart containers - fit screen size like other cards */
             .chart-container {
-                padding: 1.25rem !important;
-                height: 250px;
+                padding: 0.75rem !important;
+                height: auto !important;
+                min-height: 200px !important;
+                max-height: 240px !important;
                 border-radius: 0.75rem;
+                overflow: hidden !important;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 1rem !important;
+                width: 100% !important;
+                max-width: calc(100vw - 1rem) !important;
+                box-sizing: border-box !important;
+            }
+            
+            .chart-title {
+                flex-shrink: 0;
+                margin-bottom: 0.5rem !important;
+                font-size: 1.25rem !important;
+                font-weight: 900 !important;
+                letter-spacing: -0.02em !important;
+            }
+            
+            .simple-bar-chart,
+            .simple-line-chart {
+                flex: 1;
+                min-height: 150px !important;
+                max-height: 180px !important;
+                height: auto !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0.5rem 0.25rem !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Ensure chart content scrolls properly */
+            .simple-bar-chart *,
+            .simple-line-chart * {
+                max-width: none !important;
+            }
+            
+            .line-chart-svg-container {
+                min-width: 600px !important;
+                max-width: none !important;
+                overflow: visible !important;
+            }
+            
+            .bar-container {
+                min-width: 35px !important;
+            }
+            
+            .line-chart-svg-container {
+                min-width: 600px !important;
+                max-width: none !important;
+                width: auto;
+            }
+            
+            .simple-line-chart {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch;
+                width: 100% !important;
+            }
+            
+            .top-products-list,
+            #recent-activity,
+            #stock-status {
+                flex: 1 !important;
+                min-height: 0 !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+                padding: 0.5rem 0.75rem 0.5rem 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Fix inventory page mobile sizing - adapt to screen */
+            #page-stock {
+                padding: 1rem 0.75rem !important;
+                max-width: 100vw;
+                overflow-x: hidden;
+                box-sizing: border-box;
+            }
+            
+            #page-stock > div:first-child {
+                padding: 1.25rem !important;
+                margin-bottom: 1.5rem;
+                border-radius: 1rem !important;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            
+            #page-stock form {
+                grid-template-columns: 1fr !important;
+                gap: 0.75rem !important;
+                width: 100%;
+            }
+            
+            #page-stock form input,
+            #page-stock form button {
+                width: 100%;
+                padding: 0.875rem !important;
+                font-size: 0.875rem !important;
+                box-sizing: border-box;
+            }
+            
+            #page-stock > div:last-child {
+                border-radius: 1rem !important;
+                overflow: hidden;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            #page-stock .mobile-table-container {
+                width: 100% !important;
+                max-width: 100vw !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-stock table {
+                width: max-content !important;
+                min-width: 100% !important;
+                table-layout: auto !important;
+            }
+            
+            #page-stock table th {
+                padding: 0.875rem 0.75rem !important;
+                font-size: 0.8125rem !important;
+                white-space: nowrap !important;
+                min-width: 80px !important;
+            }
+            
+            #page-stock table td {
+                padding: 0.875rem 0.75rem !important;
+                font-size: 0.875rem !important;
+                white-space: nowrap !important;
+                min-width: 80px !important;
+            }
+            
+            /* Edit mode specific mobile fixes */
+            #page-stock table tr.editing-row td.edit-cell {
+                padding: 0.75rem 0.5rem !important;
+                max-width: 30vw !important;
+                min-width: 100px !important;
+            }
+            
+            #page-stock table tr.editing-row td.edit-cell input {
+                padding: 0.625rem 0.75rem !important;
+                font-size: 0.875rem !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                min-width: 0 !important;
+                max-width: 100% !important;
+            }
+            
+            #page-stock table tr.editing-row td.edit-cell-buttons {
+                padding: 0.75rem 0.5rem !important;
+                min-width: 160px !important;
+                max-width: 200px !important;
+            }
+            
+            #page-stock table tr.editing-row td.edit-cell-buttons .flex {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+                justify-content: flex-start !important;
+                width: 100% !important;
+            }
+            
+            #page-stock table tr.editing-row td.edit-cell-buttons .flex button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+                flex: 1 1 calc(50% - 0.25rem) !important;
+                min-width: 70px !important;
+                max-width: 100% !important;
+            }
+            
+            #page-stock table button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+            
+            /* Fix history page mobile sizing - adapt to screen */
+            #page-allOrders {
+                padding: 0.75rem 0.5rem !important;
+                max-width: 100vw;
+                overflow-x: hidden;
+                box-sizing: border-box;
+            }
+            
+            #page-allOrders > div:first-child {
+                margin-bottom: 1.5rem;
+                padding: 0 0.5rem !important;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* h2 and h3 styles are now handled globally above */
+            
+            #page-allOrders .autocomplete-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-allOrders .autocomplete-container input {
+                padding: 0.875rem !important;
+                font-size: 0.875rem !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-allOrders .mobile-table-container {
+                border-radius: 1rem !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Remove nested overflow containers on history page */
+            #page-allOrders .mobile-table-container > div {
+                overflow: visible !important;
+            }
+            
+            #page-allOrders #active-orders-list,
+            #page-allOrders #completed-orders-list {
+                overflow: visible !important;
+            }
+            
+            /* Fix products table overflow on mobile */
+            #page-addOrder .mobile-table-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                -webkit-overflow-scrolling: touch !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-addOrder #products-table {
+                width: max-content !important;
+                min-width: 100% !important;
+                table-layout: auto !important;
+            }
+            
+            #page-addOrder #products-table th,
+            #page-addOrder #products-table td {
+                padding: 0.875rem 0.75rem !important;
+                white-space: nowrap !important;
+                min-width: 80px !important;
+            }
+            
+            /* Fix input containers on bill page to prevent scrollbars */
+            #page-addOrder {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow-x: hidden !important;
+            }
+            
+            #page-addOrder > div {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-addOrder form,
+            #page-addOrder .grid,
+            #page-addOrder .space-y-2,
+            #page-addOrder .space-y-8 {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-addOrder input[type="text"],
+            #page-addOrder input[type="number"] {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-allOrders {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+                overflow-x: hidden !important;
+            }
+            
+            #page-allOrders > div:first-child {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            
+            #page-allOrders table {
+                width: max-content !important;
+                min-width: 100% !important;
+                table-layout: auto !important;
+            }
+            
+            #page-allOrders table th {
+                padding: 0.875rem 0.75rem !important;
+                font-size: 0.8125rem !important;
+                white-space: nowrap !important;
+                min-width: 100px !important;
+            }
+            
+            #page-allOrders table td {
+                padding: 0.875rem 0.75rem !important;
+                font-size: 0.875rem !important;
+                white-space: nowrap !important;
+                min-width: 100px !important;
+            }
+            
+            #page-allOrders .status-badge {
+                font-size: 0.625rem !important;
+                padding: 0.25rem 0.5rem !important;
+                white-space: nowrap;
+            }
+            
+            #page-allOrders table button {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
             }
             
             /* Card padding */
@@ -1120,10 +1714,22 @@
             
             .activity-title {
                 font-size: 0.875rem !important;
+                font-weight: 700 !important;
             }
             
             .activity-time {
                 font-size: 0.75rem !important;
+                font-weight: 500 !important;
+            }
+            
+            .activity-amount {
+                font-size: 0.875rem !important;
+                font-weight: 700 !important;
+            }
+            
+            .product-sales {
+                font-size: 0.875rem !important;
+                font-weight: 700 !important;
             }
             
             /* Top products list */
@@ -1222,7 +1828,17 @@
             
             /* Make line chart scrollable on mobile */
             .line-chart-svg-container {
-                min-width: 600px;
+                min-width: 600px !important;
+                max-width: none !important;
+            }
+            
+            /* Ensure charts fit within containers */
+            .simple-bar-chart .bar-container {
+                min-width: 30px !important;
+            }
+            
+            .simple-bar-chart .bar {
+                width: 20px !important;
             }
             
             /* Button adjustments */
@@ -1232,33 +1848,131 @@
             }
             
             /* Autocomplete positioning */
+            .autocomplete-container {
+                position: relative !important;
+            }
+            
             .autocomplete-items {
-                z-index: 10001 !important;
+                z-index: 99999 !important;
+            }
+            
+            /* Ensure charts are scrollable on mobile */
+            .chart-container {
+                overflow: visible !important;
+            }
+            
+            .simple-bar-chart,
+            .simple-line-chart {
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+            }
+            
+            /* Force autocomplete to top on mobile */
+            .autocomplete-container {
+                position: relative !important;
+                z-index: 100000 !important;
+            }
+            
+            .autocomplete-items {
+                position: fixed !important;
+                z-index: 999999 !important;
+                isolation: isolate !important;
+            }
+            
+            /* Ensure parent containers don't clip autocomplete */
+            #products-table,
+            #bill-items-container,
+            .mobile-table-container {
+                overflow: visible !important;
             }
         }
         
-        /* Desktop specific */
+        /* Desktop specific - use mobile values for cohesion */
         @media (min-width: 641px) {
-            /* Consistent spacing */
+            /* Consistent spacing - match mobile */
             .page-content {
-                padding: 2rem 0;
+                padding: 1rem;
+                max-width: 100%;
+                box-sizing: border-box;
             }
             
-            h2 {
-                font-size: 2.25rem;
-                margin-bottom: 2rem;
-                font-weight: 800;
+            /* Dashboard grid spacing */
+            .grid {
+                gap: 1.5rem;
             }
             
-            h3 {
-                font-size: 1.5rem;
+            .dashboard-grid {
+                gap: 1.5rem;
+            }
+            
+            /* Page titles - consistent sizing across ALL pages */
+            h2,
+            #page-stock h2,
+            #page-allOrders h2,
+            #page-addOrder h2,
+            #page-notes h2,
+            #page-settings h2,
+            .page-content h2 {
+                font-size: 2.5rem;
+                line-height: 1.2;
                 margin-bottom: 1.5rem;
-                font-weight: 700;
+                font-weight: 900;
+                letter-spacing: -0.03em;
+                color: var(--text-primary);
+            }
+            
+            h3,
+            #page-allOrders h3,
+            #page-addOrder h3,
+            #page-notes h3,
+            #page-settings h3,
+            .page-content h3 {
+                font-size: 1.875rem;
+                line-height: 1.3;
+                margin-bottom: 1rem;
+                font-weight: 900;
+                letter-spacing: -0.02em;
+                color: var(--text-primary);
+            }
+            
+            /* Chart titles - consistent across all charts */
+            .chart-title {
+                font-size: 1.5rem;
+                font-weight: 900;
+                letter-spacing: -0.02em;
+                margin-bottom: 0.75rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+                font-weight: 900;
+                letter-spacing: -0.02em;
+            }
+            
+            .top-products-list,
+            #recent-activity,
+            #stock-status {
+                flex: 1;
+                min-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            
+            /* Desktop chart container fixes */
+            .chart-container {
+                overflow: hidden;
+            }
+            
+            .simple-bar-chart,
+            .simple-line-chart {
+                width: 100%;
             }
             
             .chart-title {
-                font-size: 1.25rem;
-                margin-bottom: 1.5rem;
+                font-size: 1.5rem;
+                margin-bottom: 0.75rem;
+                font-weight: 900;
+                letter-spacing: -0.02em;
             }
             
             /* Button alignment fix */
@@ -1396,7 +2110,7 @@
                 </div>
             </div>
 
-            <div class="dashboard-grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="dashboard-grid grid-cols-1 md:grid-cols-4 gap-4 lg:gap-6">
                 <div class="stat-card revenue">
                     <div class="stat-label">Net Revenue</div>
                     <div class="stat-value" id="total-revenue">₹0</div>
@@ -1431,7 +2145,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
                 <div class="chart-container">
                     <div class="chart-title">Revenue Trend</div>
                     <div class="simple-bar-chart" id="revenue-chart"></div>
@@ -1442,7 +2156,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
                 <div class="chart-container">
                     <div class="chart-title">Top Selling Products</div>
                     <ul class="top-products-list" id="top-products"></ul>
@@ -1467,13 +2181,19 @@
 
                 <form id="add-order-form" class="space-y-8">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
+                        <div class="space-y-2 flex flex-col">
                             <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Customer Name</label>
-                            <input type="text" id="buyerName" placeholder="Enter Name" class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
+                            <input type="text" id="buyerName" placeholder="Enter Name" class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all flex-1" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); min-height: 4.5rem;" required>
                         </div>
-                        <div class="stock-deduction-container">
-                            <input type="checkbox" id="deduct-from-stock" class="h-4 w-4 text-black rounded focus:ring-black" checked>
-                            <label for="deduct-from-stock" class="text-sm font-medium" style="color: var(--text-secondary);">Deduct items from stock when saving bill</label>
+                        <div class="space-y-2 flex flex-col">
+                            <label class="text-[10px] font-black uppercase" style="color: var(--text-tertiary);">Stock Deduction</label>
+                            <div class="stock-deduction-container active" id="stock-deduction-toggle-container">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="deduct-from-stock" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <label for="deduct-from-stock" class="stock-deduction-label">Deduct items from stock when saving bill</label>
+                            </div>
                         </div>
                     </div>
 
@@ -1516,12 +2236,12 @@
         <!-- Inventory Section -->
         <div id="page-stock" class="page-content space-y-8">
             <div class="p-8 lg:p-12 rounded-[2rem] shadow-sm transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
-                <h2 class="text-2xl font-black mb-8">Stock Intake</h2>
+                <h2>Stock Intake</h2>
                 <form id="stock-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
-                    <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" required>
-                    <input type="number" id="stockProductQuantity" placeholder="Initial Stock (Optional)" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
-                    <button type="submit" class="primary-button p-5 rounded-2xl tracking-tight">Register Item</button>
+                    <input type="text" id="stockProductName" placeholder="Item Name / Code" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); min-height: 4.5rem;" required>
+                    <input type="number" id="stockProductPrice" placeholder="Unit Price" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); min-height: 4.5rem;" required>
+                    <input type="number" id="stockProductQuantity" placeholder="Initial Stock (Optional)" class="p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); min-height: 4.5rem;">
+                    <button type="submit" class="primary-button p-5 rounded-2xl tracking-tight" style="min-height: 4.5rem;">Register Item</button>
                 </form>
             </div>
 
@@ -1546,7 +2266,6 @@
         <div id="page-notes" class="page-content space-y-8">
             <div class="flex justify-between items-center">
                 <h2>Business Notes</h2>
-                <button onclick="createNewNote()" class="primary-button px-8 py-4 text-sm">+ New Note</button>
             </div>
             
             <div class="p-8 lg:p-12 rounded-[2rem] shadow-sm mb-8 transition-colors" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
@@ -1564,18 +2283,20 @@
         <div id="page-allOrders" class="page-content space-y-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <h2>Order Archive</h2>
-                <input type="text" id="order-search-input" oninput="renderAllOrders()" placeholder="Search client or ID..." class="w-full md:w-80 p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);">
+                <div class="autocomplete-container w-full md:w-80">
+                    <input type="text" id="order-search-input" oninput="handleOrderSearchInput(event)" placeholder="Search client or ID..." class="w-full p-5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition-all autocomplete-input" style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color); min-height: 4.5rem;">
+                </div>
             </div>
             
             <div class="mb-8">
-                <h3 class="text-2xl font-black mb-6 border-b pb-4">Active Orders</h3>
+                <h3 class="mb-6 border-b pb-4" style="border-color: var(--border-color);">Active Orders</h3>
                 <div id="active-orders-list">
                     <p style="color: var(--text-secondary);">No active orders found. Start by adding a new order!</p>
                 </div>
             </div>
 
             <div class="mt-8">
-                <h3 class="text-2xl font-black mb-6 border-b pb-4">Completed Orders</h3>
+                <h3 class="mb-6 border-b pb-4" style="border-color: var(--border-color);">Completed Orders</h3>
                 <div id="completed-orders-list">
                     <p style="color: var(--text-secondary);">No completed orders yet.</p>
                 </div>
@@ -1941,6 +2662,10 @@
                 .filter(item => item.name.toLowerCase().includes(value.toLowerCase()))
                 .slice(0, 10);
             
+            // Always show at least 3 empty options if we have matches
+            const minItems = 3;
+            const emptyItems = Math.max(0, minItems - matches.length);
+            
             if (matches.length === 0) return;
             
             // Use DocumentFragment for better performance
@@ -1983,13 +2708,82 @@
                 fragment.appendChild(suggestionDiv);
             });
             
+            // Add empty options to ensure minimum 3 items are shown
+            for (let i = 0; i < emptyItems; i++) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.style.padding = '10px';
+                emptyDiv.style.minHeight = '40px';
+                emptyDiv.style.opacity = '0.3';
+                emptyDiv.style.pointerEvents = 'none';
+                fragment.appendChild(emptyDiv);
+            }
+            
             autocompleteList.appendChild(fragment);
-            container.appendChild(autocompleteList);
+            
+            // Position the autocomplete dropdown using fixed positioning but visually connected
+            const updatePosition = () => {
+                const rect = input.getBoundingClientRect();
+                // Fixed positioning uses viewport coordinates, so no need for scroll offsets
+                autocompleteList.style.top = `${rect.bottom}px`;
+                autocompleteList.style.left = `${rect.left}px`;
+                autocompleteList.style.width = `${rect.width}px`;
+            };
+            
+            // Initial positioning
+            updatePosition();
+            autocompleteList.style.position = 'fixed';
+            autocompleteList.style.zIndex = '999999';
+            autocompleteList.style.borderTop = 'none';
+            autocompleteList.style.marginTop = '-1px';
+            autocompleteList.style.borderRadius = '0 0 0.5rem 0.5rem';
+            
+            // Append to body to avoid stacking context issues
+            document.body.appendChild(autocompleteList);
+            
+            // Use requestAnimationFrame for smooth updates during scroll
+            let rafId = null;
+            const smoothUpdatePosition = () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updatePosition);
+            };
+            
+            // Listen to all scroll events (window, document, and all scrollable parents)
+            window.addEventListener('scroll', smoothUpdatePosition, true);
+            window.addEventListener('resize', smoothUpdatePosition);
+            document.addEventListener('scroll', smoothUpdatePosition, true);
+            
+            // Also listen to scroll on all parent elements
+            let parent = input.parentElement;
+            while (parent && parent !== document.body) {
+                parent.addEventListener('scroll', smoothUpdatePosition, true);
+                parent = parent.parentElement;
+            }
+            
+            // Store cleanup function
+            autocompleteList._cleanup = () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                window.removeEventListener('scroll', smoothUpdatePosition, true);
+                window.removeEventListener('resize', smoothUpdatePosition);
+                document.removeEventListener('scroll', smoothUpdatePosition, true);
+                
+                // Clean up parent listeners
+                let parent = input.parentElement;
+                while (parent && parent !== document.body) {
+                    parent.removeEventListener('scroll', smoothUpdatePosition, true);
+                    parent = parent.parentElement;
+                }
+            };
         }
         
         function closeAllLists() {
             const lists = document.getElementsByClassName('autocomplete-items');
-            Array.from(lists).forEach(list => list.remove());
+            Array.from(lists).forEach(list => {
+                // Clean up event listeners if they exist
+                if (list._cleanup) {
+                    list._cleanup();
+                }
+                list.remove();
+            });
             activeAutocompleteInput = null;
         }
 
@@ -2289,12 +3083,6 @@
             svgContainer.className = 'line-chart-svg-container';
             
             const svgNS = "http://www.w3.org/2000/svg";
-            const svg = document.createElementNS(svgNS, "svg");
-            svg.setAttribute("width", "100%");
-            svg.setAttribute("height", "100%");
-            svg.setAttribute("viewBox", "0 0 800 200");
-            svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-            
             let dataPoints = [];
             const now = new Date();
             
@@ -2376,20 +3164,41 @@
             const counts = dataPoints.map(dp => dp.count);
             const maxCount = Math.max(...counts.filter(c => c > 0), 1);
             
+            // Calculate SVG width based on number of data points
+            // Minimum 800px, but scale up for more data points (at least 50px per point)
+            const minWidth = 800;
+            const widthPerPoint = 50;
+            const calculatedWidth = Math.max(minWidth, dataPoints.length * widthPerPoint);
+            const svgWidth = calculatedWidth;
+            const svgHeight = 200;
+            const paddingLeft = 40;
+            const paddingRight = 40;
+            const paddingTop = 40;
+            const paddingBottom = 40;
+            const chartWidth = svgWidth - paddingLeft - paddingRight;
+            const chartHeight = svgHeight - paddingTop - paddingBottom;
+            
+            // Create SVG with calculated dimensions
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "100%");
+            svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
+            svg.setAttribute("preserveAspectRatio", "xMinYMid meet");
+            
             // Draw grid lines (skip the 0th line)
             for (let i = 1; i <= 4; i++) {
-                const y = 40 + ((i - 1) * 40);
+                const y = paddingTop + ((i - 1) * (chartHeight / 4));
                 const line = document.createElementNS(svgNS, "line");
-                line.setAttribute("x1", "40");
-                line.setAttribute("y1", y);
-                line.setAttribute("x2", "760");
-                line.setAttribute("y2", y);
+                line.setAttribute("x1", paddingLeft.toString());
+                line.setAttribute("y1", y.toString());
+                line.setAttribute("x2", (svgWidth - paddingRight).toString());
+                line.setAttribute("y2", y.toString());
                 line.setAttribute("class", "chart-grid-line");
                 svg.appendChild(line);
                 
                 const text = document.createElementNS(svgNS, "text");
-                text.setAttribute("x", "30");
-                text.setAttribute("y", y + 4);
+                text.setAttribute("x", (paddingLeft - 10).toString());
+                text.setAttribute("y", (y + 4).toString());
                 text.setAttribute("text-anchor", "end");
                 text.setAttribute("font-size", "10");
                 text.setAttribute("fill", "#6b7280");
@@ -2399,8 +3208,8 @@
             
             // Create points for the line
             const points = dataPoints.map((dp, i) => {
-                const x = 40 + (i * (720 / (dataPoints.length - 1 || 1)));
-                const y = dp.count > 0 ? (200 - 40 - (dp.count / maxCount * 160)) : 200 - 40;
+                const x = paddingLeft + (i * (chartWidth / (dataPoints.length - 1 || 1)));
+                const y = dp.count > 0 ? (svgHeight - paddingBottom - (dp.count / maxCount * chartHeight)) : svgHeight - paddingBottom;
                 return `${x},${y}`;
             }).join(' ');
             
@@ -2412,7 +3221,7 @@
             svg.appendChild(polyline);
             
             // Draw the area under the line
-            const areaPoints = `${points} 760,200 40,200`;
+            const areaPoints = `${points} ${svgWidth - paddingRight},${svgHeight - paddingBottom} ${paddingLeft},${svgHeight - paddingBottom}`;
             const polygon = document.createElementNS(svgNS, "polygon");
             polygon.setAttribute("points", areaPoints);
             polygon.setAttribute("class", "area-path");
@@ -2420,14 +3229,14 @@
             
             // Draw points and labels
             dataPoints.forEach((dp, i) => {
-                const x = 40 + (i * (720 / (dataPoints.length - 1 || 1)));
-                const y = dp.count > 0 ? (200 - 40 - (dp.count / maxCount * 160)) : 200 - 40;
+                const x = paddingLeft + (i * (chartWidth / (dataPoints.length - 1 || 1)));
+                const y = dp.count > 0 ? (svgHeight - paddingBottom - (dp.count / maxCount * chartHeight)) : svgHeight - paddingBottom;
                 
                 // Draw circle at data point only if count > 0
                 if (dp.count > 0) {
                     const circle = document.createElementNS(svgNS, "circle");
-                    circle.setAttribute("cx", x);
-                    circle.setAttribute("cy", y);
+                    circle.setAttribute("cx", x.toString());
+                    circle.setAttribute("cy", y.toString());
                     circle.setAttribute("r", "4");
                     circle.setAttribute("fill", "#3b82f6");
                     svg.appendChild(circle);
@@ -2435,8 +3244,8 @@
                 
                 // Draw label
                 const text = document.createElementNS(svgNS, "text");
-                text.setAttribute("x", x);
-                text.setAttribute("y", "195");
+                text.setAttribute("x", x.toString());
+                text.setAttribute("y", (svgHeight - paddingBottom + 15).toString());
                 text.setAttribute("text-anchor", "middle");
                 text.setAttribute("font-size", "10");
                 text.setAttribute("fill", "#6b7280");
@@ -2446,6 +3255,17 @@
             
             svgContainer.appendChild(svg);
             chartContainer.appendChild(svgContainer);
+            
+            // Update container min-width based on calculated width for mobile scrolling
+            // Ensure it doesn't overflow on mobile - cap at reasonable width
+            if (window.innerWidth <= 640) {
+                // For mobile, cap at 1000px max to prevent extreme overflow, but allow scrolling
+                const mobileWidth = Math.min(calculatedWidth, 1000);
+                svgContainer.style.minWidth = `${Math.max(600, mobileWidth)}px`;
+                svgContainer.style.maxWidth = 'none';
+            } else {
+                svgContainer.style.minWidth = `${calculatedWidth}px`;
+            }
         }
 
         function renderTopProducts(orders) {
@@ -2472,7 +3292,7 @@
                     ...data
                 }))
                 .sort((a, b) => b.revenue - a.revenue)
-                .slice(0, 5);
+                .slice(0, 6);
             
             const maxRevenue = topProducts.length > 0 ? Math.max(...topProducts.map(p => p.revenue)) : 1;
             
@@ -2510,7 +3330,7 @@
             
             const recentOrders = [...orders]
                 .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
-                .slice(0, 5);
+                .slice(0, 6);
             
             recentOrders.forEach(order => {
                 const activityItem = document.createElement('div');
@@ -2544,7 +3364,7 @@
             const lowStockItems = stock
                 .filter(item => item.quantity !== null && item.quantity !== undefined && item.quantity <= 10)
                 .sort((a, b) => a.quantity - b.quantity)
-                .slice(0, 5);
+                .slice(0, 6);
             
             lowStockItems.forEach(item => {
                 const stockItem = document.createElement('div');
@@ -2636,6 +3456,33 @@
             });
             
             attachProductInputListeners();
+            
+            // Setup stock deduction toggle
+            setupStockDeductionToggle();
+        }
+        
+        function setupStockDeductionToggle() {
+            const checkbox = document.getElementById('deduct-from-stock');
+            const container = document.getElementById('stock-deduction-toggle-container');
+            
+            if (checkbox && container) {
+                // Update container state based on checkbox
+                const updateToggleState = () => {
+                    if (checkbox.checked) {
+                        container.classList.add('active');
+                        container.classList.remove('not-active');
+                    } else {
+                        container.classList.remove('active');
+                        container.classList.add('not-active');
+                    }
+                };
+                
+                // Initial state
+                updateToggleState();
+                
+                // Listen for changes
+                checkbox.addEventListener('change', updateToggleState);
+            }
         }
 
         function addItemRow() {
@@ -2913,23 +3760,24 @@
                     row.dataset.stockId = item.id;
                     
                     if (item.isEditing) {
+                        row.className += ' editing-row';
                         row.innerHTML = `
-                            <td class="p-8">
+                            <td class="p-8 edit-cell">
                                 <input type="text" data-field="name" value="${item.name}"
                                     class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
                                     style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                             </td>
-                            <td class="p-8">
+                            <td class="p-8 edit-cell">
                                 <input type="number" data-field="price" value="${item.price}" step="0.01" min="0"
                                     class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
                                     style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" />
                             </td>
-                            <td class="p-8">
+                            <td class="p-8 edit-cell">
                                 <input type="number" data-field="quantity" value="${item.quantity !== null && item.quantity !== undefined ? item.quantity : ''}" step="1" min="0"
                                     class="block w-full px-4 py-3 rounded-2xl outline-none focus:ring-2 focus:ring-black transition-all"
                                     style="background-color: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-color);" placeholder="Optional" />
                             </td>
-                            <td class="p-8 text-right">
+                            <td class="p-8 text-right edit-cell-buttons">
                                 <div class="flex gap-2 justify-end">
                                     <button onclick="saveEditedStockItem('${item.id}')" class="primary-button px-6 py-3 text-sm">Save</button>
                                     <button onclick="cancelEditStockItem('${item.id}')" class="secondary-button px-6 py-3 text-sm">Cancel</button>
@@ -3220,6 +4068,126 @@
         }
 
         // --- All Orders Page Logic ---
+        function handleOrderSearchInput(event) {
+            const input = event.target;
+            const value = input.value;
+            
+            // Show autocomplete for client names
+            if (value.length > 0) {
+                showClientAutocomplete(input, value);
+            } else {
+                closeAllLists();
+            }
+            
+            // Also update the orders list
+            renderAllOrders();
+        }
+        
+        function showClientAutocomplete(input, value) {
+            closeAllLists();
+            if (!value) return;
+            
+            const container = input.closest('.autocomplete-container') || document.createElement('div');
+            if (!input.parentNode.classList.contains('autocomplete-container')) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'autocomplete-container';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+            }
+            
+            const autocompleteList = document.createElement('div');
+            autocompleteList.className = 'autocomplete-items';
+            
+            activeAutocompleteInput = input;
+            
+            // Get unique client names from all orders
+            const allOrdersCombined = [...orders, ...completedOrders];
+            const clientNames = [...new Set(allOrdersCombined.map(order => order.buyerName))];
+            
+            const matches = clientNames
+                .filter(name => name.toLowerCase().includes(value.toLowerCase()))
+                .slice(0, 10);
+            
+            if (matches.length === 0) return;
+            
+            const fragment = document.createDocumentFragment();
+            
+            matches.forEach(clientName => {
+                const suggestionDiv = document.createElement('div');
+                const matchStart = clientName.toLowerCase().indexOf(value.toLowerCase());
+                const matchEnd = matchStart + value.length;
+                
+                suggestionDiv.innerHTML = 
+                    clientName.substr(0, matchStart) +
+                    `<strong>${clientName.substr(matchStart, value.length)}</strong>` +
+                    clientName.substr(matchEnd);
+                
+                suggestionDiv.addEventListener('click', () => {
+                    input.value = clientName;
+                    closeAllLists();
+                    renderAllOrders();
+                });
+                
+                fragment.appendChild(suggestionDiv);
+            });
+            
+            autocompleteList.appendChild(fragment);
+            
+            // Position the autocomplete dropdown using fixed positioning but visually connected
+            const updatePosition = () => {
+                const rect = input.getBoundingClientRect();
+                // Fixed positioning uses viewport coordinates, so no need for scroll offsets
+                autocompleteList.style.top = `${rect.bottom}px`;
+                autocompleteList.style.left = `${rect.left}px`;
+                autocompleteList.style.width = `${rect.width}px`;
+            };
+            
+            // Initial positioning
+            updatePosition();
+            autocompleteList.style.position = 'fixed';
+            autocompleteList.style.zIndex = '999999';
+            autocompleteList.style.borderTop = 'none';
+            autocompleteList.style.marginTop = '-1px';
+            autocompleteList.style.borderRadius = '0 0 0.5rem 0.5rem';
+            
+            // Append to body to avoid stacking context issues
+            document.body.appendChild(autocompleteList);
+            
+            // Use requestAnimationFrame for smooth updates during scroll
+            let rafId = null;
+            const smoothUpdatePosition = () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updatePosition);
+            };
+            
+            // Listen to all scroll events (window, document, and all scrollable parents)
+            window.addEventListener('scroll', smoothUpdatePosition, true);
+            window.addEventListener('resize', smoothUpdatePosition);
+            document.addEventListener('scroll', smoothUpdatePosition, true);
+            
+            // Also listen to scroll on all parent elements
+            let parent = input.parentElement;
+            while (parent && parent !== document.body) {
+                parent.addEventListener('scroll', smoothUpdatePosition, true);
+                parent = parent.parentElement;
+            }
+            
+            // Store cleanup function
+            autocompleteList._cleanup = () => {
+                if (rafId) cancelAnimationFrame(rafId);
+                window.removeEventListener('scroll', smoothUpdatePosition, true);
+                window.removeEventListener('resize', smoothUpdatePosition);
+                document.removeEventListener('scroll', smoothUpdatePosition, true);
+                
+                // Clean up parent listeners
+                let parent = input.parentElement;
+                while (parent && parent !== document.body) {
+                    parent.removeEventListener('scroll', smoothUpdatePosition, true);
+                    parent = parent.parentElement;
+                }
+            };
+        }
+        
         function renderAllOrders() {
             const activeOrdersList = document.getElementById('active-orders-list');
             const completedOrdersList = document.getElementById('completed-orders-list');
@@ -3246,7 +4214,7 @@
                 activeOrdersList.innerHTML = '<p class="text-gray-600">No active orders found. Start by adding a new order!</p>';
             } else {
                 activeOrdersList.innerHTML = `
-                    <div class="overflow-x-auto rounded-[1.5rem] shadow-md mobile-table-container">
+                    <div class="rounded-[1.5rem] shadow-md mobile-table-container">
                         <table class="min-w-full" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 1rem;">
                             <thead style="background-color: var(--bg-tertiary);">
                                 <tr>
@@ -3272,7 +4240,7 @@
                 clearCompletedOrdersBtn.classList.add('hidden');
             } else {
                 completedOrdersList.innerHTML = `
-                    <div class="overflow-x-auto rounded-[1.5rem] shadow-md mobile-table-container">
+                    <div class="rounded-[1.5rem] shadow-md mobile-table-container">
                         <table class="min-w-full" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 1rem;">
                             <thead style="background-color: var(--bg-tertiary);">
                                 <tr>
@@ -4203,8 +5171,27 @@
         document.getElementById('nav-allOrders').addEventListener('click', () => renderPage('allOrders'));
         document.getElementById('nav-settings').addEventListener('click', () => renderPage('settings'));
 
-        // Search functionality
-        document.getElementById('order-search-input').addEventListener('input', renderAllOrders);
+        // Search functionality - handled by handleOrderSearchInput
+        // Add blur handler for order search input
+        const orderSearchInput = document.getElementById('order-search-input');
+        if (orderSearchInput) {
+            orderSearchInput.addEventListener('blur', (e) => {
+                // Small delay to allow click event on autocomplete items
+                setTimeout(() => {
+                    if (activeAutocompleteInput !== e.target) {
+                        closeAllLists();
+                    }
+                }, 200);
+            });
+        }
+        
+        // Close autocomplete when clicking outside search input
+        document.addEventListener('click', (e) => {
+            const searchInput = document.getElementById('order-search-input');
+            if (searchInput && !e.target.closest('.autocomplete-container') && !e.target.classList.contains('autocomplete-input')) {
+                closeAllLists();
+            }
+        });
         
         // Close autocomplete when clicking outside
         document.addEventListener('click', (e) => {
